@@ -1,93 +1,110 @@
-# frontend
+# [Horizon UI Tailwind CSS NextJS ⚡️](https://horizon-ui.com/horizon-tailwind-react-nextjs) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=Check%20Horizon%20UI,%20the%20trendiest%20open-source%20admin%20dashboard%20template%20for%20Tailwind%20CSS,%20React%20JS%20and%20NextJS%20-%20https%3A//horizon-ui.com/)
 
+![version](https://img.shields.io/badge/version-3.0.0-blue.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
+[![GitHub issues open](https://img.shields.io/github/issues/horizon-ui/horizon-tailwind-react-nextjs.svg?maxAge=2592000)](https://github.com/horizon-ui/horizon-tailwind-react-nextjs/issues?q=is%3Aopen+is%3Aissue)
 
+<p>&nbsp;</p>
 
-## Getting started
+[<img alt="Horizon UI Tailwind CSS NextJS" src="https://i.ibb.co/mtLkcYL/horizon-ui-nextjs-free.png" /> ](https://github.com/horizon-ui/horizon-tailwind-react-nextjs)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+<p>&nbsp;</p>
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Get started and build your dream web app with Horizon UI Tailwind CSS NextJS, the trendiest & innovative Open Source Admin Template for Tailwind CSS, React & NextJS!
 
-## Add your files
+---
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+### Introduction
 
+Designed for those who like modern UI elements and beautiful websites. Made of
+hundred of elements, designed blocks, and fully coded pages, Horizon UI is ready
+to help you create stunning websites and web apps.
+
+Save hundreds of hours trying to create and develop a dashboard from scratch.
+The fastest, most responsive & trendiest dashboard is here. Seriously.
+
+With Horizon UI you will find many examples of pages like NFTs Pages,
+Authentication Pages, Profile, and so on. Just choose between a Basic Design or a
+cover and you are good to go!
+
+### 🎉 [NEW] Horizon UI Components
+
+All the main components from both versions. This will help you to see and interact with all & the latest added components of Horizon (also, new components are on the way, stay tuned)! ⚡️
+<a href="https://horizon-ui.com/components/?ref=readme-horizon-tailwind-nextjs" target="_blank">See all components</a>
+
+### Documentation
+
+Each element is well presented in a very complex documentation. You can read
+more about the <a href="https://horizon-ui.com/docs-tailwind/docs/react/installation?ref=readme-horizon-tailwind-nextjs" target="_blank">documentation
+here.</a>
+
+### Quick Start
+
+Install Horizon UI by running either of the following:
+
+- Install NodeJS LTS from [NodeJs Official Page](https://nodejs.org/en/?ref=horizon-documentation)
+  (NOTE: Product only works with LTS version)
+
+- Install Yarn CLI from [Yarn Official Page](https://yarnpkg.com/cli/install?ref=horizon-documentation)
+
+Clone the repository with the following command:
+
+```bash
+git clone https://github.com/horizon-ui/horizon-tailwind-react-nextjs.git
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/easytax1/frontend.git
-git branch -M main
-git push -uf origin main
+
+Run in terminal this command:
+
+```bash
+yarn install
 ```
 
-## Integrate with your tools
+Then run this command to start your local server
 
-- [ ] [Set up project integrations](https://gitlab.com/easytax1/frontend/-/settings/integrations)
+```bash
+yarn dev
+```
 
-## Collaborate with your team
+### Example Pages
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+If you want to get inspiration or just show something directly to your clients, you can jump start your development with our pre-built example pages. You will be able to quickly set up the basic structure for your web project. View <a href="https://horizon-ui.com/horizon-tailwind-react-nextjs/?ref=readme-horizon-tailwind-nextjs" target="_blank">example pages here.</a>
 
-## Test and Deploy
+### Versions
 
-Use the built-in continuous integration in GitLab.
+| Free Version                                                                                                                                         | PRO Version                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [![Horizon UI Tailwind NextJS](https://i.ibb.co/mtLkcYL/horizon-ui-nextjs-free.png)](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-nextjs) | [![Horizon UI NextJS PRO](https://i.ibb.co/sPSYxGv/horizon-2-0-pro-presentation-image.png)](https://www.horizon-ui.com/pro?ref=readme-horizon-tailwind-nextjs) |
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### Figma Version
 
-***
+Horizon UI is available in Figma format as well! Check it out on Figma
+Community! 🎨
+[See the Horizon UI Figma design files](https://bit.ly/horizon-figma)
 
-# Editing this README
+### Reporting Issues
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+We use GitHub Issues as the official bug tracker for the Horizon UI. Here are
+some advices for our users that want to report an issue:
 
-## Suggestions for a good README
+1. Make sure that you are using the latest version of the Horizon UI Dashbaord.
+   Check the CHANGELOG from your dashboard on our
+   [CHANGE LOG File](https://github.com/horizon-ui/horizon-tailwind-react-nextjs/blob/main/CHANGELOG.md?ref=readme-horizon-tailwind-nextjs).
+2. Providing us reproducible steps for the issue will shorten the time it takes
+   for it to be fixed.
+3. Some issues may be browser specific, so specifying in what browser you
+   encountered the issue might help.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+---
 
-## Name
-Choose a self-explaining name for your project.
+### Community
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Connect with the community! Feel free to ask questions, report issues, and meet
+new people that already use Horizon UI!
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+💬 [Join the #HorizonUI Discord Community!](https://discord.gg/f6tEKFBd4m)
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Copyright and license
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+⭐️ [Copyright 2023 Simmmple ](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-nextjs)
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+📄 [Horizon UI License](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-nextjs)
