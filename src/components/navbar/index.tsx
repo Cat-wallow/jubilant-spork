@@ -6,14 +6,14 @@ import navbarimage from '/public/img/layout/Navbar.png';
 import { BsArrowBarUp } from 'react-icons/bs';
 import { FiSearch } from 'react-icons/fi';
 import { RiMoonFill, RiSunFill } from 'react-icons/ri';
-// import { RiMoonFill, RiSunFill } from 'react-icons/ri';
-// import Configurator from './Configurator';
 import {
   IoMdNotificationsOutline,
   IoMdInformationCircleOutline,
 } from 'react-icons/io';
 import avatar from '/public/img/avatars/avatar4.png';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { logout } from 'services/auth.service';
 
 const Navbar = (props: {
   onOpenSidenav: () => void;
@@ -25,6 +25,20 @@ const Navbar = (props: {
   const [darkmode, setDarkmode] = React.useState(
     document.body.classList.contains('dark'),
   );
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken'); // Also remove refresh token just in case
+      router.push('/auth/sign-in');
+    }
+  };
+
   return (
     <nav className="sticky top-4 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
       <div className="ml-[6px]">
@@ -218,12 +232,12 @@ const Navbar = (props: {
               >
                 Newsletter Settings
               </a>
-              <a
-                href=" "
-                className="mt-3 text-sm font-medium text-red-500 hover:text-red-500"
+              <button
+                onClick={handleLogout}
+                className="mt-3 text-sm font-medium text-red-500 hover:text-red-500 text-left"
               >
                 Log Out
-              </a>
+              </button>
             </div>
           </div>
         </Dropdown>
