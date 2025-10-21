@@ -11,6 +11,8 @@
     "@chakra-ui/tooltip": "^2.2.6",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@hookform/resolvers": "^3.4.2",
+    "@tanstack/react-query": "^5.90.5",
     "@tanstack/react-table": "^8.7.9",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
@@ -20,6 +22,7 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.2",
+    "axios": "^1.12.2",
     "framer-motion": "^7.10.2",
     "lucide-react": "^0.546.0",
     "next": "^15.1.4",
@@ -29,12 +32,14 @@
     "react-calendar": "^3.9.0",
     "react-custom-scrollbars-2": "^4.2.1",
     "react-dom": "^19.0.0-rc.1",
+    "react-hook-form": "^7.51.5",
     "react-icons": "^4.4.0",
     "react-no-ssr": "^1.1.0",
     "react-router-dom": "^6.4.0",
     "tailwindcss-rtl": "^0.9.0",
     "typescript": "^4.9.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zod": "^3.23.8"
   },
   "scripts": {
     "dev": "next dev",

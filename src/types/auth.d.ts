@@ -1,5 +1,18 @@
+export interface ILoginRequest {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
 export interface ILoginResponse {
   success: boolean;
   message: string;
-  data: string; // This will hold the token
+  data: {
+    accessToken: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
 }
