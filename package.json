@@ -11,6 +11,7 @@
     "@chakra-ui/tooltip": "^2.2.6",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@emotion/cache": "^11.10.5",
     "@hookform/resolvers": "^3.4.2",
     "@tanstack/react-query": "^5.90.5",
     "@tanstack/react-table": "^8.7.9",
@@ -37,9 +38,9 @@
     "react-no-ssr": "^1.1.0",
     "react-router-dom": "^6.4.0",
     "tailwindcss-rtl": "^0.9.0",
-    "typescript": "^4.9.4",
+    "typescript": "^5.9.3",
     "web-vitals": "^2.1.4",
-    "zod": "^3.23.8"
+    "zod": "^4.1.12"
   },
   "scripts": {
     "dev": "next dev",
@@ -48,12 +49,7 @@
     "export": "next export",
     "lint": "next lint"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
+
   "browserslist": {
     "production": [
       ">0.2%",

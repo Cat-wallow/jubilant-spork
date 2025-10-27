@@ -28,7 +28,11 @@ export default function Index() {
   const keepLoggedIn = watch('keepLoggedIn');
 
   const handleLogin = (data: LoginFormInputs) => {
-    loginMutation.mutate(data);
+    loginMutation.mutate({
+      email: data.email,
+      password: data.password,
+      rememberMe: data.keepLoggedIn,
+    });
   };
 
   return (
