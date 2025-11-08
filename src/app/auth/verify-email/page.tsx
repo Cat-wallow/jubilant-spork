@@ -59,8 +59,9 @@ export default function VerifyEmailPage() {
           {/* Instructions Box */}
           <div className="flex w-full items-center justify-center gap-2.5 rounded-[15px] border border-[#D9D9D9] p-[15px]">
             <p className="flex-1 font-dm text-sm font-normal leading-[150%] tracking-[-0.28px] text-[#8C8C8C]">
-              Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata sandi. Jika tidak
-              menerima email dalam 60 detik, kirim ulang email verifikasi.
+              Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata
+              sandi. Jika tidak menerima email dalam 60 detik, kirim ulang email
+              verifikasi.
             </p>
           </div>
 
@@ -82,7 +83,7 @@ export default function VerifyEmailPage() {
             <button
               onClick={handleResend}
               disabled={countdown > 0}
-              className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#D9D9D9] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-[#8C8C8C] transition-colors disabled:cursor-not-allowed enabled:bg-[#332687] enabled:text-white enabled:hover:bg-[#422AFB]"
+              className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#D9D9D9] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-[#8C8C8C] transition-colors enabled:bg-[#332687] enabled:text-white enabled:hover:bg-[#422AFB] disabled:cursor-not-allowed"
             >
               {countdown > 0 ? `Kirim ulang (${countdown}s)` : 'Kirim ulang'}
             </button>

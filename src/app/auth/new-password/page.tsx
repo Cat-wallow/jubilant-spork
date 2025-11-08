@@ -57,7 +57,10 @@ export default function NewPasswordPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex w-full flex-col items-start gap-[15px]">
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full flex-col items-start gap-[15px]"
+        >
           {/* New Password Field */}
           <div className="relative w-full">
             <label

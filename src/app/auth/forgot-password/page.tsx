@@ -37,12 +37,16 @@ export default function ForgotPasswordPage() {
             Lupa kata sandi?
           </h1>
           <p className="text-center font-dm text-base font-normal leading-[150%] tracking-[-0.32px] text-[#404040]">
-            Masukkan alamat email dan kami akan kirimkan link untuk mereset kata sandi
+            Masukkan alamat email dan kami akan kirimkan link untuk mereset kata
+            sandi
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex w-full flex-col items-start gap-[15px]">
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full flex-col items-start gap-[15px]"
+        >
           {/* Email Field */}
           <div className="relative w-full">
             <label

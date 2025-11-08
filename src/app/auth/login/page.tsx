@@ -34,7 +34,10 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex w-full flex-col items-start gap-[15px]">
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full flex-col items-start gap-[15px]"
+        >
           {/* Email Field */}
           <div className="relative w-full">
             <label
