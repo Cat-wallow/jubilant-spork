@@ -51,7 +51,9 @@ export default function Index() {
 
             {loginMutation.error && (
               <p className="text-sm text-red-500 bg-red-100 p-3 rounded-lg">
-                {loginMutation.error.message}
+                {(loginMutation.error as any)?.response?.data?.message || 
+                 loginMutation.error?.message || 
+                 'Login failed. Please check your credentials and try again.'}
               </p>
             )}
 

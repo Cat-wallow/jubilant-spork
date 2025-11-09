@@ -25,8 +25,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If the error is 401 and it's not a retry request
-    if (error.response.status === 401 && !originalRequest._retry) {
+    // ✅ Check if error.response exists before accessing .status
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
