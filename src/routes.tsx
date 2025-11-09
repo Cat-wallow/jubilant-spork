@@ -9,6 +9,7 @@ import {
   MdBarChart,
   MdPerson,
   MdLock,
+  MdMailOutline,
 } from 'react-icons/md';
 
 const routes = [
@@ -37,6 +38,12 @@ const routes = [
     layout: '/admin',
     path: 'profile',
     icon: <MdPerson className="h-6 w-6" />,
+  },
+  {
+    name: 'Undangan Masuk',
+    layout: '/admin',
+    path: 'invitations',
+    icon: <MdMailOutline className="h-6 w-6" />,
   },
   {
     name: 'Sign In',
