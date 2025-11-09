@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(50);
+  const [countdown, setCountdown] = useState(60);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
 
   const handleResend = () => {
     if (countdown === 0) {
-      setCountdown(50);
+      setCountdown(60);
       // TODO: Implement resend email API call
     }
   };
@@ -28,7 +28,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-white px-4 py-8">
-      <div className="flex w-full max-w-[510px] flex-col items-center justify-center gap-[30px] rounded-[20px] bg-white px-6 py-12 shadow-[0_4px_8.3px_0_rgba(0,0,0,0.25)] sm:px-[50px] sm:py-[50px]">
+      <div className="flex w-full max-w-[450px] flex-col items-center justify-center gap-[20px] rounded-[20px] bg-white px-6 py-12 shadow-[0_4px_8.3px_0_rgba(0,0,0,0.25)] sm:px-[50px] sm:py-[50px]">
         {/* Mail Icon */}
         <svg
           className="h-[72px] w-[72px]"
@@ -46,10 +46,10 @@ export default function VerifyEmailPage() {
 
         {/* Header */}
         <div className="flex flex-col items-center justify-center gap-2">
-          <h1 className="font-dm text-2xl font-normal leading-[56px] tracking-[-0.48px] text-[rgba(30,30,30,1)]">
+          <h1 className="font-dm text-xl font-normal leading-[56px] tracking-[-0.48px] text-[rgba(30,30,30,1)]">
             Periksa email masuk!
           </h1>
-          <p className="text-center font-dm text-base font-normal leading-[150%] tracking-[-0.32px] text-[#404040]">
+          <p className="text-center font-dm text-sm font-normal leading-[150%] tracking-[-0.32px] text-[#404040]">
             Tautan verifikasi telah dikirim
           </p>
         </div>
@@ -58,24 +58,11 @@ export default function VerifyEmailPage() {
         <div className="flex w-full flex-col items-start gap-[15px]">
           {/* Instructions Box */}
           <div className="flex w-full items-center justify-center gap-2.5 rounded-[15px] border border-[#D9D9D9] p-[15px]">
-            <p className="flex-1 font-dm text-sm font-normal leading-[150%] tracking-[-0.28px] text-[#8C8C8C]">
+            <p className="flex-1 font-dm text-sm font-normal leading-[150%]  text-[#8C8C8C]">
               Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata
               sandi. Jika tidak menerima email dalam 60 detik, kirim ulang email
               verifikasi.
             </p>
-          </div>
-
-          {/* Demo Box */}
-          <div className="flex w-full flex-col items-center justify-center gap-2.5 rounded-[15px] border border-[#D9D9D9] bg-[#EFF6FF] p-[15px]">
-            <p className="w-full font-dm text-sm font-bold leading-[150%] tracking-[-0.28px] text-[#8C8C8C]">
-              Demo: simulasi email reset password
-            </p>
-            <button
-              onClick={handleDemoClick}
-              className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl border border-[#D9D9D9] bg-[#F8FAFC] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-[#1578FC] transition-colors hover:bg-[#EFF6FF]"
-            >
-              Klik tautan reset kata sandi (Demo)
-            </button>
           </div>
 
           {/* Resend Button */}
@@ -83,7 +70,7 @@ export default function VerifyEmailPage() {
             <button
               onClick={handleResend}
               disabled={countdown > 0}
-              className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#D9D9D9] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-[#8C8C8C] transition-colors enabled:bg-[#332687] enabled:text-white enabled:hover:bg-[#422AFB] disabled:cursor-not-allowed"
+              className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#D9D9D9] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-[#8C8C8C] transition-colors enabled:bg-[#332687] enabled:text-white enabled:hover:bg-[#2a1f6f] disabled:cursor-not-allowed"
             >
               {countdown > 0 ? `Kirim ulang (${countdown}s)` : 'Kirim ulang'}
             </button>
@@ -92,7 +79,7 @@ export default function VerifyEmailPage() {
 
         {/* Back to Login */}
         <button
-          onClick={() => router.push('/auth/login')}
+          onClick={() => router.push('/auth/sign-in')}
           className="flex items-center gap-1 font-dm text-sm font-semibold leading-[22px] text-[#212B36] transition-colors hover:text-[#332687]"
         >
           <svg

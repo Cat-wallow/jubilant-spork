@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-white px-4 py-8">
-      <div className="flex w-full max-w-[510px] flex-col items-center justify-center gap-[30px] rounded-[20px] bg-white px-6 py-12 shadow-[0_4px_8.3px_0_rgba(0,0,0,0.25)] sm:px-[50px] sm:py-[50px]">
+      <div className="flex w-full max-w-[450px] flex-col items-center justify-center gap-[30px] rounded-[20px] bg-white px-8 py-12 shadow-[0_4px_8.3px_0_rgba(0,0,0,0.25)] sm:px-[50px] sm:py-[50px]">
         {/* Lock Icon */}
         <svg
           className="h-[72px] w-[72px]"
@@ -33,10 +33,10 @@ export default function ForgotPasswordPage() {
 
         {/* Header */}
         <div className="flex flex-col items-center justify-center gap-2">
-          <h1 className="font-dm text-2xl font-bold leading-[56px] tracking-[-0.48px] text-[rgba(30,30,30,1)]">
+          <h1 className="font-dm text-xl font-bold leading-[56px] tracking-[-0.48px] text-[rgba(30,30,30,1)]">
             Lupa kata sandi?
           </h1>
-          <p className="text-center font-dm text-base font-normal leading-[150%] tracking-[-0.32px] text-[#404040]">
+          <p className="text-center font-dm text-sm font-normal leading-[150%] tracking-[-0.32px] text-[#404040]">
             Masukkan alamat email dan kami akan kirimkan link untuk mereset kata
             sandi
           </p>
@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#332687] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-white transition-colors hover:bg-[#422AFB]"
+            className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#332687] px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-white transition-colors  hover:bg-[#2a1f6f]"
           >
             Kirim tautan reset
           </button>
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
 
         {/* Back to Login */}
         <button
-          onClick={() => router.push('/auth/login')}
+          onClick={() => router.push('/auth/sign-in')}
           className="flex items-center gap-1 font-dm text-sm font-semibold leading-[22px] text-[#212B36] transition-colors hover:text-[#332687]"
         >
           <svg
