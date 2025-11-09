@@ -36,10 +36,10 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-hidden max-h-screen">
-      <div className="flex-1 flex flex-col lg:flex-row">
-        <div className="flex-1 flex items-center justify-end flex-col px-6 py-12 lg:px-12">
-          <div className="w-full max-w-[410px] flex flex-col gap-[30px]">
+    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-white">
+      <div className="flex flex-1 flex-col lg:flex-row">
+        <div className="flex flex-1 flex-col items-center justify-end px-6 py-12 lg:px-12">
+          <div className="flex w-full max-w-[410px] flex-col gap-[30px]">
             <div className="space-y-4">
               <h1 className="text-[36px] font-bold leading-[56px] tracking-[-0.72px] text-[#1E1E1E]">
                 Login
@@ -50,10 +50,10 @@ export default function Index() {
             </div>
 
             {loginMutation.error && (
-              <p className="text-sm text-red-500 bg-red-100 p-3 rounded-lg">
-                {(loginMutation.error as any)?.response?.data?.message || 
-                 loginMutation.error?.message || 
-                 'Login failed. Please check your credentials and try again.'}
+              <p className="rounded-lg bg-red-100 p-3 text-sm text-red-500">
+                {(loginMutation.error as any)?.response?.data?.message ||
+                  loginMutation.error?.message ||
+                  'Login failed. Please check your credentials and try again.'}
               </p>
             )}
 
@@ -63,7 +63,7 @@ export default function Index() {
             >
               <div className="space-y-[27px]">
                 <div>
-                  <label className="block text-sm font-medium leading-none tracking-[-0.28px] text-[#1E1E1E] mb-2">
+                  <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-[#1E1E1E]">
                     Email*
                   </label>
                   <div className="relative">
@@ -71,7 +71,7 @@ export default function Index() {
                       type="text"
                       placeholder="Email/Username/Phone Number"
                       {...register('email')}
-                      className={`w-full h-[50px] px-6 border rounded-2xl text-sm focus:outline-none focus:ring-2 ${
+                      className={`h-[50px] w-full rounded-2xl border px-6 text-sm focus:outline-none focus:ring-2 ${
                         errors.email
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-[#E0E5F2] focus:ring-[#332687]'
@@ -79,14 +79,14 @@ export default function Index() {
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-red-500 mt-1">
+                    <p className="mt-1 text-sm text-red-500">
                       {errors.email.message}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium leading-none tracking-[-0.28px] text-[#1E1E1E] mb-2">
+                  <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-[#1E1E1E]">
                     Kata sandi*
                   </label>
                   <div className="relative">
@@ -94,7 +94,7 @@ export default function Index() {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Min. 8 characters"
                       {...register('password')}
-                      className={`w-full h-[50px] px-6 pr-14 border rounded-2xl text-sm focus:outline-none focus:ring-2 ${
+                      className={`h-[50px] w-full rounded-2xl border px-6 pr-14 text-sm focus:outline-none focus:ring-2 ${
                         errors.password
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-[#E0E5F2] focus:ring-[#332687]'
@@ -103,17 +103,17 @@ export default function Index() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A3AED0] hover:text-[#332687] transition-colors"
+                      className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A3AED0] transition-colors hover:text-[#332687]"
                     >
                       {showPassword ? (
-                        <Eye className="w-5 h-5" />
+                        <Eye className="h-5 w-5" />
                       ) : (
-                        <EyeOff className="w-5 h-5" />
+                        <EyeOff className="h-5 w-5" />
                       )}
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-red-500 mt-1">
+                    <p className="mt-1 text-sm text-red-500">
                       {errors.password.message}
                     </p>
                   )}
@@ -121,19 +121,26 @@ export default function Index() {
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-[11px] cursor-pointer">
+                <label className="flex cursor-pointer items-center gap-[11px]">
                   <input
                     type="checkbox"
                     {...register('keepLoggedIn')}
                     className="sr-only"
                   />
                   <div
-                    className={`w-[18px] h-[18px] rounded-sm flex items-center justify-center transition-colors border cursor-pointer ${
-                      keepLoggedIn ? 'bg-[#332687] border-[#332687]' : 'bg-white border-[#E0E5F2]'
+                    className={`flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-sm border transition-colors ${
+                      keepLoggedIn
+                        ? 'border-[#332687] bg-[#332687]'
+                        : 'border-[#E0E5F2] bg-white'
                     }`}
                   >
                     {keepLoggedIn && (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                      >
                         <path
                           d="M6.66662 10.1145L12.7946 3.98584L13.738 4.92851L6.66662 11.9998L2.42395 7.75717L3.36662 6.81451L6.66662 10.1145Z"
                           fill="white"
@@ -147,8 +154,8 @@ export default function Index() {
                 </label>
 
                 <Link
-                  href="/forgot-password"
-                  className="text-sm font-medium leading-5 tracking-[-0.28px] text-[#1E1E1E] hover:text-[#332687] transition-colors"
+                  href="/auth/forgot-password"
+                  className="text-sm font-medium leading-5 tracking-[-0.28px] text-[#1E1E1E] transition-colors hover:text-[#332687]"
                 >
                   Lupa kata sandi?
                 </Link>
@@ -157,26 +164,26 @@ export default function Index() {
               <button
                 type="submit"
                 disabled={loginMutation.isPending}
-                className="w-full h-[54px] bg-[#332687] hover:bg-[#2a1f6f] text-white text-sm font-bold leading-none tracking-[-0.28px] rounded-2xl transition-colors disabled:bg-gray-400"
+                className="h-[54px] w-full rounded-2xl bg-[#332687] text-sm font-bold leading-none tracking-[-0.28px] text-white transition-colors hover:bg-[#2a1f6f] disabled:bg-gray-400"
               >
                 {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
           </div>
-          <footer className="py-20 mt-10 text-center">
+          <footer className="mt-10 py-20 text-center">
             <p className="text-sm font-medium leading-6 tracking-[-0.28px] text-[#332687]">
               © 2025 EasyTax , Made by Surya Microsystems
             </p>
           </footer>
         </div>
 
-        <div className="hidden lg:flex flex-1 bg-cover bg-center bg-no-repeat bg-gradient-to-br from-[#6B5DD3] via-[#8B7AE6] to-[#4A3FA8] items-center justify-center relative overflow-hidden">
+        <div className="relative hidden flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-[#6B5DD3] via-[#8B7AE6] to-[#4A3FA8] bg-cover bg-center bg-no-repeat lg:flex">
           <Image
             width={80}
             height={80}
             src="/img/auth/auth.png"
             alt="Tax illustration"
-            className="relative z-10 w-full h-full"
+            className="relative z-10 h-full w-full"
           />
         </div>
       </div>

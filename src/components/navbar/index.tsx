@@ -14,6 +14,7 @@ import avatar from '/public/img/avatars/avatar4.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { logout } from 'services/auth.service';
+import { useAuth } from 'contexts/AuthContext';
 
 const Navbar = (props: {
   onOpenSidenav: () => void;
@@ -38,6 +39,8 @@ const Navbar = (props: {
       router.push('/auth/sign-in');
     }
   };
+
+  const { user } = useAuth();
 
   return (
     <nav className="sticky top-4 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
@@ -213,7 +216,7 @@ const Navbar = (props: {
             <div className="ml-4 mt-3">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-bold text-navy-700 dark:text-white">
-                  👋 Hey, Adela
+                  {user?.name}
                 </p>{' '}
               </div>
             </div>
@@ -234,7 +237,7 @@ const Navbar = (props: {
               </a>
               <button
                 onClick={handleLogout}
-                className="mt-3 text-sm font-medium text-red-500 hover:text-red-500 text-left"
+                className="mt-3 text-left text-sm font-medium text-red-500 hover:text-red-500"
               >
                 Log Out
               </button>
