@@ -16,7 +16,7 @@ api.interceptors.response.use(
     // 2. The request hasn't been retried yet.
     // 3. The failed request was NOT for the refresh-token endpoint itself.
     if (
-      error.response.status === 401 &&
+      error.response?.status === 401 &&
       !originalRequest._retry &&
       originalRequest.url !== '/auth/refresh-token'
     ) {
