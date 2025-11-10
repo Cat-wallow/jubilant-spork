@@ -5,6 +5,7 @@ import Links from './components/Links';
 import { IRoute } from 'types/navigation';
 import { useAuth } from 'contexts/AuthContext';
 import Image from 'next/image';
+import RoleSwitcher from './components/RoleSwitcher';
 
 function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
@@ -17,10 +18,6 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
       return (names[0][0] + names[1][0]).toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
-  };
-
-  const getUserRole = () => {
-    return 'Executive';
   };
 
   return (
@@ -45,30 +42,26 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
             height={29}
             className="h-[29px] w-[120px]"
           />
-          <p className="font-dm text-xs font-normal leading-[150%] tracking-[-0.24px] text-[#8C8C8C]">
+          <p className="font-dm text-xs font-normal leading-[150%] tracking-[-0.24px] text-gray-600 dark:text-gray-400">
             Tax Consultancy
           </p>
         </div>
 
         <div className="flex items-center gap-[13px]">
-          <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#4F46E5]">
+          <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-500">
             <span className="font-dm text-2xl font-normal leading-[30px] tracking-[-0.48px] text-white">
               {user ? getUserInitials(user.name) : 'EX'}
             </span>
           </div>
-          <div className="flex flex-col">
-            <p className="font-dm text-xs font-bold leading-[24px] tracking-[-0.24px] text-[#404040]">
+          <div className="flex flex-col gap-1">
+            <p className="font-dm text-xs font-bold leading-[24px] tracking-[-0.24px] text-gray-700 dark:text-gray-200">
               {user?.name || 'John Doe'}
             </p>
-            <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-[#EDECFC] px-[5px]">
-              <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-[#7887EE]">
-                {getUserRole()}
-              </span>
-            </div>
+            <RoleSwitcher />
           </div>
         </div>
 
-        <div className="h-[2px] w-[250px] bg-[#D9D9D9]" />
+        <div className="h-[2px] w-[250px] bg-gray-300 dark:bg-white/30" />
       </div>
 
       <ul className="mb-auto flex flex-col gap-5 px-5 pt-[50px]">
