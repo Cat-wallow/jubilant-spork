@@ -36,21 +36,21 @@ export default function Index() {
   };
 
   return (
-    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-white">
+    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-white dark:bg-navy-900">
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex flex-1 flex-col items-center justify-end px-6 py-12 lg:px-12">
           <div className="flex w-full max-w-[410px] flex-col gap-[30px]">
             <div className="space-y-4">
-              <h1 className="text-[36px] font-bold leading-[56px] tracking-[-0.72px] text-[#1E1E1E]">
+              <h1 className="text-[36px] font-bold leading-[56px] tracking-[-0.72px] text-navy-700 dark:text-white">
                 Login
               </h1>
-              <p className="text-base leading-none tracking-[-0.32px] text-[#404040]">
+              <p className="text-base leading-none tracking-[-0.32px] text-gray-700 dark:text-gray-400">
                 Masukan email dan password
               </p>
             </div>
 
             {loginMutation.error && (
-              <p className="rounded-lg bg-red-100 p-3 text-sm text-red-500">
+              <p className="rounded-lg bg-red-100 p-3 text-sm text-red-500 dark:bg-red-900/20 dark:text-red-400">
                 {(loginMutation.error as any)?.response?.data?.message ||
                   loginMutation.error?.message ||
                   'Login failed. Please check your credentials and try again.'}
@@ -63,7 +63,7 @@ export default function Index() {
             >
               <div className="space-y-[27px]">
                 <div>
-                  <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-[#1E1E1E]">
+                  <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-navy-700 dark:text-white">
                     Email*
                   </label>
                   <div className="relative">
@@ -71,22 +71,22 @@ export default function Index() {
                       type="text"
                       placeholder="Email/Username/Phone Number"
                       {...register('email')}
-                      className={`h-[50px] w-full rounded-2xl border px-6 text-sm focus:outline-none focus:ring-2 ${
+                      className={`h-[50px] w-full rounded-2xl border px-6 text-sm text-navy-700 focus:outline-none focus:ring-2 dark:bg-navy-800 dark:text-white ${
                         errors.email
-                          ? 'border-red-500 focus:ring-red-500'
-                          : 'border-[#E0E5F2] focus:ring-[#332687]'
+                          ? 'border-red-500 focus:ring-red-500 dark:border-red-400'
+                          : 'border-gray-300 focus:ring-brand-500 dark:border-white/30 dark:focus:ring-brand-400'
                       }`}
                     />
                   </div>
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                       {errors.email.message}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-[#1E1E1E]">
+                  <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-navy-700 dark:text-white">
                     Kata sandi*
                   </label>
                   <div className="relative">
@@ -94,16 +94,16 @@ export default function Index() {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Min. 8 characters"
                       {...register('password')}
-                      className={`h-[50px] w-full rounded-2xl border px-6 pr-14 text-sm focus:outline-none focus:ring-2 ${
+                      className={`h-[50px] w-full rounded-2xl border px-6 pr-14 text-sm text-navy-700 focus:outline-none focus:ring-2 dark:bg-navy-800 dark:text-white ${
                         errors.password
-                          ? 'border-red-500 focus:ring-red-500'
-                          : 'border-[#E0E5F2] focus:ring-[#332687]'
+                          ? 'border-red-500 focus:ring-red-500 dark:border-red-400'
+                          : 'border-gray-300 focus:ring-brand-500 dark:border-white/30 dark:focus:ring-brand-400'
                       }`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A3AED0] transition-colors hover:text-[#332687]"
+                      className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-600 transition-colors hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400"
                     >
                       {showPassword ? (
                         <Eye className="h-5 w-5" />
@@ -113,7 +113,7 @@ export default function Index() {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                       {errors.password.message}
                     </p>
                   )}
@@ -130,8 +130,8 @@ export default function Index() {
                   <div
                     className={`flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-sm border transition-colors ${
                       keepLoggedIn
-                        ? 'border-[#332687] bg-[#332687]'
-                        : 'border-[#E0E5F2] bg-white'
+                        ? 'border-brand-500 bg-brand-500 dark:border-brand-400 dark:bg-brand-400'
+                        : 'border-gray-300 bg-white dark:border-white/30 dark:bg-navy-800'
                     }`}
                   >
                     {keepLoggedIn && (
@@ -148,14 +148,14 @@ export default function Index() {
                       </svg>
                     )}
                   </div>
-                  <span className="text-sm leading-5 tracking-[-0.28px] text-[#1E1E1E]">
+                  <span className="text-sm leading-5 tracking-[-0.28px] text-navy-700 dark:text-gray-300">
                     Buat saya tetap login
                   </span>
                 </label>
 
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm font-medium leading-5 tracking-[-0.28px] text-[#1E1E1E] transition-colors hover:text-[#332687]"
+                  className="text-sm font-medium leading-5 tracking-[-0.28px] text-navy-700 transition-colors hover:text-brand-500 dark:text-gray-300 dark:hover:text-brand-400"
                 >
                   Lupa kata sandi?
                 </Link>
@@ -164,20 +164,20 @@ export default function Index() {
               <button
                 type="submit"
                 disabled={loginMutation.isPending}
-                className="h-[54px] w-full rounded-2xl bg-[#332687] text-sm font-bold leading-none tracking-[-0.28px] text-white transition-colors hover:bg-[#2a1f6f] disabled:bg-gray-400"
+                className="h-[54px] w-full rounded-2xl bg-brand-500 text-sm font-bold leading-none tracking-[-0.28px] text-white transition-colors hover:bg-brand-600 disabled:bg-gray-400 dark:bg-brand-400 dark:hover:bg-brand-500"
               >
                 {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
           </div>
           <footer className="mt-10 py-20 text-center">
-            <p className="text-sm font-medium leading-6 tracking-[-0.28px] text-[#332687]">
+            <p className="text-sm font-medium leading-6 tracking-[-0.28px] text-brand-500 dark:text-brand-400">
               © 2025 EasyTax , Made by Surya Microsystems
             </p>
           </footer>
         </div>
 
-        <div className="relative hidden flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-[#6B5DD3] via-[#8B7AE6] to-[#4A3FA8] bg-cover bg-center bg-no-repeat lg:flex">
+        <div className="relative hidden flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-[#6B5DD3] via-[#8B7AE6] to-[#4A3FA8] bg-cover bg-center bg-no-repeat dark:from-brand-700 dark:via-brand-600 dark:to-brand-800 lg:flex">
           <Image
             width={80}
             height={80}
