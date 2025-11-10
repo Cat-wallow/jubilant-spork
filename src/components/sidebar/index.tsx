@@ -1,16 +1,31 @@
-/* eslint-disable */
+'use client';
 
 import { HiX } from 'react-icons/hi';
 import Links from './components/Links';
-
-import SidebarCard from 'components/sidebar/components/SidebarCard';
 import { IRoute } from 'types/navigation';
+import { useAuth } from 'contexts/AuthContext';
+import Image from 'next/image';
 
 function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
+  const { user } = useAuth();
+
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    const names = name.split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const getUserRole = () => {
+    return 'Executive';
+  };
+
   return (
     <div
-      className={`sm:none duration-175 linear fixed !z-50 flex min-h-full flex-col bg-white pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
+      className={`sm:none duration-175 linear fixed !z-50 flex min-h-full w-[290px] flex-col bg-white pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
         open ? 'translate-x-0' : '-translate-x-96 xl:translate-x-0'
       }`}
     >
@@ -21,24 +36,44 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
         <HiX />
       </span>
 
-      <div className={`mx-[56px] mt-[50px] flex items-center`}>
-        <div className="ml-1 mt-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
-          Easy <span className="font-medium">Tax</span>
+      <div className="flex flex-col gap-5 px-5 pt-5">
+        <div className="flex flex-col">
+          <Image
+            src="https://api.builder.io/api/v1/image/assets/TEMP/00a49d181b0bb66e62377f3e7fba55a2f3929db2?width=240"
+            alt="EasyTax Logo"
+            width={120}
+            height={29}
+            className="h-[29px] w-[120px]"
+          />
+          <p className="font-dm text-xs font-normal leading-[150%] tracking-[-0.24px] text-[#8C8C8C]">
+            Tax Consultancy
+          </p>
         </div>
-      </div>
-      <div className="mb-7 mt-[58px] h-px bg-gray-300 dark:bg-white/30" />
-      {/* Nav item */}
 
-      <ul className="mb-auto pt-1">
+        <div className="flex items-center gap-[13px]">
+          <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#4F46E5]">
+            <span className="font-dm text-2xl font-normal leading-[30px] tracking-[-0.48px] text-white">
+              {user ? getUserInitials(user.name) : 'EX'}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <p className="font-dm text-xs font-bold leading-[24px] tracking-[-0.24px] text-[#404040]">
+              {user?.name || 'John Doe'}
+            </p>
+            <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-[#EDECFC] px-[5px]">
+              <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-[#7887EE]">
+                {getUserRole()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-[2px] w-[250px] bg-[#D9D9D9]" />
+      </div>
+
+      <ul className="mb-auto flex flex-col gap-5 px-5 pt-[50px]">
         <Links routes={routes} />
       </ul>
-
-      {/* Free Horizon Card */}
-      {/* <div className="flex justify-center">
-        <SidebarCard />
-      </div> */}
-
-      {/* Nav item end */}
     </div>
   );
 }
