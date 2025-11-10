@@ -63,9 +63,9 @@ export default function RoleSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-50 mt-2 flex w-[196px] flex-col gap-px rounded-[5.25px] border border-black/15 bg-white p-1 shadow-[0_4px_6px_4px_rgba(0,0,0,0.10),0_2px_4px_-2px_rgba(0,0,0,0.10)] dark:border-white/15 dark:bg-navy-800">
+        <div className="border-black/15 absolute left-0 top-full z-50 mt-2 flex w-[196px] flex-col gap-px rounded-[5.25px] border bg-white p-1 shadow-[0_4px_6px_4px_rgba(0,0,0,0.10),0_2px_4px_-2px_rgba(0,0,0,0.10)] dark:border-white/15 dark:bg-navy-800">
           <div className="flex h-[24.488px] items-start px-[7px] py-[5.25px]">
-            <span className="flex-1 font-inter text-[10.5px] font-bold leading-[14px] text-slate-500 dark:text-slate-400">
+            <span className="font-inter text-slate-500 dark:text-slate-400 flex-1 text-[10.5px] font-bold leading-[14px]">
               Switch Role
             </span>
           </div>
@@ -83,7 +83,7 @@ export default function RoleSwitcher() {
                   className="h-[7px] w-[7px] flex-shrink-0 rounded-full"
                   style={{ background: role.color }}
                 />
-                <span className="flex-1 font-inter text-xs font-normal leading-[17.5px] text-slate-800 dark:text-slate-200">
+                <span className="font-inter text-slate-800 dark:text-slate-200 flex-1 text-xs font-normal leading-[17.5px]">
                   {role.name}
                 </span>
               </div>
@@ -111,8 +111,8 @@ export default function RoleSwitcher() {
                       </clipPath>
                     </defs>
                   </svg>
-                  <div className="flex h-[19.087px] w-[51.425px] items-center justify-center gap-[3.5px] rounded-[5.25px] border border-black/15 px-[7px] py-[1.75px] dark:border-white/15">
-                    <span className="font-inter text-[10.5px] font-medium leading-[14px] text-slate-800 dark:text-slate-200">
+                  <div className="border-black/15 flex h-[19.087px] w-[51.425px] items-center justify-center gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">
+                    <span className="font-inter text-slate-800 dark:text-slate-200 text-[10.5px] font-medium leading-[14px]">
                       Current
                     </span>
                   </div>

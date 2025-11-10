@@ -141,11 +141,8 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
             {hasCollapse && isExpanded && (
               <div className="ml-[39px] mt-2 flex w-[247px] flex-col">
                 {subMenuItems.map((item, subIndex) => (
-                  <NavLink
-                    key={subIndex}
-                    href={route.layout + '/' + item.path}
-                  >
-                    <div className="flex items-center gap-[15px] py-[3px] px-[10px] hover:bg-gray-50 dark:hover:bg-navy-700">
+                  <NavLink key={subIndex} href={route.layout + '/' + item.path}>
+                    <div className="flex items-center gap-[15px] px-[10px] py-[3px] hover:bg-gray-50 dark:hover:bg-navy-700">
                       <svg
                         className="h-6 w-6"
                         viewBox="0 0 24 24"
