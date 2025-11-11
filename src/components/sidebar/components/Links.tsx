@@ -70,7 +70,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
                       {route.icon ? route.icon : <DashIcon />}
                     </span>
                     <p
-                      className={`font-dm text-base leading-[30px] tracking-[-0.32px] ${
+                      className={`text-nowrap font-dm text-base leading-[30px] tracking-[-0.32px] ${
                         isActive || isExpanded
                           ? 'font-bold text-brand-500 dark:text-white'
                           : 'font-normal text-gray-600 group-hover:text-brand-500 dark:text-gray-400 dark:group-hover:text-white'
@@ -139,7 +139,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
             </div>
 
             {hasCollapse && isExpanded && (
-              <div className="ml-[39px] mt-2 flex w-[247px] flex-col">
+              <div className="ml-[20px] mt-2 flex w-[247px] flex-col">
                 {subMenuItems.map((item, subIndex) => (
                   <NavLink key={subIndex} href={route.layout + '/' + item.path}>
                     <div className="flex items-center gap-[15px] px-[10px] py-[3px] hover:bg-gray-50 dark:hover:bg-navy-700">

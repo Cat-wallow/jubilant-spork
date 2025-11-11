@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   withCredentials: true, // Important for sending cookies
 });
 
@@ -18,13 +18,13 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url !== '/auth/refresh-token'
+      originalRequest.url !== '/refresh-token'
     ) {
       originalRequest._retry = true;
 
       try {
         // The backend will issue a new access token cookie on successful refresh
-        await api.post('/auth/refresh-token');
+        await api.get('/refresh-token');
         // Retry the original request, the browser will send the new cookie
         return api(originalRequest);
       } catch (refreshError) {
@@ -39,5 +39,17 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export const forgotPassword = (email: string) => {
+  return api.post('/forgot-password', { email });
+};
+
+export const resetPassword = (data: {
+  token: string;
+  password;
+  confirmPassword;
+}) => {
+  return api.post('/reset-password', data);
+};
 
 export default api;

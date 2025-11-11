@@ -4,29 +4,32 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import api from 'lib/api';
-import { ILoginRequest } from 'types/auth';
+import { ILoginRequest, ILoginResponse } from 'types/auth';
 
 // Define the user type based on your ILoginResponse
 export interface IUser {
   id: string;
   name: string;
   email: string;
+  permissions: string[]; // Array of permission names
 }
 
 interface IAuthContext {
   user: IUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  permissions: string[];
   login: (credentials: ILoginRequest) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
-// Function to fetch the current user
+// Function to fetch the current user and their permissions
 const getMe = async (): Promise<IUser> => {
-  const { data } = await api.get('/auth/me');
-  return data.data;
+  // Assuming the /verify endpoint returns the user and their permissions
+  const { data } = await api.get('/refresh-token', { withCredentials: true });
+  return data; // The response should match the IUser interface
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -41,28 +44,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   } = useQuery<IUser>({
     queryKey: ['user'],
     queryFn: getMe,
-    retry: false, // Don't retry on failure, it means the user is not logged in
+    retry: false, // Don't retry on failure
     refetchOnWindowFocus: false,
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: ILoginRequest) => {
-      const { data } = await api.post('/auth/login', credentials);
-      return data.user as IUser;
+      // The backend response now includes user, tenant, and permissions
+      const { data } = await api.post('/account/login', credentials);
+      return data.data as ILoginResponse; // Assuming data is the full response
     },
-    onSuccess: (user) => {
-      // On success, invalidate and refetch the user query
-      queryClient.setQueryData(['user'], user);
+    onSuccess: (data) => {
+      // Store user and permissions in the query cache
+      const userData: IUser = {
+        ...data.user,
+        permissions: data.permissions,
+      };
+      queryClient.setQueryData(['user'], userData);
       router.push('/admin/default');
     },
     onError: (error) => {
       console.error('Login failed:', error);
-      // You can add toast notifications here
     },
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => api.post('/auth/logout'),
+    mutationFn: () => api.post('/account/logout'),
     onSuccess: () => {
       // Clear user data and redirect
       queryClient.setQueryData(['user'], null);
@@ -71,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const isAuthenticated = !!user && !isError;
+  const permissions = user?.permissions || [];
 
   return (
     <AuthContext.Provider
@@ -78,6 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: user || null,
         isAuthenticated,
         isLoading,
+        permissions, // Provide permissions through the context
         login: loginMutation.mutate,
         logout: logoutMutation.mutate,
       }}

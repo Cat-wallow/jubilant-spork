@@ -19,7 +19,7 @@ function SidebarHorizon(props: { variant?: string; [x: string]: any }) {
   const { open, onClose, variant, mini, hovered, setHovered } = props;
   return (
     <div
-      className={`sm:none ${
+      className={`sm:none  mx-10 ${
         mini === false
           ? 'w-[285px]'
           : mini === true && hovered === true

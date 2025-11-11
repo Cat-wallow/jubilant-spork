@@ -83,7 +83,7 @@ export default function RoleSwitcher() {
                   className="h-[7px] w-[7px] flex-shrink-0 rounded-full"
                   style={{ background: role.color }}
                 />
-                <span className="font-inter text-slate-800 dark:text-slate-200 flex-1 text-xs font-normal leading-[17.5px]">
+                <span className="font-inter text-slate-800 dark:text-slate-200 flex-1 text-start text-xs font-normal leading-[17.5px]">
                   {role.name}
                 </span>
               </div>
@@ -111,7 +111,7 @@ export default function RoleSwitcher() {
                       </clipPath>
                     </defs>
                   </svg>
-                  <div className="border-black/15 flex h-[19.087px] w-[51.425px] items-center justify-center gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">
+                  <div className="border-black/15 flex h-[19.087px] w-[51.425px] items-start justify-start gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">
                     <span className="font-inter text-slate-800 dark:text-slate-200 text-[10.5px] font-medium leading-[14px]">
                       Current
                     </span>

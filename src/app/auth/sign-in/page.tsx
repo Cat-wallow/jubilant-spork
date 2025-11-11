@@ -36,7 +36,7 @@ export default function Index() {
   };
 
   return (
-    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-white dark:bg-navy-900">
+    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden  dark:bg-navy-900">
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex flex-1 flex-col items-center justify-end px-6 py-12 lg:px-12">
           <div className="flex w-full max-w-[410px] flex-col gap-[30px]">
