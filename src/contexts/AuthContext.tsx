@@ -11,6 +11,7 @@ export interface IUser {
   id: string;
   name: string;
   email: string;
+  role?: string;
   permissions: string[]; // Array of permission names
 }
 
@@ -19,6 +20,7 @@ interface IAuthContext {
   isAuthenticated: boolean;
   isLoading: boolean;
   permissions: string[];
+  role: string | null;
   login: (credentials: ILoginRequest) => void;
   logout: () => void;
 }
@@ -52,13 +54,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     mutationFn: async (credentials: ILoginRequest) => {
       // The backend response now includes user, tenant, and permissions
       const { data } = await api.post('/account/login', credentials);
-      return data.data as ILoginResponse; // Assuming data is the full response
+      return data as ILoginResponse; // Full response
     },
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       // Store user and permissions in the query cache
       const userData: IUser = {
-        ...data.user,
-        permissions: data.permissions,
+        ...response.data.user,
+        role: response.data.role || response.data.user.role,
+        permissions: response.data.permissions || [],
       };
       queryClient.setQueryData(['user'], userData);
       router.push('/admin/default');
@@ -79,6 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isAuthenticated = !!user && !isError;
   const permissions = user?.permissions || [];
+  const role = user?.role || null;
 
   return (
     <AuthContext.Provider
@@ -87,6 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated,
         isLoading,
         permissions, // Provide permissions through the context
+        role, // Provide role through the context
         login: loginMutation.mutate,
         logout: logoutMutation.mutate,
       }}

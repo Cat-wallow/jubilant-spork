@@ -13,6 +13,9 @@ export interface ILoginResponse {
       id: string;
       name: string;
       email: string;
+      role?: string;
     };
+    role?: string;
+    permissions?: string[];
   };
 }

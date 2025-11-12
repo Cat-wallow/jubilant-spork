@@ -134,8 +134,8 @@ const routes = [
   },
   {
     name: 'Manajemen Pengguna',
-    layout: '/admin',
-    path: 'invitations',
+    layout: '/tenant',
+    path: 'users',
     icon: (
       <svg
         className="h-6 w-6"
