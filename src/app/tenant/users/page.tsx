@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Plus, Upload, Search, MoreVertical, UserCheck, UserX } from 'lucide-react';
 import RBAC from 'components/rbac/RBAC';
 import InviteUserModal from './components/InviteUserModal';
@@ -15,9 +16,12 @@ export default function TenantUsersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [page, setPage] = useState(1);
   const limit = 10;
+  const searchParams = useSearchParams();
+  const tenantId = (searchParams.get('tenant_id') || searchParams.get('tenantId') || '').toString();
 
   // Fetch tenant users
   const { data, isLoading, error, refetch } = useTenantUsers({
+    tenantId,
     search: searchQuery,
     status: statusFilter === 'all' ? undefined : statusFilter,
     page,
@@ -26,6 +30,17 @@ export default function TenantUsersPage() {
 
   const users = data?.items || [];
   const pagination = data?.pagination;
+
+  if (!tenantId) {
+    return (
+      <div className="mt-3 flex h-full w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-700 dark:text-gray-200 mb-2">Tenant belum dipilih.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Tambahkan parameter tenant_id pada URL untuk melanjutkan.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -55,7 +70,7 @@ export default function TenantUsersPage() {
   }
 
   return (
-    <RBAC requiredPermission="user:read" requiredRole="Admin Tenant" redirect={true}>
+    <RBAC requiredPermission="tenant:user_read" requiredRole="Admin Tenant" redirect={true}>
       <div className="mt-3 h-full w-full">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -68,7 +83,7 @@ export default function TenantUsersPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <RBAC requiredPermission="user:create">
+            <RBAC requiredPermission="tenant:user_manage">
               <button
                 onClick={() => setShowImportModal(true)}
                 className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-navy-800 dark:text-white dark:hover:bg-navy-700"
@@ -77,7 +92,7 @@ export default function TenantUsersPage() {
                 Import CSV
               </button>
             </RBAC>
-            <RBAC requiredPermission="user:create">
+            <RBAC requiredPermission="tenant:user_create">
               <button
                 onClick={() => setShowInviteModal(true)}
                 className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
@@ -211,14 +226,14 @@ export default function TenantUsersPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(user.created_at).toLocaleDateString('id-ID', {
+                        {new Date(user.joinedAt).toLocaleDateString('id-ID', {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
                         })}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <UserActionsMenu user={user} onSuccess={() => refetch()} />
+                        <UserActionsMenu tenantId={tenantId} user={user} onSuccess={() => refetch()} />
                       </td>
                     </tr>
                   ))
@@ -259,6 +274,7 @@ export default function TenantUsersPage() {
         {/* Modals */}
         {showInviteModal && (
           <InviteUserModal
+            tenantId={tenantId}
             onClose={() => setShowInviteModal(false)}
             onSuccess={() => {
               setShowInviteModal(false);
@@ -269,6 +285,7 @@ export default function TenantUsersPage() {
 
         {showImportModal && (
           <ImportUsersModal
+            tenantId={tenantId}
             onClose={() => setShowImportModal(false)}
             onSuccess={() => {
               setShowImportModal(false);
@@ -280,3 +297,5 @@ export default function TenantUsersPage() {
     </RBAC>
   );
 }
+
+ 

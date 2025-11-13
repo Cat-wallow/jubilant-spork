@@ -14,6 +14,7 @@ interface User {
 }
 
 interface UserActionsMenuProps {
+  tenantId: string;
   user: User;
   onSuccess: () => void;
 }
@@ -27,19 +28,18 @@ const ROLES = [
   { id: 'direktur', name: 'Direktur' },
 ];
 
-export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProps) {
+export default function UserActionsMenu({ tenantId, user, onSuccess }: UserActionsMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { permissions } = useAuth();
-  const updateRoleMutation = useUpdateUserRole();
-  const deactivateMutation = useDeactivateUser();
-  const reactivateMutation = useReactivateUser();
+  const updateRoleMutation = useUpdateUserRole(tenantId);
+  const deactivateMutation = useDeactivateUser(tenantId);
+  const reactivateMutation = useReactivateUser(tenantId);
 
-  const canUpdate = permissions.includes('user:update');
-  const canDelete = permissions.includes('user:delete');
+  const canManage = permissions.includes('tenant:user_manage');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -80,7 +80,7 @@ export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProp
       {isOpen && (
         <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-navy-800">
           <div className="py-1">
-            {canUpdate && (
+            {canManage && (
               <button
                 onClick={() => {
                   setShowRoleModal(true);
@@ -92,7 +92,7 @@ export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProp
                 Ubah Role
               </button>
             )}
-            {canDelete && (
+            {canManage && (
               <button
                 onClick={handleToggleStatus}
                 className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
@@ -110,7 +110,7 @@ export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProp
                 )}
               </button>
             )}
-            {!canUpdate && !canDelete && (
+            {!canManage && (
               <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                 No actions available
               </div>
@@ -122,6 +122,7 @@ export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProp
       {/* Change Role Modal */}
       {showRoleModal && (
         <ChangeRoleModal
+          tenantId={tenantId}
           user={user}
           onClose={() => setShowRoleModal(false)}
           onSuccess={() => {
@@ -134,6 +135,7 @@ export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProp
       {/* Deactivate Confirmation Modal */}
       {showDeactivateModal && (
         <DeactivateModal
+          tenantId={tenantId}
           user={user}
           onClose={() => setShowDeactivateModal(false)}
           onSuccess={() => {
@@ -147,9 +149,9 @@ export default function UserActionsMenu({ user, onSuccess }: UserActionsMenuProp
 }
 
 // Change Role Modal Component
-function ChangeRoleModal({ user, onClose, onSuccess }: { user: User; onClose: () => void; onSuccess: () => void }) {
+function ChangeRoleModal({ tenantId, user, onClose, onSuccess }: { tenantId: string; user: User; onClose: () => void; onSuccess: () => void }) {
   const [roleId, setRoleId] = useState('');
-  const updateRoleMutation = useUpdateUserRole();
+  const updateRoleMutation = useUpdateUserRole(tenantId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,9 +222,9 @@ function ChangeRoleModal({ user, onClose, onSuccess }: { user: User; onClose: ()
 }
 
 // Deactivate Confirmation Modal Component
-function DeactivateModal({ user, onClose, onSuccess }: { user: User; onClose: () => void; onSuccess: () => void }) {
+function DeactivateModal({ tenantId, user, onClose, onSuccess }: { tenantId: string; user: User; onClose: () => void; onSuccess: () => void }) {
   const [reason, setReason] = useState('');
-  const deactivateMutation = useDeactivateUser();
+  const deactivateMutation = useDeactivateUser(tenantId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || 'http://localhost:3001',
+  // Prefer Kong Gateway in front of all services
+  baseURL:
+    process.env.NEXT_PUBLIC_GATEWAY_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ||
+    'http://localhost:8000',
   withCredentials: true, // Important for sending cookies
 });
 

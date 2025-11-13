@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { useInviteUser } from 'hooks/useTenantUsers';
 
 interface InviteUserModalProps {
+  tenantId: string;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -18,10 +19,10 @@ const ROLES = [
   { id: 'direktur', name: 'Direktur' },
 ];
 
-export default function InviteUserModal({ onClose, onSuccess }: InviteUserModalProps) {
+export default function InviteUserModal({ tenantId, onClose, onSuccess }: InviteUserModalProps) {
   const [email, setEmail] = useState('');
   const [roleId, setRoleId] = useState('');
-  const inviteMutation = useInviteUser();
+  const inviteMutation = useInviteUser(tenantId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

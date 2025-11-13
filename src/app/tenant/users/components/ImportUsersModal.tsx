@@ -5,23 +5,25 @@ import { X, Upload, Download, CheckCircle, XCircle } from 'lucide-react';
 import { useImportUsers } from 'hooks/useTenantUsers';
 
 interface ImportUsersModalProps {
+  tenantId: string;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModalProps) {
+export default function ImportUsersModal({ tenantId, onClose, onSuccess }: ImportUsersModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const importMutation = useImportUsers();
+  const importMutation = useImportUsers(tenantId);
+  const [headerError, setHeaderError] = useState<string | null>(null);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === 'dragenter' || e.type === 'dragleave') {
+      setDragActive(e.type === 'dragenter');
+    } else if (e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
     }
   };
 
@@ -33,7 +35,7 @@ export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModa
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
       if (droppedFile.type === 'text/csv' || droppedFile.name.endsWith('.csv')) {
-        setFile(droppedFile);
+        validateCsvHeader(droppedFile);
       } else {
         alert('Please upload a CSV file');
       }
@@ -42,13 +44,13 @@ export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModa
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      validateCsvHeader(e.target.files[0]);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!file) return;
 
     try {
@@ -60,7 +62,7 @@ export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModa
   };
 
   const downloadTemplate = () => {
-    const csvContent = 'email,nama,role\nuser@example.com,John Doe,wajib_pajak\n';
+    const csvContent = 'email,name,role\nuser@example.com,John Doe,wajib_pajak\n';
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -68,6 +70,35 @@ export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModa
     a.download = 'template-import-users.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const validateCsvHeader = (f: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = (reader.result as string) || '';
+        const firstLine = text.split(/\r?\n/)[0] || '';
+        const headers = firstLine.split(',').map((h) => h.trim().toLowerCase());
+        const hasEmail = headers.includes('email');
+        const hasName = headers.includes('name') || headers.includes('nama');
+        const hasRole = headers.includes('role');
+        if (!hasEmail || !hasName || !hasRole) {
+          setHeaderError('CSV harus memiliki header: email,name,role');
+          setFile(null);
+        } else {
+          setHeaderError(null);
+          setFile(f);
+        }
+      } catch (e) {
+        setHeaderError('Gagal membaca file CSV. Pastikan format benar.');
+        setFile(null);
+      }
+    };
+    reader.onerror = () => {
+      setHeaderError('Gagal membaca file CSV.');
+      setFile(null);
+    };
+    reader.readAsText(f.slice(0, 1024));
   };
 
   return (
@@ -95,7 +126,7 @@ export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModa
                 Download Template CSV
               </h3>
               <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
-                Format: email, nama, role
+                Format: email, name, role
               </p>
               <button
                 onClick={downloadTemplate}
@@ -108,6 +139,12 @@ export default function ImportUsersModal({ onClose, onSuccess }: ImportUsersModa
         </div>
 
         {/* Error/Success Message */}
+        {headerError && (
+          <div className="mb-4 flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+            <XCircle className="h-5 w-5 flex-shrink-0" />
+            <span>{headerError}</span>
+          </div>
+        )}
         {importMutation.error && (
           <div className="mb-4 flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
             <XCircle className="h-5 w-5 flex-shrink-0" />
