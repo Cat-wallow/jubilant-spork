@@ -73,7 +73,7 @@ const routes = [
       </svg>
     ),
     path: 'data-tables',
-    collapse: true,
+    collapsible: true,
   },
   {
     name: 'Akuntansi',

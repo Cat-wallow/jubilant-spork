@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
@@ -18,6 +18,8 @@ export default function Index() {
     handleSubmit,
     watch,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(LoginValidator),
     defaultValues: {
@@ -27,7 +29,29 @@ export default function Index() {
 
   const keepLoggedIn = watch('keepLoggedIn');
 
+  // Set server error when login fails
+  useEffect(() => {
+    if (loginMutation.error) {
+      // Extract error message from the response
+      const errorMessage =
+        (loginMutation.error as any)?.response?.data?.message ||
+        'Login gagal. Silakan coba lagi.';
+
+      // Set a form-level error that will appear below password field
+      setError('root', {
+        type: 'server',
+        message: errorMessage,
+      });
+    } else {
+      // Clear the error when there's no error or on component mount
+      clearErrors('root');
+    }
+  }, [loginMutation.error, setError, clearErrors]);
+
   const handleLogin = (data: LoginFormInputs) => {
+    // Clear any existing server errors before submitting
+    clearErrors('root');
+
     loginMutation.mutate({
       email: data.email,
       password: data.password,
@@ -48,14 +72,6 @@ export default function Index() {
                 Masukan email dan password
               </p>
             </div>
-
-            {loginMutation.error && (
-              <p className="rounded-lg bg-red-100 p-3 text-sm text-red-500 dark:bg-red-900/20 dark:text-red-400">
-                {(loginMutation.error as any)?.response?.data?.message ||
-                  loginMutation.error?.message ||
-                  'Login failed. Please check your credentials and try again.'}
-              </p>
-            )}
 
             <form
               className="flex flex-col gap-[30px]"
@@ -119,6 +135,13 @@ export default function Index() {
                   )}
                 </div>
               </div>
+
+              {/* Server-side error display */}
+              {errors.root && (
+                <div className="-mt-5 rounded-lg bg-red-100 p-3 text-sm text-red-500 dark:bg-red-900/20 dark:text-red-400">
+                  {errors.root.message}
+                </div>
+              )}
 
               <div className="flex items-center justify-between">
                 <label className="flex cursor-pointer items-center gap-[11px]">

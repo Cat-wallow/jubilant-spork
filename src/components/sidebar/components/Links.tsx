@@ -44,7 +44,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
     return routes.map((route, index) => {
       const isActive = activeRoute(route.path);
       const isExpanded = expandedMenus[route.path];
-      const hasCollapse = route.collapse;
+      const hasCollapse = route.collapsible;
 
       if (
         route.layout === '/admin' ||

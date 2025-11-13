@@ -5,7 +5,7 @@ import Links from './components/Links';
 import { IRoute } from 'types/navigation';
 import { useAuth } from 'contexts/AuthContext';
 import Image from 'next/image';
-import RoleSwitcher from './components/RoleSwitcher';
+import TenantSwitcher from './components/TenantSwitcher';
 
 function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
@@ -57,7 +57,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
             <p className="font-dm text-xs font-bold leading-[24px] tracking-[-0.24px] text-gray-700 dark:text-gray-200">
               {user?.name || 'John Doe'}
             </p>
-            <RoleSwitcher />
+            <TenantSwitcher />
           </div>
         </div>
 

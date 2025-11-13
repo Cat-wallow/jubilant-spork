@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
         password,
         confirmPassword,
       });
-      setMessage(response.data.message/Auth);
+      setMessage(response.data.message);
       setTimeout(() => {
         router.push('/auth/sign-in');
       }, 3000);

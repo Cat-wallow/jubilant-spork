@@ -1,66 +1,70 @@
 'use client';
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import api from 'lib/api';
-import { ILoginRequest, ILoginResponse } from 'types/auth';
-
-// Define the user type based on your ILoginResponse
-export interface IUser {
-  id: string;
-  name: string;
-  email: string;
-  permissions: string[]; // Array of permission names
-}
+import {
+  ILoginRequest,
+  ILoginResponse,
+  IUser,
+  ITenant,
+  IRole,
+  IUserTenant,
+  ISwitchTenantRequest,
+} from 'types/auth';
+import { switchTenant as switchTenantService } from 'services/tenantService';
 
 interface IAuthContext {
+  // Core user data
   user: IUser | null;
+  tenant: ITenant | null;
+  currentRole: IRole | null;
+  availableTenants: IUserTenant[];
+  permissions: string[];
+
+  // Auth state
   isAuthenticated: boolean;
   isLoading: boolean;
-  permissions: string[];
+
+  // Actions
   login: (credentials: ILoginRequest) => void;
   logout: () => void;
+  switchTenant: (data: ISwitchTenantRequest) => void;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
-// Function to fetch the current user and their permissions
-const getMe = async (): Promise<IUser> => {
-  // Assuming the /verify endpoint returns the user and their permissions
+// Function to fetch the current session information
+const getMe = async (): Promise<ILoginResponse> => {
   const { data } = await api.get('/refresh-token', { withCredentials: true });
-  return data; // The response should match the IUser interface
+  return data as ILoginResponse;
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Use a query to fetch the user, this will act as our session check
+  // Use a query to fetch the session, this will act as our session check
   const {
-    data: user,
+    data: sessionResponse,
     isLoading,
     isError,
-  } = useQuery<IUser>({
-    queryKey: ['user'],
+  } = useQuery<ILoginResponse>({
+    queryKey: ['session'],
     queryFn: getMe,
-    retry: false, // Don't retry on failure
+    retry: false,
     refetchOnWindowFocus: false,
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: ILoginRequest) => {
-      // The backend response now includes user, tenant, and permissions
       const { data } = await api.post('/account/login', credentials);
-      return data.data as ILoginResponse; // Assuming data is the full response
+      return data as ILoginResponse;
     },
-    onSuccess: (data) => {
-      // Store user and permissions in the query cache
-      const userData: IUser = {
-        ...data.user,
-        permissions: data.permissions,
-      };
-      queryClient.setQueryData(['user'], userData);
+    onSuccess: (response) => {
+      // Store the entire session response in the query cache
+      queryClient.setQueryData(['session'], response);
       router.push('/admin/default');
     },
     onError: (error) => {
@@ -68,27 +72,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
+  const switchTenantMutation = useMutation({
+    mutationFn: (data: ISwitchTenantRequest) => switchTenantService(data),
+    onSuccess: (response) => {
+      // Update the session data in the cache with new tenant context
+      queryClient.setQueryData(['session'], response);
+
+      // Refresh the page to reload all data with new tenant context
+      window.location.reload();
+    },
+    onError: (error) => {
+      console.error('Tenant switch failed:', error);
+      // Optionally show error toast/notification here
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: () => api.post('/account/logout'),
     onSuccess: () => {
-      // Clear user data and redirect
-      queryClient.setQueryData(['user'], null);
+      // Clear session data and redirect
+      queryClient.setQueryData(['session'], null);
       router.push('/auth/sign-in');
     },
   });
 
-  const isAuthenticated = !!user && !isError;
-  const permissions = user?.permissions || [];
+  // Extract data from the session response
+  const sessionData = sessionResponse?.data;
+  const isAuthenticated = !!sessionData && !isError;
 
   return (
     <AuthContext.Provider
       value={{
-        user: user || null,
+        // Core data
+        user: sessionData?.user || null,
+        tenant: sessionData?.tenant || null,
+        currentRole: sessionData?.role || null,
+        availableTenants: sessionData?.availableTenants || [],
+        permissions: sessionData?.permissions || [],
+
+        // Auth state
         isAuthenticated,
         isLoading,
-        permissions, // Provide permissions through the context
+
+        // Actions
         login: loginMutation.mutate,
         logout: logoutMutation.mutate,
+        switchTenant: switchTenantMutation.mutate,
       }}
     >
       {children}
