@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import NavLink from 'components/link/NavLink';
 import DashIcon from 'components/icons/DashIcon';
+import RBAC from 'components/rbac/RBAC';
 
 interface SubMenuItem {
   name: string;
@@ -49,8 +50,44 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
       if (
         route.layout === '/admin' ||
         route.layout === '/auth' ||
-        route.layout === '/rtl'
+        route.layout === '/rtl' ||
+        route.layout === '/tenant'
       ) {
+        if (route.name === 'Manajemen Pengguna') {
+          return (
+            <RBAC requiredPermission="tenant:user_manage" key={index}>
+              <NavLink href={route.layout + '/' + route.path}>
+                <div className="group relative flex w-full items-center gap-[73px] hover:cursor-pointer">
+                  <div className="flex flex-1 items-center gap-[15px]">
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center ${
+                        isActive
+                          ? 'text-brand-500 dark:text-white'
+                          : 'text-gray-600 group-hover:text-brand-500 dark:text-gray-400 dark:group-hover:text-white'
+                      }`}
+                    >
+                      {route.icon ? route.icon : <DashIcon />}
+                    </span>
+                    <p
+                      className={`text-nowrap font-dm text-base leading-[30px] tracking-[-0.32px] ${
+                        isActive
+                          ? 'font-bold text-brand-500 dark:text-white'
+                          : 'font-normal text-gray-600 group-hover:text-brand-500 dark:text-gray-400 dark:group-hover:text-white'
+                      }`}
+                    >
+                      {route.name}
+                    </p>
+                  </div>
+
+                  {isActive && (
+                    <div className="h-9 w-1 flex-shrink-0 rounded-[25px] bg-brand-500 dark:bg-brand-400" />
+                  )}
+                </div>
+              </NavLink>
+            </RBAC>
+          );
+        }
+
         return (
           <div key={index}>
             <div

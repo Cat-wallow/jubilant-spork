@@ -37,13 +37,21 @@ const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 // Function to fetch the current session information
 const getMe = async (): Promise<ILoginResponse> => {
-  const { data } = await api.get('/refresh-token', { withCredentials: true });
+  const { data } = await api.get('auth/me', {
+    withCredentials: true,
+  });
   return data as ILoginResponse;
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  // Check if we're on auth pages to prevent unnecessary session checks
+  const isOnAuthPage =
+    typeof window !== 'undefined' &&
+    (window.location.pathname.includes('/auth/') ||
+      window.location.pathname === '/auth');
 
   // Use a query to fetch the session, this will act as our session check
   const {
@@ -53,22 +61,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   } = useQuery<ILoginResponse>({
     queryKey: ['session'],
     queryFn: getMe,
-    retry: false,
-    refetchOnWindowFocus: false,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 401 (will be handled by interceptor) or 403
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        return false;
+      }
+      // Retry up to 2 times for other errors with exponential backoff
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    refetchOnWindowFocus: true, // Refetch when user comes back to the window
+    refetchOnReconnect: true, // Refetch when internet reconnects
+    enabled: typeof window !== 'undefined' && !isOnAuthPage,
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: ILoginRequest) => {
-      const { data } = await api.post('/account/login', credentials);
+      queryClient.setQueryData(['session'], null);
+      const { data } = await api.post('auth/login', credentials);
       return data as ILoginResponse;
     },
     onSuccess: (response) => {
       // Store the entire session response in the query cache
       queryClient.setQueryData(['session'], response);
+      queryClient.invalidateQueries({ queryKey: ['session'] });
       router.push('/admin/default');
     },
     onError: (error) => {
       console.error('Login failed:', error);
+      queryClient.setQueryData(['session'], null);
     },
   });
 
@@ -88,9 +110,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => api.post('/account/logout'),
+    mutationFn: () => api.post('auth/logout'),
     onSuccess: () => {
-      // Clear session data and redirect
+      queryClient.clear();
+      queryClient.setQueryData(['session'], null);
+      router.push('/auth/sign-in');
+    },
+    onError: () => {
+      queryClient.clear();
       queryClient.setQueryData(['session'], null);
       router.push('/auth/sign-in');
     },

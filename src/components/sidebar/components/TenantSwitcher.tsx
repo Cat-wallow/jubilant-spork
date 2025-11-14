@@ -23,7 +23,7 @@ const getTenantColor = (tenantName: string): string => {
 };
 
 export default function TenantSwitcher() {
-  const { tenant, currentRole, availableTenants, switchTenant, isLoading } =
+  const { tenant, availableTenants, switchTenant, isLoading, currentRole } =
     useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
@@ -80,7 +80,7 @@ export default function TenantSwitcher() {
       return (
         <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-[#EDECFC] px-[5px] dark:bg-navy-700">
           <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-[#7887EE] dark:text-purple-300">
-            {'halo'}
+            {`${tenant.name}`}
           </span>
         </div>
       );
@@ -172,7 +172,7 @@ export default function TenantSwitcher() {
                 {/* Display user's role in this tenant */}
                 <div className="flex w-full items-center pl-[14px]">
                   <span className="font-inter text-slate-500 dark:text-slate-400 text-[10px] leading-[14px]">
-                    as {userTenant.role.name}
+                    {userTenant.role.name}
                   </span>
                   {isCurrentTenant && (
                     <div className="border-black/15 ml-auto flex h-[19.087px] items-center justify-center gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">

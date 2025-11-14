@@ -1,5 +1,5 @@
 export interface ILoginRequest {
-  email: string;
+  emailOrUsername: string;
   password: string;
   rememberMe?: boolean;
 }
@@ -40,7 +40,7 @@ export interface ILoginResponse {
   success: boolean;
   message: string;
   data: {
-    accessToken: string;
+    accessToken?: string;
     user: IUser;
     tenant: ITenant;
     role: IRole;

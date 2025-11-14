@@ -34,8 +34,8 @@ export default function Index() {
     if (loginMutation.error) {
       // Extract error message from the response
       const errorMessage =
-        (loginMutation.error as any)?.response?.data?.message ||
-        'Login gagal. Silakan coba lagi.';
+        (loginMutation.error as any)?.message ||
+        'Login gagal, silakan coba lagi';
 
       // Set a form-level error that will appear below password field
       setError('root', {
@@ -53,7 +53,7 @@ export default function Index() {
     clearErrors('root');
 
     loginMutation.mutate({
-      email: data.email,
+      emailOrUsername: data.emailOrUsername,
       password: data.password,
       rememberMe: data.keepLoggedIn,
     });
@@ -69,7 +69,7 @@ export default function Index() {
                 Login
               </h1>
               <p className="text-base leading-none tracking-[-0.32px] text-gray-700 dark:text-gray-400">
-                Masukan email dan password
+                Masukan email/username dan password
               </p>
             </div>
 
@@ -80,23 +80,23 @@ export default function Index() {
               <div className="space-y-[27px]">
                 <div>
                   <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-navy-700 dark:text-white">
-                    Email*
+                    Email atau Username*
                   </label>
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="Email/Username/Phone Number"
-                      {...register('email')}
+                      placeholder="Masukkan email atau username"
+                      {...register('emailOrUsername')}
                       className={`h-[50px] w-full rounded-2xl border px-6 text-sm text-navy-700 focus:outline-none focus:ring-2 dark:bg-navy-800 dark:text-white ${
-                        errors.email
+                        errors.emailOrUsername
                           ? 'border-red-500 focus:ring-red-500 dark:border-red-400'
                           : 'border-gray-300 focus:ring-brand-500 dark:border-white/30 dark:focus:ring-brand-400'
                       }`}
                     />
                   </div>
-                  {errors.email && (
+                  {errors.emailOrUsername && (
                     <p className="mt-1 text-sm text-red-500 dark:text-red-400">
-                      {errors.email.message}
+                      {errors.emailOrUsername.message}
                     </p>
                   )}
                 </div>

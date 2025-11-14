@@ -15,7 +15,7 @@ export const switchTenant = async (
   data: ISwitchTenantRequest,
 ): Promise<ILoginResponse> => {
   try {
-    const response = await api.post('/switch-tenant', data);
+    const response = await api.post('auth/switch-tenant', data);
 
     // The API should return data in the same format as login response
     // containing user, tenant, role, availableTenants, and permissions
