@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useInviteUser } from 'hooks/useTenantUsers';
+import api from 'lib/api';
 
 interface InviteUserModalProps {
   tenantId: string;
@@ -10,19 +11,34 @@ interface InviteUserModalProps {
   onSuccess: () => void;
 }
 
-const ROLES = [
-  { id: 'admin_tenant', name: 'Admin Tenant' },
-  { id: 'wajib_pajak', name: 'Wajib Pajak / WP' },
-  { id: 'anggota_tim', name: 'Anggota Tim' },
-  { id: 'ketua_tim', name: 'Ketua Tim' },
-  { id: 'pmo', name: 'PMO (Project Manager)' },
-  { id: 'direktur', name: 'Direktur' },
-];
+interface Role {
+  id: string;
+  name: string;
+  level: number;
+}
 
 export default function InviteUserModal({ tenantId, onClose, onSuccess }: InviteUserModalProps) {
   const [email, setEmail] = useState('');
   const [roleId, setRoleId] = useState('');
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loadingRoles, setLoadingRoles] = useState(true);
   const inviteMutation = useInviteUser(tenantId);
+
+  // Fetch roles on mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const { data } = await api.get('/api/v1/roles');
+        setRoles(data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch roles:', error);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,10 +99,13 @@ export default function InviteUserModal({ tenantId, onClose, onSuccess }: Invite
               value={roleId}
               onChange={(e) => setRoleId(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
+              disabled={loadingRoles}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white disabled:opacity-50"
             >
-              <option value="">Pilih role...</option>
-              {ROLES.map((role) => (
+              <option value="">
+                {loadingRoles ? 'Loading roles...' : 'Pilih role...'}
+              </option>
+              {roles.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name}
                 </option>
