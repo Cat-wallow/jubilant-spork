@@ -42,14 +42,14 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
             height={29}
             className="h-[29px] w-[120px]"
           />
-          <p className="font-dm text-xs font-normal leading-[150%] tracking-[-0.24px] text-gray-600 dark:text-gray-400">
+          <p className="font-dm text-xs font-normal leading-[150%] tracking-[-0.24px] text-brand-900 dark:text-white">
             Tax Consultancy
           </p>
         </div>
 
         <div className="flex items-center gap-[13px]">
-          <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-500">
-            <span className="font-dm text-2xl font-normal leading-[30px] tracking-[-0.48px] text-white">
+          <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-brand-500 dark:bg-brand-400">
+            <span className="text-xl font-semibold leading-[30px] tracking-[-0.48px] text-white">
               {user ? getUserInitials(user.name) : 'EX'}
             </span>
           </div>

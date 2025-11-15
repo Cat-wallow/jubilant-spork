@@ -3,6 +3,7 @@
 import { useAuth } from 'contexts/AuthContext';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import UnauthorizedPage from 'components/auth/UnauthorizedPage';
 
 interface RBACProps {
   /**
@@ -17,24 +18,29 @@ interface RBACProps {
   requiredRole?: string | string[];
   children: React.ReactNode;
   /**
-   * If true, will redirect to /auth/sign-in if the user is not authenticated
-   * or does not have the required permission.
+   * If true, will redirect the user to the previous page if they don't have access.
    */
   redirect?: boolean;
+  /**
+   * If true, will render a dedicated "Unauthorized" page if the user doesn't have access.
+   * This takes precedence over `redirect`.
+   */
+  unauthorizedPage?: boolean;
 }
 
 /**
  * A component that conditionally renders its children based on
  * whether the current user has the required permission or is authenticated.
- * Can also handle redirection for protected pages.
+ * Can also handle redirection or show an unauthorized page.
  */
 const RBAC: React.FC<RBACProps> = ({
   requiredPermission,
   requiredRole,
   children,
   redirect = false,
+  unauthorizedPage = false,
 }) => {
-  const { permissions, isAuthenticated, role, isLoading } = useAuth();
+  const { permissions, isAuthenticated, currentRole, isLoading } = useAuth();
   const router = useRouter();
 
   // Check permission
@@ -45,34 +51,52 @@ const RBAC: React.FC<RBACProps> = ({
   // Check role
   const hasRole = requiredRole
     ? Array.isArray(requiredRole)
-      ? requiredRole.includes(role || '')
-      : role === requiredRole
+      ? requiredRole.includes(currentRole?.name || '')
+      : currentRole?.name === requiredRole
     : true;
 
   // User must be authenticated and have both permission and role
   const hasAccess = isAuthenticated && hasPermission && hasRole;
 
   useEffect(() => {
-    if (!isLoading && !hasAccess && redirect) {
-      router.push('/auth/sign-in');
-    }
-  }, [isLoading, hasAccess, redirect, router]);
+    // If auth state is still loading, do nothing.
+    if (isLoading) return;
 
-  // While loading, show a spinner to prevent content flash
+    // If user is not authenticated, always redirect to sign-in.
+    if (!isAuthenticated) {
+      router.push('/auth/sign-in');
+      return;
+    }
+
+    // If user is authenticated but lacks permission/role, handle redirection.
+    if (!hasAccess && redirect && !unauthorizedPage) {
+      router.back();
+    }
+  }, [
+    isLoading,
+    isAuthenticated,
+    hasAccess,
+    redirect,
+    unauthorizedPage,
+    router,
+  ]);
+
+  // While loading authentication state, don't render anything to prevent flashes
   if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="border-t-transparent h-16 w-16 animate-spin rounded-full border-4 border-solid border-brand-500"></div>
-      </div>
-    );
+    return null;
   }
 
   if (hasAccess) {
     return <>{children}</>;
   }
 
+  // If access is denied, decide what to show.
+  if (unauthorizedPage) {
+    return <UnauthorizedPage />;
+  }
+
   // If redirecting, return null while the redirect happens.
-  // If not redirecting, return null to hide the content.
+  // Otherwise, return null to hide the content.
   return null;
 };
 

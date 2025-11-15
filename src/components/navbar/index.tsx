@@ -41,9 +41,18 @@ const Navbar = (props: {
     }
   };
 
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    const names = name.split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
   return (
     <nav className="sticky top-2 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl">
-      <div className="relative mt-[3px] flex h-[61px] w-full flex-grow items-center justify-between gap-2 rounded-full bg-white px-8 py-2 shadow-xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none md:w-[365px] md:flex-grow-0 md:gap-1 xl:w-full xl:gap-4">
+      <div className="relative mt-[3px] flex h-[61px] w-full flex-grow items-center justify-between gap-2 rounded-full bg-white px-8 py-2 shadow-xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none md:w-full md:flex-grow-0 md:gap-1 xl:w-full xl:gap-4">
         <div>
           {/*<div className="h-6 w-[224px] pt-1">
             <a
@@ -133,7 +142,7 @@ const Navbar = (props: {
               </button>
             </div>
           </Dropdown>
-          {/*<div
+          <div
             className="cursor-pointer text-gray-600"
             onClick={() => {
               if (darkmode) {
@@ -150,17 +159,25 @@ const Navbar = (props: {
             ) : (
               <RiMoonFill className="h-6 w-6 text-gray-600 dark:text-white" />
             )}
-          </div>*/}
-          {/* Profile & Dropdown */}
+          </div>
+          {/*// Profile & Dropdown */}
           <Dropdown
             button={
-              <Image
-                width="20"
-                height="20"
-                className="size-10 min-h-10 min-w-10 rounded-full bg-red-500"
-                src={user?.avatar || avatar}
-                alt="Elon Musk"
-              />
+              user.avatar ? (
+                <Image
+                  width="20"
+                  height="20"
+                  className="size-10 min-h-10 min-w-10 rounded-full bg-red-500"
+                  src={user.avatar}
+                  alt="Profile picture"
+                />
+              ) : (
+                <div className="flex size-10 min-h-10 min-w-10 items-center justify-center rounded-full bg-brand-500 font-bold dark:bg-brand-400">
+                  <span className="cursor-pointer text-lg font-semibold leading-[30px] tracking-[-0.48px] text-white">
+                    {user ? getUserInitials(user.name) : 'EX'}
+                  </span>
+                </div>
+              )
             }
             classNames={'py-2 top-8 -left-[180px] w-max'}
           >

@@ -37,10 +37,29 @@ const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 // Function to fetch the current session information
 const getMe = async (): Promise<ILoginResponse> => {
-  const { data } = await api.get('auth/me', {
-    withCredentials: true,
-  });
-  return data as ILoginResponse;
+  try {
+    // First, try to get the user session
+    const { data } = await api.get('auth/me');
+    return data as ILoginResponse;
+  } catch (error: any) {
+    // If it fails with 401, it might be an expired access token
+    if (error.response?.status === 401) {
+      try {
+        // Attempt to refresh the token
+        await api.get('auth/refresh-token');
+
+        // If refresh is successful, retry getting the user session
+        const { data } = await api.get('auth/me');
+        return data as ILoginResponse;
+      } catch (refreshError) {
+        // If refreshing fails, then the session is truly invalid
+        console.error('Session refresh failed, redirecting to login.');
+        throw refreshError;
+      }
+    }
+    // For other errors, just re-throw
+    throw error;
+  }
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {

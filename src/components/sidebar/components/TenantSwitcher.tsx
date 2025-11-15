@@ -78,8 +78,8 @@ export default function TenantSwitcher() {
     // Show current tenant as static badge if user has exactly one tenant
     if (availableTenants.length === 1 && tenant) {
       return (
-        <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-[#EDECFC] px-[5px] dark:bg-navy-700">
-          <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-[#7887EE] dark:text-purple-300">
+        <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-white px-[5px] dark:bg-navy-700">
+          <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-brand-500 dark:text-white">
             {`${tenant.name}`}
           </span>
         </div>
@@ -95,7 +95,7 @@ export default function TenantSwitcher() {
         disabled={isSwitching}
         className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-[#EDECFC] px-[5px] transition-colors hover:bg-[#d8d5f7] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-navy-700 dark:hover:bg-navy-600"
       >
-        <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-[#7887EE] dark:text-purple-300">
+        <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-brand-500 dark:text-white">
           {isSwitching ? 'Switching...' : tenant.name}
         </span>
         {/* Dropdown indicator */}
@@ -143,10 +143,23 @@ export default function TenantSwitcher() {
                   <span className="font-inter text-slate-800 dark:text-slate-200 flex-1 text-start text-xs font-medium leading-[17.5px]">
                     {userTenant.tenant.name}
                   </span>
+                  {isCurrentTenant && (
+                    <div className="border-black/15 ml-auto flex h-[19.087px] items-center justify-center gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">
+                      <span className="font-inter text-slate-800 dark:text-slate-200 text-[10.5px] font-medium leading-[14px]">
+                        Current
+                      </span>
+                    </div>
+                  )}
+                </div>
 
+                {/* Display user's role in this tenant */}
+                <div className="flex w-full items-center pl-[14px]">
+                  <span className="font-inter text-slate-500 dark:text-slate-400 text-[10px] leading-[14px]">
+                    {userTenant.role.name}
+                  </span>
                   {isCurrentTenant && (
                     <svg
-                      className="h-[14px] w-[14px]"
+                      className="ml-2 h-[14px] w-[14px]"
                       viewBox="0 0 14 14"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +167,7 @@ export default function TenantSwitcher() {
                       <g clipPath="url(#clip0_965_93305)">
                         <path
                           d="M11.6666 7.58331C11.6666 10.5 9.62492 11.9583 7.19825 12.8041C7.07118 12.8472 6.93315 12.8451 6.80742 12.7983C4.37492 11.9583 2.33325 10.5 2.33325 7.58331V3.49998C2.33325 3.34527 2.39471 3.19689 2.50411 3.0875C2.6135 2.9781 2.76188 2.91664 2.91659 2.91664C4.08325 2.91664 5.54159 2.21664 6.55659 1.32998C6.68017 1.22439 6.83737 1.16638 6.99992 1.16638C7.16246 1.16638 7.31967 1.22439 7.44325 1.32998C8.46409 2.22248 9.91659 2.91664 11.0833 2.91664C11.238 2.91664 11.3863 2.9781 11.4957 3.0875C11.6051 3.19689 11.6666 3.34527 11.6666 3.49998V7.58331Z"
-                          stroke="#9810FA"
+                          className="stroke-brand-400 dark:stroke-white"
                           strokeWidth="1.16667"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -166,20 +179,6 @@ export default function TenantSwitcher() {
                         </clipPath>
                       </defs>
                     </svg>
-                  )}
-                </div>
-
-                {/* Display user's role in this tenant */}
-                <div className="flex w-full items-center pl-[14px]">
-                  <span className="font-inter text-slate-500 dark:text-slate-400 text-[10px] leading-[14px]">
-                    {userTenant.role.name}
-                  </span>
-                  {isCurrentTenant && (
-                    <div className="border-black/15 ml-auto flex h-[19.087px] items-center justify-center gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">
-                      <span className="font-inter text-slate-800 dark:text-slate-200 text-[10.5px] font-medium leading-[14px]">
-                        Current
-                      </span>
-                    </div>
                   )}
                 </div>
               </button>
