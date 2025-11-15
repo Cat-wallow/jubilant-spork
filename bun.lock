@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "dependencies": {
@@ -18,7 +19,6 @@
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.3.0",
         "@testing-library/user-event": "^13.5.0",
-        "@types/jest": "^25.2.3",
         "@types/node": "^12.20.55",
         "@types/react": "^18.0.15",
         "@types/react-dom": "^18.0.6",
