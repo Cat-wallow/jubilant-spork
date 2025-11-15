@@ -42,7 +42,7 @@ export default function SecuritySection({
         {/* Password & Session Settings */}
         <div className="flex gap-5">
           <div className="flex flex-1 flex-col">
-            <label className="mb-2 font-roboto text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
+            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
               Minimum Panjang Password
             </label>
             <input
@@ -51,12 +51,12 @@ export default function SecuritySection({
               onChange={(e) =>
                 updateFormData({ minPasswordLength: e.target.value })
               }
-              className="h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 font-public-sans text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
+              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
             />
           </div>
 
           <div className="flex flex-1 flex-col">
-            <label className="mb-2 font-roboto text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
+            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
               Session Timeout (menit)
             </label>
             <input
@@ -65,7 +65,7 @@ export default function SecuritySection({
               onChange={(e) =>
                 updateFormData({ sessionTimeout: e.target.value })
               }
-              className="h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 font-public-sans text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
+              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
             />
           </div>
         </div>

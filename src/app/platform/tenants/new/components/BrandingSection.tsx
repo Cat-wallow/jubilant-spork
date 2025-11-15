@@ -18,7 +18,7 @@ export default function BrandingSection({
       <div className="flex flex-col gap-2.5">
         {/* Logo Upload */}
         <div className="flex flex-col">
-          <label className="mb-2 font-roboto text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
+          <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
             Logo Perusahaan
           </label>
           <button
@@ -36,7 +36,7 @@ export default function BrandingSection({
         <div className="flex gap-5">
           {/* Primary Color */}
           <div className="flex flex-1 flex-col">
-            <label className="mb-2 font-roboto text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
+            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
               Warna Primer
             </label>
             <div className="flex items-start gap-2.5">
@@ -47,14 +47,14 @@ export default function BrandingSection({
                 onChange={(e) =>
                   updateFormData({ primaryColor: e.target.value })
                 }
-                className="h-[54px] flex-1 rounded-lg border border-gray-300 bg-white px-3.5 font-public-sans text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
+                className="font-public-sans h-[54px] flex-1 rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
               />
             </div>
           </div>
 
           {/* Secondary Color */}
           <div className="flex flex-1 flex-col">
-            <label className="mb-2 font-roboto text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
+            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
               Warna Sekunder
             </label>
             <div className="flex items-start gap-2.5">
@@ -65,7 +65,7 @@ export default function BrandingSection({
                 onChange={(e) =>
                   updateFormData({ secondaryColor: e.target.value })
                 }
-                className="h-[54px] flex-1 rounded-lg border border-gray-300 bg-white px-3.5 font-public-sans text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
+                className="font-public-sans h-[54px] flex-1 rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
               />
             </div>
           </div>

@@ -149,7 +149,9 @@ export default function TenantTable({ tenants }: TenantTableProps) {
               {/* Status */}
               <div className="w-[120px]">
                 <div
-                  className={`inline-flex h-[29px] items-center justify-center rounded-[5px] px-2.5 ${getStatusColor(tenant.status)}`}
+                  className={`inline-flex h-[29px] items-center justify-center rounded-[5px] px-2.5 ${getStatusColor(
+                    tenant.status,
+                  )}`}
                 >
                   <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-navy-700 dark:text-white">
                     {tenant.status}
@@ -160,7 +162,9 @@ export default function TenantTable({ tenants }: TenantTableProps) {
               {/* Plan */}
               <div className="w-[120px]">
                 <div
-                  className={`inline-flex h-[29px] items-center justify-center rounded-[5px] px-2.5 ${getPlanColor(tenant.plan)}`}
+                  className={`inline-flex h-[29px] items-center justify-center rounded-[5px] px-2.5 ${getPlanColor(
+                    tenant.plan,
+                  )}`}
                 >
                   <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-navy-700 dark:text-white">
                     {tenant.plan}
@@ -197,7 +201,9 @@ export default function TenantTable({ tenants }: TenantTableProps) {
                     <div
                       className="h-2 rounded-full bg-brand-500"
                       style={{
-                        width: `${(tenant.storage.used / tenant.storage.total) * 100}%`,
+                        width: `${
+                          (tenant.storage.used / tenant.storage.total) * 100
+                        }%`,
                       }}
                     />
                   </div>

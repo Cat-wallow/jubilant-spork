@@ -102,7 +102,10 @@ function NewTenantPageContent() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-[30px]">
         {/* Row 1: Basic Info + Package */}
         <div className="flex gap-[30px]">
-          <BasicInfoSection formData={formData} updateFormData={updateFormData} />
+          <BasicInfoSection
+            formData={formData}
+            updateFormData={updateFormData}
+          />
           <PackageSection formData={formData} updateFormData={updateFormData} />
         </div>
 
@@ -116,7 +119,10 @@ function NewTenantPageContent() {
         <BrandingSection formData={formData} updateFormData={updateFormData} />
 
         {/* Row 4: System Settings */}
-        <SystemSettingsSection formData={formData} updateFormData={updateFormData} />
+        <SystemSettingsSection
+          formData={formData}
+          updateFormData={updateFormData}
+        />
 
         {/* Row 5: Security */}
         <SecuritySection formData={formData} updateFormData={updateFormData} />
