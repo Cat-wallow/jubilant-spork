@@ -1,4 +1,5 @@
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 
 interface TenantStatsProps {
   stats: {
@@ -14,80 +15,68 @@ interface TenantStatsProps {
 
 export default function TenantStats({ stats }: TenantStatsProps) {
   return (
-    <div className="grid grid-cols-1 gap-[30px] md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {/* Total Client */}
-      <div className="flex items-center gap-[18px] rounded-[20px] bg-white p-5 dark:bg-navy-800">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-lightPrimary dark:bg-navy-700">
-          <Users className="h-[30px] w-[30px] text-brand-500" />
+      <Card className="flex items-center gap-4 p-5">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
+          <Users className="h-7 w-7 text-primary" />
         </div>
-        <div className="flex flex-col">
-          <p className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-gray-600 dark:text-gray-400">
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-muted-foreground">
             Total Client
           </p>
-          <p className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-navy-700 dark:text-white">
-            {stats.totalClients}
-          </p>
-          <p className="font-dm text-xs leading-5 tracking-[-0.24px] text-gray-600 dark:text-gray-400">
+          <p className="text-2xl font-bold">{stats.totalClients}</p>
+          <p className="text-xs text-muted-foreground">
             {stats.pkpClients} PKP / {stats.nonPkpClients} Non-PKP
           </p>
         </div>
-      </div>
+      </Card>
 
       {/* Active Client */}
-      <div className="flex items-center gap-[18px] rounded-[20px] bg-white p-5 dark:bg-navy-800">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-lightPrimary dark:bg-navy-700">
-          <Briefcase className="h-[30px] w-[30px] text-brand-500" />
+      <Card className="flex items-center gap-4 p-5">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
+          <Briefcase className="h-7 w-7 text-primary" />
         </div>
-        <div className="flex flex-col">
-          <p className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-gray-600 dark:text-gray-400">
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-muted-foreground">
             Active Client
           </p>
-          <p className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-navy-700 dark:text-white">
-            {stats.activeClients}
-          </p>
+          <p className="text-2xl font-bold">{stats.activeClients}</p>
         </div>
-      </div>
+      </Card>
 
       {/* Total Project */}
-      <div className="flex items-center gap-[18px] rounded-[20px] bg-white p-5 dark:bg-navy-800">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-lightPrimary dark:bg-navy-700">
-          <Briefcase className="h-[30px] w-[30px] text-brand-500" />
+      <Card className="flex items-center gap-4 p-5">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
+          <Briefcase className="h-7 w-7 text-primary" />
         </div>
-        <div className="flex flex-col">
-          <p className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-gray-600 dark:text-gray-400">
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-muted-foreground">
             Total Project
           </p>
-          <p className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-navy-700 dark:text-white">
-            {stats.totalProjects}
-          </p>
-          <p className="font-dm text-xs leading-5 tracking-[-0.24px] text-gray-600 dark:text-gray-400">
-            Dari semua klien
-          </p>
+          <p className="text-2xl font-bold">{stats.totalProjects}</p>
+          <p className="text-xs text-muted-foreground">Dari semua klien</p>
         </div>
-      </div>
+      </Card>
 
       {/* Compliance Rate */}
-      <div className="flex items-center gap-[18px] rounded-[20px] bg-white p-5 dark:bg-navy-800">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-lightPrimary dark:bg-navy-700">
-          <TrendingUp className="h-[30px] w-[30px] text-brand-500" />
+      <Card className="flex items-center gap-4 p-5">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
+          <TrendingUp className="h-7 w-7 text-primary" />
         </div>
-        <div className="flex flex-col">
-          <p className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-gray-600 dark:text-gray-400">
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-muted-foreground">
             Compliance Rate
           </p>
-          <p className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-navy-700 dark:text-white">
-            {stats.complianceRate}%
-          </p>
-          <div className="flex items-center gap-1">
-            <span className="font-dm text-xs font-bold leading-5 tracking-[-0.24px] text-green-500">
+          <p className="text-2xl font-bold">{stats.complianceRate}%</p>
+          <div className="flex gap-1">
+            <span className="text-xs font-semibold text-green-600 dark:text-green-400">
               +{stats.complianceChange}%
             </span>
-            <span className="font-dm text-xs leading-5 tracking-[-0.24px] text-gray-600 dark:text-gray-400">
-              from last quarter
-            </span>
+            <span className="text-xs text-muted-foreground">from last quarter</span>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
