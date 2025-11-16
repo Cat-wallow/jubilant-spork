@@ -81,4 +81,4 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUpdate }) =>
     - **Components & Types**: `PascalCase` (e.g., `UserProfile`, `IUserProps`).
     - **Variables, Functions, Hooks**: `camelCase` (e.g., `userData`, `fetchUsers`, `useUserData`).
     - **Custom Hooks**: Must start with `use` (e.g., `useAuth`).
-- **Imports**: Use absolute imports (`@/components/...`) instead of relative imports (`../../components/...`).
+- **Imports**: Use absolute imports (`components/...`) instead of relative imports (`../../components/...`).

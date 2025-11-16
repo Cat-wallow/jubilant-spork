@@ -1,7 +1,7 @@
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Toggle } from '@/components/ui/toggle';
+import { Card } from 'components/ui/card';
+import { Input } from 'components/ui/input';
+import { Label } from 'components/ui/label';
+import { Toggle } from 'components/ui/toggle';
 
 interface SecuritySectionProps {
   formData: any;
@@ -21,7 +21,7 @@ export default function SecuritySection({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">Wajib 2FA</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               Paksa semua pengguna menggunakan 2FA
             </p>
           </div>

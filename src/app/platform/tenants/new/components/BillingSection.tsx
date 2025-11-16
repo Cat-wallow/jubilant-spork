@@ -1,14 +1,14 @@
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Toggle } from '@/components/ui/toggle';
+import { Card } from 'components/ui/card';
+import { Input } from 'components/ui/input';
+import { Label } from 'components/ui/label';
+import { Toggle } from 'components/ui/toggle';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from 'components/ui/select';
 
 interface BillingSectionProps {
   formData: any;
@@ -56,7 +56,7 @@ export default function BillingSection({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">Auto Inactive</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               Tangguhkan otomatis akun jika terlambat bayar
             </p>
           </div>
