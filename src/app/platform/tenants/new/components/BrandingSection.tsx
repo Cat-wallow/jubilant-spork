@@ -37,7 +37,9 @@ export default function BrandingSection({
               <Input
                 type="text"
                 value={formData.primaryColor}
-                onChange={(e) => updateFormData({ primaryColor: e.target.value })}
+                onChange={(e) =>
+                  updateFormData({ primaryColor: e.target.value })
+                }
                 placeholder="#qw123d"
               />
             </div>
@@ -51,7 +53,9 @@ export default function BrandingSection({
               <Input
                 type="text"
                 value={formData.secondaryColor}
-                onChange={(e) => updateFormData({ secondaryColor: e.target.value })}
+                onChange={(e) =>
+                  updateFormData({ secondaryColor: e.target.value })
+                }
                 placeholder="#6E3DB7"
               />
             </div>

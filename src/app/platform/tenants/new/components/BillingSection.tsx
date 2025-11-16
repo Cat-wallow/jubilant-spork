@@ -27,7 +27,10 @@ export default function BillingSection({
         {/* Billing Cycle */}
         <div className="space-y-2">
           <Label>Siklus Penagihan</Label>
-          <Select value={formData.billingCycle} onValueChange={(value) => updateFormData({ billingCycle: value })}>
+          <Select
+            value={formData.billingCycle}
+            onValueChange={(value) => updateFormData({ billingCycle: value })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Pilih siklus" />
             </SelectTrigger>
@@ -53,13 +56,15 @@ export default function BillingSection({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">Auto Inactive</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Tangguhkan otomatis akun jika terlambat bayar
             </p>
           </div>
           <Toggle
             pressed={formData.autoInactive}
-            onPressedChange={(pressed) => updateFormData({ autoInactive: pressed })}
+            onPressedChange={(pressed) =>
+              updateFormData({ autoInactive: pressed })
+            }
             className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
           >
             {formData.autoInactive ? 'ON' : 'OFF'}

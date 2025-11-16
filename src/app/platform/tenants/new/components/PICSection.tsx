@@ -36,7 +36,10 @@ export default function PICSection({
 
           <div className="space-y-2">
             <Label>Jabatan</Label>
-            <Select value={formData.position} onValueChange={(value) => updateFormData({ position: value })}>
+            <Select
+              value={formData.position}
+              onValueChange={(value) => updateFormData({ position: value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Pilih jabatan" />
               </SelectTrigger>

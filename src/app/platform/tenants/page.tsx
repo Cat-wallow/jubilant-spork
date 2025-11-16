@@ -21,7 +21,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import TenantStats from './components/TenantStats';
-import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 function TenantsPageContent() {
@@ -79,7 +86,8 @@ function TenantsPageContent() {
     const matchesSearch = tenant.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || tenant.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'all' || tenant.status === statusFilter;
     const matchesPlan = planFilter === 'all' || tenant.plan === planFilter;
     return matchesSearch && matchesStatus && matchesPlan;
   });
@@ -116,7 +124,7 @@ function TenantsPageContent() {
     <div className="mt-3 w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-[5px]">
-        <p className="text-sm font-medium text-muted-foreground">Tenant</p>
+        <p className="text-muted-foreground text-sm font-medium">Tenant</p>
         <h1 className="text-4xl font-bold tracking-tight">
           Tenant (Perusahaan Konsultan Pajak)
         </h1>
@@ -126,14 +134,14 @@ function TenantsPageContent() {
       <TenantStats stats={stats} />
 
       {/* Main Content Card */}
-      <div className="rounded-lg border bg-card p-6">
+      <div className="bg-card rounded-lg border p-6">
         {/* Title and Add Button */}
         <div className="mb-6 flex items-start justify-between">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-bold">
               Daftar Tenant ({filteredTenants.length})
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Kelola data identitas, klasifikasi pajak, dan dokumen legal client
             </p>
           </div>
@@ -149,7 +157,7 @@ function TenantsPageContent() {
         {/* Filters */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 items-center gap-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
+            <Search className="text-muted-foreground h-4 w-4" />
             <Input
               type="text"
               placeholder="Cari Nama Tenant"
@@ -229,7 +237,7 @@ function TenantsPageContent() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="inline-flex rounded bg-accent/10 px-2 py-1 text-xs font-semibold text-accent">
+                  <span className="bg-accent/10 text-accent inline-flex rounded px-2 py-1 text-xs font-semibold">
                     {tenant.plan}
                   </span>
                 </TableCell>
@@ -241,11 +249,13 @@ function TenantsPageContent() {
                       <span>{tenant.storage.used}GB</span>
                       <span>{tenant.storage.total}GB</span>
                     </div>
-                    <div className="h-2 w-24 rounded-full bg-muted">
+                    <div className="bg-muted h-2 w-24 rounded-full">
                       <div
-                        className="h-2 rounded-full bg-primary"
+                        className="bg-primary h-2 rounded-full"
                         style={{
-                          width: `${(tenant.storage.used / tenant.storage.total) * 100}%`,
+                          width: `${
+                            (tenant.storage.used / tenant.storage.total) * 100
+                          }%`,
                         }}
                       />
                     </div>
@@ -271,8 +281,9 @@ function TenantsPageContent() {
 
         {/* Pagination */}
         <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing 1-{filteredTenants.length} of {filteredTenants.length} tenants
+          <p className="text-muted-foreground text-sm">
+            Showing 1-{filteredTenants.length} of {filteredTenants.length}{' '}
+            tenants
           </p>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" disabled>

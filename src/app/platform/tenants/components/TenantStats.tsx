@@ -18,15 +18,15 @@ export default function TenantStats({ stats }: TenantStatsProps) {
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {/* Total Client */}
       <Card className="flex items-center gap-4 p-5">
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
-          <Users className="h-7 w-7 text-primary" />
+        <div className="bg-muted flex h-14 w-14 items-center justify-center rounded-lg">
+          <Users className="text-primary h-7 w-7" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
+          <p className="text-muted-foreground text-sm font-semibold">
             Total Client
           </p>
           <p className="text-2xl font-bold">{stats.totalClients}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {stats.pkpClients} PKP / {stats.nonPkpClients} Non-PKP
           </p>
         </div>
@@ -34,11 +34,11 @@ export default function TenantStats({ stats }: TenantStatsProps) {
 
       {/* Active Client */}
       <Card className="flex items-center gap-4 p-5">
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
-          <Briefcase className="h-7 w-7 text-primary" />
+        <div className="bg-muted flex h-14 w-14 items-center justify-center rounded-lg">
+          <Briefcase className="text-primary h-7 w-7" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
+          <p className="text-muted-foreground text-sm font-semibold">
             Active Client
           </p>
           <p className="text-2xl font-bold">{stats.activeClients}</p>
@@ -47,25 +47,25 @@ export default function TenantStats({ stats }: TenantStatsProps) {
 
       {/* Total Project */}
       <Card className="flex items-center gap-4 p-5">
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
-          <Briefcase className="h-7 w-7 text-primary" />
+        <div className="bg-muted flex h-14 w-14 items-center justify-center rounded-lg">
+          <Briefcase className="text-primary h-7 w-7" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
+          <p className="text-muted-foreground text-sm font-semibold">
             Total Project
           </p>
           <p className="text-2xl font-bold">{stats.totalProjects}</p>
-          <p className="text-xs text-muted-foreground">Dari semua klien</p>
+          <p className="text-muted-foreground text-xs">Dari semua klien</p>
         </div>
       </Card>
 
       {/* Compliance Rate */}
       <Card className="flex items-center gap-4 p-5">
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
-          <TrendingUp className="h-7 w-7 text-primary" />
+        <div className="bg-muted flex h-14 w-14 items-center justify-center rounded-lg">
+          <TrendingUp className="text-primary h-7 w-7" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
+          <p className="text-muted-foreground text-sm font-semibold">
             Compliance Rate
           </p>
           <p className="text-2xl font-bold">{stats.complianceRate}%</p>
@@ -73,7 +73,9 @@ export default function TenantStats({ stats }: TenantStatsProps) {
             <span className="text-xs font-semibold text-green-600 dark:text-green-400">
               +{stats.complianceChange}%
             </span>
-            <span className="text-xs text-muted-foreground">from last quarter</span>
+            <span className="text-muted-foreground text-xs">
+              from last quarter
+            </span>
           </div>
         </div>
       </Card>

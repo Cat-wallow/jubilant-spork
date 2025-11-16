@@ -26,14 +26,21 @@ export default function PackageSection({
         {/* Package Selection */}
         <div className="space-y-2">
           <Label>Pilih Paket *</Label>
-          <Select value={formData.package} onValueChange={(value) => updateFormData({ package: value })}>
+          <Select
+            value={formData.package}
+            onValueChange={(value) => updateFormData({ package: value })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Pilih paket" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Free - Rp.0">Free - Rp.0</SelectItem>
-              <SelectItem value="Pro - Rp.2.500.000">Pro - Rp.2.500.000</SelectItem>
-              <SelectItem value="Enterprise - Rp.5.000.000">Enterprise - Rp.5.000.000</SelectItem>
+              <SelectItem value="Pro - Rp.2.500.000">
+                Pro - Rp.2.500.000
+              </SelectItem>
+              <SelectItem value="Enterprise - Rp.5.000.000">
+                Enterprise - Rp.5.000.000
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>

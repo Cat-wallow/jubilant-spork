@@ -21,13 +21,15 @@ export default function SecuritySection({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">Wajib 2FA</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Paksa semua pengguna menggunakan 2FA
             </p>
           </div>
           <Toggle
             pressed={formData.require2FA}
-            onPressedChange={(pressed) => updateFormData({ require2FA: pressed })}
+            onPressedChange={(pressed) =>
+              updateFormData({ require2FA: pressed })
+            }
             className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
           >
             {formData.require2FA ? 'ON' : 'OFF'}
@@ -41,7 +43,9 @@ export default function SecuritySection({
             <Input
               type="number"
               value={formData.minPasswordLength}
-              onChange={(e) => updateFormData({ minPasswordLength: e.target.value })}
+              onChange={(e) =>
+                updateFormData({ minPasswordLength: e.target.value })
+              }
               placeholder="8"
             />
           </div>
@@ -51,7 +55,9 @@ export default function SecuritySection({
             <Input
               type="number"
               value={formData.sessionTimeout}
-              onChange={(e) => updateFormData({ sessionTimeout: e.target.value })}
+              onChange={(e) =>
+                updateFormData({ sessionTimeout: e.target.value })
+              }
               placeholder="10"
             />
           </div>

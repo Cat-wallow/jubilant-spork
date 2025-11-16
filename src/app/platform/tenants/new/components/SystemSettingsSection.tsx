@@ -49,21 +49,33 @@ export default function SystemSettingsSection({
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <Label>Time zone</Label>
-            <Select value={formData.timezone} onValueChange={(value) => updateFormData({ timezone: value })}>
+            <Select
+              value={formData.timezone}
+              onValueChange={(value) => updateFormData({ timezone: value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Pilih timezone" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Asia/Jakarta (WIB)">Asia/Jakarta (WIB)</SelectItem>
-                <SelectItem value="Asia/Surabaya (WITA)">Asia/Surabaya (WITA)</SelectItem>
-                <SelectItem value="Asia/Makassar (WITA)">Asia/Makassar (WITA)</SelectItem>
+                <SelectItem value="Asia/Jakarta (WIB)">
+                  Asia/Jakarta (WIB)
+                </SelectItem>
+                <SelectItem value="Asia/Surabaya (WITA)">
+                  Asia/Surabaya (WITA)
+                </SelectItem>
+                <SelectItem value="Asia/Makassar (WITA)">
+                  Asia/Makassar (WITA)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label>Bahasa</Label>
-            <Select value={formData.language} onValueChange={(value) => updateFormData({ language: value })}>
+            <Select
+              value={formData.language}
+              onValueChange={(value) => updateFormData({ language: value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Pilih bahasa" />
               </SelectTrigger>
@@ -76,7 +88,10 @@ export default function SystemSettingsSection({
 
           <div className="space-y-2">
             <Label>Mata Uang</Label>
-            <Select value={formData.currency} onValueChange={(value) => updateFormData({ currency: value })}>
+            <Select
+              value={formData.currency}
+              onValueChange={(value) => updateFormData({ currency: value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Pilih mata uang" />
               </SelectTrigger>
@@ -95,7 +110,10 @@ export default function SystemSettingsSection({
           {/* Feature Toggles Grid */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map(({ key, label }) => (
-              <div key={key} className="flex items-center gap-3 rounded-lg border p-3">
+              <div
+                key={key}
+                className="flex items-center gap-3 rounded-lg border p-3"
+              >
                 <Toggle
                   pressed={formData.features[key]}
                   onPressedChange={() => toggleFeature(key)}

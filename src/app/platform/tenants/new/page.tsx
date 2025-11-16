@@ -67,8 +67,12 @@ function NewTenantPageContent() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex flex-1 flex-col gap-1">
-          <p className="text-sm text-muted-foreground">Tenant &gt; Add Tenant</p>
-          <h1 className="text-4xl font-bold tracking-tight">Tambah Tenant Baru</h1>
+          <p className="text-muted-foreground text-sm">
+            Tenant &gt; Add Tenant
+          </p>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Tambah Tenant Baru
+          </h1>
         </div>
         <Button onClick={handleSubmit} className="gap-2">
           <Plus className="h-4 w-4" />
@@ -81,7 +85,10 @@ function NewTenantPageContent() {
         {/* Row 1: Basic Info + Package */}
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <BasicInfoSection formData={formData} updateFormData={updateFormData} />
+            <BasicInfoSection
+              formData={formData}
+              updateFormData={updateFormData}
+            />
           </div>
           <PackageSection formData={formData} updateFormData={updateFormData} />
         </div>
@@ -98,7 +105,10 @@ function NewTenantPageContent() {
         <BrandingSection formData={formData} updateFormData={updateFormData} />
 
         {/* Row 4: System Settings */}
-        <SystemSettingsSection formData={formData} updateFormData={updateFormData} />
+        <SystemSettingsSection
+          formData={formData}
+          updateFormData={updateFormData}
+        />
 
         {/* Row 5: Security */}
         <SecuritySection formData={formData} updateFormData={updateFormData} />
