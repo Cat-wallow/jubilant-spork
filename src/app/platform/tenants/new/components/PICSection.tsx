@@ -1,4 +1,13 @@
-import { ChevronDown } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface PICSectionProps {
   formData: any;
@@ -10,73 +19,59 @@ export default function PICSection({
   updateFormData,
 }: PICSectionProps) {
   return (
-    <div className="flex flex-1 flex-col gap-5 rounded-[20px] bg-white p-5 dark:bg-navy-800">
-      <h2 className="font-roboto text-[22px] font-medium leading-7 text-navy-700 dark:text-white">
-        Person in Charge (PIC)
-      </h2>
+    <Card className="p-6">
+      <h2 className="mb-6 text-xl font-semibold">Person in Charge (PIC)</h2>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="space-y-4">
         {/* Row 1 */}
-        <div className="flex gap-5">
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Nama PIC*
-            </label>
-            <input
-              type="text"
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Nama PIC *</Label>
+            <Input
               placeholder="Nama lengkap PIC"
               value={formData.picName}
               onChange={(e) => updateFormData({ picName: e.target.value })}
-              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
             />
           </div>
 
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Jabatan
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Manager, Owner, dll"
-                value={formData.position}
-                onChange={(e) => updateFormData({ position: e.target.value })}
-                className="font-public-sans h-[54px] w-full rounded-lg border border-gray-300 bg-white px-3.5 pr-10 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-              />
-              <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
-            </div>
+          <div className="space-y-2">
+            <Label>Jabatan</Label>
+            <Select value={formData.position} onValueChange={(value) => updateFormData({ position: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih jabatan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Manager">Manager</SelectItem>
+                <SelectItem value="Owner">Owner</SelectItem>
+                <SelectItem value="Director">Director</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Row 2 */}
-        <div className="flex gap-5">
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Email *
-            </label>
-            <input
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Email *</Label>
+            <Input
               type="email"
               placeholder="email@example.com"
               value={formData.email}
               onChange={(e) => updateFormData({ email: e.target.value })}
-              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
             />
           </div>
 
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Telepon *
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label>Telepon *</Label>
+            <Input
               type="tel"
               placeholder="365-374-4961"
               value={formData.phone}
               onChange={(e) => updateFormData({ phone: e.target.value })}
-              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
             />
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -1,4 +1,13 @@
-import { ChevronDown } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface PackageSectionProps {
   formData: any;
@@ -10,67 +19,61 @@ export default function PackageSection({
   updateFormData,
 }: PackageSectionProps) {
   return (
-    <div className="flex w-[500px] flex-col gap-5 rounded-[20px] bg-white p-5 dark:bg-navy-800">
-      <h2 className="font-roboto text-[22px] font-medium leading-7 text-navy-700 dark:text-white">
-        Paket Layanan
-      </h2>
+    <Card className="p-6">
+      <h2 className="mb-6 text-xl font-semibold">Paket Layanan</h2>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="space-y-4">
         {/* Package Selection */}
-        <div className="flex flex-col">
-          <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-            Pilih Paket *
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={formData.package}
-              onChange={(e) => updateFormData({ package: e.target.value })}
-              className="font-public-sans h-[54px] w-full rounded-lg border border-gray-300 bg-white px-3.5 pr-10 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-            />
-            <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
-          </div>
+        <div className="space-y-2">
+          <Label>Pilih Paket *</Label>
+          <Select value={formData.package} onValueChange={(value) => updateFormData({ package: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih paket" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Free - Rp.0">Free - Rp.0</SelectItem>
+              <SelectItem value="Pro - Rp.2.500.000">Pro - Rp.2.500.000</SelectItem>
+              <SelectItem value="Enterprise - Rp.5.000.000">Enterprise - Rp.5.000.000</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Row: Storage, Projects, Max Users */}
-        <div className="flex gap-5">
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Storage (GB) *
-            </label>
-            <input
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Storage (GB) *</Label>
+            <Input
               type="text"
               value={formData.storage}
               onChange={(e) => updateFormData({ storage: e.target.value })}
-              className="font-public-sans h-[53px] rounded-lg bg-gray-100 px-3 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none dark:bg-navy-900 dark:text-white"
+              readOnly
+              className="bg-muted"
             />
           </div>
 
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Project*
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label>Project *</Label>
+            <Input
               type="text"
               value={formData.projects}
               onChange={(e) => updateFormData({ projects: e.target.value })}
-              className="font-public-sans h-[53px] rounded-lg bg-gray-100 px-3 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none dark:bg-navy-900 dark:text-white"
+              readOnly
+              className="bg-muted"
             />
           </div>
 
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Max User *
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label>Max User *</Label>
+            <Input
               type="text"
               value={formData.maxUsers}
               onChange={(e) => updateFormData({ maxUsers: e.target.value })}
-              className="font-public-sans h-[53px] rounded-lg bg-gray-100 px-3 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none dark:bg-navy-900 dark:text-white"
+              readOnly
+              className="bg-muted"
             />
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

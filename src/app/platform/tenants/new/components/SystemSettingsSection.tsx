@@ -1,113 +1,114 @@
-import { ChevronDown } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Toggle } from '@/components/ui/toggle';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface SystemSettingsSectionProps {
   formData: any;
   updateFormData: (updates: any) => void;
 }
 
+const FEATURES = [
+  { key: 'form10', label: 'Form 1.0' },
+  { key: 'kk1', label: 'KK1' },
+  { key: 'kk2', label: 'KK2' },
+  { key: 'kk3', label: 'KK3' },
+  { key: 'kk4', label: 'KK4' },
+  { key: 'kk5', label: 'KK5' },
+  { key: 'clientManagement', label: 'Manajemen Klien' },
+  { key: 'reports', label: 'Laporan' },
+  { key: 'analytics', label: 'Analytics' },
+];
+
 export default function SystemSettingsSection({
   formData,
   updateFormData,
 }: SystemSettingsSectionProps) {
-  const toggleFeature = (feature: string) => {
+  const toggleFeature = (key: string) => {
     updateFormData({
       features: {
         ...formData.features,
-        [feature]: !formData.features[feature],
+        [key]: !formData.features[key],
       },
     });
   };
 
   return (
-    <div className="flex w-[1040px] flex-col gap-5 rounded-[20px] bg-white p-5 dark:bg-navy-800">
-      <h2 className="font-roboto text-[22px] font-medium leading-7 text-navy-700 dark:text-white">
-        Pengaturan Sistem
-      </h2>
+    <Card className="p-6">
+      <h2 className="mb-6 text-xl font-semibold">Pengaturan Sistem</h2>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="space-y-6">
         {/* Row 1: Timezone, Language, Currency */}
-        <div className="flex gap-5">
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Time zone
-            </label>
-            <input
-              type="text"
-              value={formData.timezone}
-              onChange={(e) => updateFormData({ timezone: e.target.value })}
-              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-            />
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label>Time zone</Label>
+            <Select value={formData.timezone} onValueChange={(value) => updateFormData({ timezone: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih timezone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Asia/Jakarta (WIB)">Asia/Jakarta (WIB)</SelectItem>
+                <SelectItem value="Asia/Surabaya (WITA)">Asia/Surabaya (WITA)</SelectItem>
+                <SelectItem value="Asia/Makassar (WITA)">Asia/Makassar (WITA)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Bahasa
-            </label>
-            <input
-              type="text"
-              value={formData.language}
-              onChange={(e) => updateFormData({ language: e.target.value })}
-              className="font-public-sans h-[54px] rounded-lg border border-gray-300 bg-white px-3.5 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-            />
+          <div className="space-y-2">
+            <Label>Bahasa</Label>
+            <Select value={formData.language} onValueChange={(value) => updateFormData({ language: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih bahasa" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Indonesia">Indonesia</SelectItem>
+                <SelectItem value="English">English</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex flex-1 flex-col">
-            <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-              Mata Uang
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={formData.currency}
-                onChange={(e) => updateFormData({ currency: e.target.value })}
-                className="font-public-sans h-[54px] w-full rounded-lg border border-gray-300 bg-white px-3.5 pr-10 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-              />
-              <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
-            </div>
+          <div className="space-y-2">
+            <Label>Mata Uang</Label>
+            <Select value={formData.currency} onValueChange={(value) => updateFormData({ currency: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih mata uang" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Rupiah (IDR)">Rupiah (IDR)</SelectItem>
+                <SelectItem value="Dollar (USD)">Dollar (USD)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* NIK Label */}
-        <label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-          NIK *
-        </label>
+        <div>
+          <Label className="mb-4 block">NIK *</Label>
 
-        {/* Feature Toggles Grid */}
-        <div className="grid grid-cols-3 gap-x-5 gap-y-2.5">
-          {Object.entries({
-            form10: 'Form 1.0',
-            kk1: 'KK1',
-            kk2: 'KK2',
-            kk3: 'KK3',
-            kk4: 'KK4',
-            kk5: 'KK5',
-            clientManagement: 'Manajemen Klien',
-            reports: 'Laporan',
-            analytics: 'Analytics',
-          }).map(([key, label]) => (
-            <div key={key} className="flex w-[320px] items-center gap-2">
-              <button
-                type="button"
-                onClick={() => toggleFeature(key)}
-                className={`relative h-6 w-11 rounded-full transition-colors ${
-                  formData.features[key] ? 'bg-brand-500' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`absolute top-[2px] block h-5 w-5 rounded-full bg-white transition-transform ${
-                    formData.features[key]
-                      ? 'translate-x-[22px]'
-                      : 'translate-x-[2px]'
-                  }`}
-                />
-              </button>
-              <span className="font-inter text-sm font-medium leading-[14px] text-gray-900 dark:text-white">
-                {label}
-              </span>
-            </div>
-          ))}
+          {/* Feature Toggles Grid */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map(({ key, label }) => (
+              <div key={key} className="flex items-center gap-3 rounded-lg border p-3">
+                <Toggle
+                  pressed={formData.features[key]}
+                  onPressedChange={() => toggleFeature(key)}
+                  className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                >
+                  {formData.features[key] ? 'ON' : 'OFF'}
+                </Toggle>
+                <Label className="cursor-pointer text-sm">{label}</Label>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

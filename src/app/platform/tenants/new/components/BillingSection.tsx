@@ -1,4 +1,14 @@
-import { ChevronDown } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Toggle } from '@/components/ui/toggle';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface BillingSectionProps {
   formData: any;
@@ -10,73 +20,52 @@ export default function BillingSection({
   updateFormData,
 }: BillingSectionProps) {
   return (
-    <div className="flex w-[500px] flex-col gap-5 rounded-[20px] bg-white p-5 dark:bg-navy-800">
-      <h2 className="font-roboto text-[22px] font-medium leading-7 text-navy-700 dark:text-white">
-        Pengaturan Billing
-      </h2>
+    <Card className="p-6">
+      <h2 className="mb-6 text-xl font-semibold">Pengaturan Billing</h2>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="space-y-4">
         {/* Billing Cycle */}
-        <div className="flex flex-col">
-          <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-            Siklus Penagihan
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={formData.billingCycle}
-              onChange={(e) => updateFormData({ billingCycle: e.target.value })}
-              className="font-public-sans h-[54px] w-full rounded-lg border border-gray-300 bg-white px-3.5 pr-10 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-            />
-            <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
-          </div>
+        <div className="space-y-2">
+          <Label>Siklus Penagihan</Label>
+          <Select value={formData.billingCycle} onValueChange={(value) => updateFormData({ billingCycle: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih siklus" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Bulanan">Bulanan</SelectItem>
+              <SelectItem value="Tahunan">Tahunan</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Trial Days */}
-        <div className="flex flex-col">
-          <label className="font-roboto mb-2 text-base font-medium leading-6 tracking-[0.15px] text-gray-700 dark:text-gray-300">
-            Batas Hari Trial
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={formData.trialDays}
-              onChange={(e) => updateFormData({ trialDays: e.target.value })}
-              className="font-public-sans h-[54px] w-full rounded-lg border border-gray-300 bg-white px-3.5 pr-10 text-sm leading-[22px] text-navy-700 placeholder-gray-400 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
-            />
-            <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
-          </div>
+        <div className="space-y-2">
+          <Label>Batas Hari Trial</Label>
+          <Input
+            type="number"
+            value={formData.trialDays}
+            onChange={(e) => updateFormData({ trialDays: e.target.value })}
+            placeholder="7"
+          />
         </div>
 
         {/* Auto Inactive Toggle */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-1.5">
-            <span className="font-inter text-sm font-medium leading-[14px] text-gray-900 dark:text-white">
-              Auto Inactive
-            </span>
-            <p className="font-roboto text-sm leading-5 tracking-[0.25px] text-navy-700 dark:text-gray-400">
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Auto Inactive</p>
+            <p className="text-xs text-muted-foreground">
               Tangguhkan otomatis akun jika terlambat bayar
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() =>
-              updateFormData({ autoInactive: !formData.autoInactive })
-            }
-            className={`relative h-6 w-11 rounded-full transition-colors ${
-              formData.autoInactive ? 'bg-brand-500' : 'bg-gray-300'
-            }`}
+          <Toggle
+            pressed={formData.autoInactive}
+            onPressedChange={(pressed) => updateFormData({ autoInactive: pressed })}
+            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
           >
-            <span
-              className={`absolute top-[2px] block h-5 w-5 rounded-full bg-white transition-transform ${
-                formData.autoInactive
-                  ? 'translate-x-[22px]'
-                  : 'translate-x-[2px]'
-              }`}
-            />
-          </button>
+            {formData.autoInactive ? 'ON' : 'OFF'}
+          </Toggle>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
