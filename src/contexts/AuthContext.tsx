@@ -105,7 +105,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Store the entire session response in the query cache
       queryClient.setQueryData(['session'], response);
       queryClient.invalidateQueries({ queryKey: ['session'] });
-      router.push('/admin/default');
+
+      // Redirect user based on the path provided by the backend
+      const redirectPath = response.data?.redirectTo || '/admin/default';
+      router.push(redirectPath);
     },
     onError: (error) => {
       console.error('Login failed:', error);
