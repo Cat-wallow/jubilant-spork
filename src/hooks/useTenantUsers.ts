@@ -98,9 +98,14 @@ export const useDeactivateUser = (tenantId: string) => {
 
   return useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
+      const payload: { reason?: string } = {};
+      if (reason && reason.trim().length > 0) {
+        payload.reason = reason;
+      }
+
       const { data } = await api.delete(
         `/api/v1/tenants/${tenantId}/users/${userId}`,
-        { data: { reason } },
+        { data: payload },
       );
       return data;
     },

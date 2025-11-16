@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Edit, UserX, UserCheck } from 'lucide-react';
 import { useUpdateUserRole, useDeactivateUser, useReactivateUser } from 'hooks/useTenantUsers';
 import { useAuth } from 'contexts/AuthContext';
+import api from 'lib/api';
 
 interface User {
   id: string;
@@ -13,20 +14,17 @@ interface User {
   status: 'active' | 'inactive';
 }
 
+interface Role {
+  id: string;
+  name: string;
+  level?: number;
+}
+
 interface UserActionsMenuProps {
   tenantId: string;
   user: User;
   onSuccess: () => void;
 }
-
-const ROLES = [
-  { id: 'admin_tenant', name: 'Admin Tenant' },
-  { id: 'wajib_pajak', name: 'Wajib Pajak / WP' },
-  { id: 'anggota_tim', name: 'Anggota Tim' },
-  { id: 'ketua_tim', name: 'Ketua Tim' },
-  { id: 'pmo', name: 'PMO (Project Manager)' },
-  { id: 'direktur', name: 'Direktur' },
-];
 
 export default function UserActionsMenu({ tenantId, user, onSuccess }: UserActionsMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -151,7 +149,24 @@ export default function UserActionsMenu({ tenantId, user, onSuccess }: UserActio
 // Change Role Modal Component
 function ChangeRoleModal({ tenantId, user, onClose, onSuccess }: { tenantId: string; user: User; onClose: () => void; onSuccess: () => void }) {
   const [roleId, setRoleId] = useState('');
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loadingRoles, setLoadingRoles] = useState(true);
   const updateRoleMutation = useUpdateUserRole(tenantId);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const { data } = await api.get('/api/v1/roles');
+        setRoles(data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch roles:', error);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+
+    fetchRoles();
+  }, [tenantId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,10 +203,13 @@ function ChangeRoleModal({ tenantId, user, onClose, onSuccess }: { tenantId: str
               value={roleId}
               onChange={(e) => setRoleId(e.target.value)}
               required
+              disabled={loadingRoles}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-navy-900 dark:text-white"
             >
-              <option value="">Pilih role...</option>
-              {ROLES.map((role) => (
+              <option value="">
+                {loadingRoles ? 'Loading roles...' : 'Pilih role...'}
+              </option>
+              {roles.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name}
                 </option>
