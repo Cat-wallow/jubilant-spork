@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { forgotPassword } from 'lib/api'; // Assuming resend logic is the same as forgot password
+import { forgotPassword } from 'lib/api';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -25,7 +27,7 @@ export default function VerifyEmailPage() {
       setIsResending(true);
       setResendMessage('');
       try {
-        await forgotPassword(email); // Re-use the forgot password API for resending
+        await forgotPassword(email);
         setResendMessage('Tautan baru telah berhasil dikirim.');
       } catch (error) {
         setResendMessage('Gagal mengirim ulang tautan. Coba lagi nanti.');
@@ -38,7 +40,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-white px-4 py-8 dark:bg-navy-900">
-      <div className="flex w-full max-w-[450px] flex-col items-center justify-center gap-[20px] rounded-[20px] bg-white px-6 py-12 shadow-[0_4px_8.3px_0_rgba(0,0,0,0.25)] dark:bg-navy-800 dark:shadow-[0_4px_8.3px_0_rgba(0,0,0,0.5)] sm:px-[50px] sm:py-[50px]">
+      <Card className="flex w-full max-w-[450px] flex-col items-center justify-center gap-5 rounded-[20px] p-6 sm:p-[50px]">
         {/* Mail Icon */}
         <svg
           className="h-[72px] w-[72px]"
@@ -55,11 +57,11 @@ export default function VerifyEmailPage() {
         </svg>
 
         {/* Header */}
-        <div className="flex flex-col items-center justify-center gap-2 text-center">
-          <h1 className="font-dm text-xl font-normal leading-[56px] tracking-[-0.48px] text-navy-700 dark:text-white">
+        <div className="space-y-2 text-center">
+          <h1 className="text-xl font-normal leading-[56px] tracking-[-0.48px] text-navy-700 dark:text-white">
             Periksa email masuk!
           </h1>
-          <p className="font-dm text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
+          <p className="text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
             Tautan verifikasi telah dikirim ke{' '}
             <span className="font-medium text-navy-700 dark:text-white">
               {email || 'email Anda'}
@@ -67,42 +69,46 @@ export default function VerifyEmailPage() {
           </p>
         </div>
 
-        {/* Instructions & Demo Section */}
-        <div className="flex w-full flex-col items-start gap-[15px]">
-          {/* Instructions Box */}
-          <div className="flex w-full items-center justify-center gap-2.5 rounded-[15px] border border-gray-300 p-[15px] dark:border-white/30">
-            <p className="flex-1 font-dm text-sm font-normal leading-[150%] text-gray-600 dark:text-gray-400">
-              Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata
-              sandi. Jika tidak menerima email dalam 60 detik, kirim ulang email
-              verifikasi.
-            </p>
-          </div>
-
-          {/* Resend Button */}
-          <div className="relative h-auto w-full">
-            <button
-              onClick={handleResend}
-              disabled={countdown > 0 || isResending}
-              className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-gray-300 px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-gray-600 transition-colors enabled:bg-brand-500 enabled:text-white enabled:hover:bg-brand-600 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-400 dark:enabled:bg-brand-400 dark:enabled:hover:bg-brand-500"
-            >
-              {isResending
-                ? 'Mengirim ulang...'
-                : countdown > 0
-                ? `Kirim ulang (${countdown}s)`
-                : 'Kirim ulang'}
-            </button>
-            {resendMessage && (
-              <p className="mt-2 text-center text-sm text-green-500">
-                {resendMessage}
-              </p>
-            )}
-          </div>
+        {/* Instructions Box */}
+        <div className="w-full rounded-[15px] border border-gray-300 p-[15px] dark:border-white/30">
+          <p className="text-sm font-normal leading-[150%] text-gray-600 dark:text-gray-400">
+            Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata
+            sandi. Jika tidak menerima email dalam 60 detik, kirim ulang email
+            verifikasi.
+          </p>
         </div>
+
+        {/* Resend Button */}
+        <Button
+          onClick={handleResend}
+          disabled={countdown > 0 || isResending}
+          variant={countdown > 0 ? 'outline' : 'default'}
+          className="h-[54px] w-full rounded-2xl text-sm font-bold leading-[100%] tracking-[-0.28px]"
+        >
+          {isResending
+            ? 'Mengirim ulang...'
+            : countdown > 0
+              ? `Kirim ulang (${countdown}s)`
+              : 'Kirim ulang'}
+        </Button>
+
+        {/* Resend Message */}
+        {resendMessage && (
+          <p
+            className={`text-center text-sm ${
+              resendMessage.includes('berhasil')
+                ? 'text-green-500'
+                : 'text-red-500'
+            }`}
+          >
+            {resendMessage}
+          </p>
+        )}
 
         {/* Back to Login */}
         <button
           onClick={() => router.push('/auth/sign-in')}
-          className="flex items-center gap-1 font-dm text-sm font-semibold leading-[22px] text-navy-700 transition-colors hover:text-brand-500 dark:text-gray-300 dark:hover:text-brand-400"
+          className="flex items-center gap-1 text-sm font-semibold leading-[22px] text-navy-700 transition-colors hover:text-brand-500 dark:text-gray-300 dark:hover:text-brand-400"
         >
           <svg
             className="h-4 w-4"
@@ -119,10 +125,10 @@ export default function VerifyEmailPage() {
           </svg>
           Kembali ke halaman masuk
         </button>
-      </div>
+      </Card>
 
       {/* Footer */}
-      <div className="absolute bottom-8 font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-brand-500 dark:text-brand-400">
+      <div className="absolute bottom-8 text-center text-sm font-medium leading-6 tracking-[-0.28px] text-brand-500 dark:text-brand-400">
         © 2025 EasyTax , Made by Surya Microsystems
       </div>
     </div>
