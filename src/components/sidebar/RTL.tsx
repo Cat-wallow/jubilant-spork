@@ -3,7 +3,7 @@
 import { HiX } from 'react-icons/hi';
 import Links from './components/Links';
 
-import SidebarCard from 'components/sidebar/components/SidebarCard';
+// import SidebarCard from 'components/sidebar/components/SidebarCard';
 import {
   renderThumb,
   renderTrack,
@@ -19,7 +19,7 @@ function SidebarHorizon(props: { variant?: string; [x: string]: any }) {
   const { open, onClose, variant, mini, hovered, setHovered } = props;
   return (
     <div
-      className={`sm:none ${
+      className={`sm:none  mx-10 ${
         mini === false
           ? 'w-[285px]'
           : mini === true && hovered === true
@@ -81,9 +81,7 @@ function SidebarHorizon(props: { variant?: string; [x: string]: any }) {
             </div>
             {/* Free Horizon Card    */}
             <div className="mb-[30px] mt-[28px]">
-              <div className="flex justify-center">
-                <SidebarCard />
-              </div>
+              <div className="flex justify-center">{/*<SidebarCard />*/}</div>
               {/* Sidebar profile info */}
               <div className="mt-5 flex items-center justify-center gap-3">
                 <div className="relative h-12 w-12 rounded-full bg-blue-200">

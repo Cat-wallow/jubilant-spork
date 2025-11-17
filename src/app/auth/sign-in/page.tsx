@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
@@ -18,6 +18,8 @@ export default function Index() {
     handleSubmit,
     watch,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(LoginValidator),
     defaultValues: {
@@ -27,16 +29,38 @@ export default function Index() {
 
   const keepLoggedIn = watch('keepLoggedIn');
 
+  // Set server error when login fails
+  useEffect(() => {
+    if (loginMutation.error) {
+      // Extract error message from the response
+      const errorMessage =
+        (loginMutation.error as any)?.message ||
+        'Login gagal, silakan coba lagi';
+
+      // Set a form-level error that will appear below password field
+      setError('root', {
+        type: 'server',
+        message: errorMessage,
+      });
+    } else {
+      // Clear the error when there's no error or on component mount
+      clearErrors('root');
+    }
+  }, [loginMutation.error, setError, clearErrors]);
+
   const handleLogin = (data: LoginFormInputs) => {
+    // Clear any existing server errors before submitting
+    clearErrors('root');
+
     loginMutation.mutate({
-      email: data.email,
+      emailOrUsername: data.emailOrUsername,
       password: data.password,
       rememberMe: data.keepLoggedIn,
     });
   };
 
   return (
-    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-white dark:bg-navy-900">
+    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden  dark:bg-navy-900">
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex flex-1 flex-col items-center justify-end px-6 py-12 lg:px-12">
           <div className="flex w-full max-w-[410px] flex-col gap-[30px]">
@@ -45,17 +69,9 @@ export default function Index() {
                 Login
               </h1>
               <p className="text-base leading-none tracking-[-0.32px] text-gray-700 dark:text-gray-400">
-                Masukan email dan password
+                Masukan email/username dan password
               </p>
             </div>
-
-            {loginMutation.error && (
-              <p className="rounded-lg bg-red-100 p-3 text-sm text-red-500 dark:bg-red-900/20 dark:text-red-400">
-                {(loginMutation.error as any)?.response?.data?.message ||
-                  loginMutation.error?.message ||
-                  'Login failed. Please check your credentials and try again.'}
-              </p>
-            )}
 
             <form
               className="flex flex-col gap-[30px]"
@@ -64,23 +80,23 @@ export default function Index() {
               <div className="space-y-[27px]">
                 <div>
                   <label className="mb-2 block text-sm font-medium leading-none tracking-[-0.28px] text-navy-700 dark:text-white">
-                    Email*
+                    Email atau Username*
                   </label>
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="Email/Username/Phone Number"
-                      {...register('email')}
+                      placeholder="Masukkan email atau username"
+                      {...register('emailOrUsername')}
                       className={`h-[50px] w-full rounded-2xl border px-6 text-sm text-navy-700 focus:outline-none focus:ring-2 dark:bg-navy-800 dark:text-white ${
-                        errors.email
+                        errors.emailOrUsername
                           ? 'border-red-500 focus:ring-red-500 dark:border-red-400'
                           : 'border-gray-300 focus:ring-brand-500 dark:border-white/30 dark:focus:ring-brand-400'
                       }`}
                     />
                   </div>
-                  {errors.email && (
+                  {errors.emailOrUsername && (
                     <p className="mt-1 text-sm text-red-500 dark:text-red-400">
-                      {errors.email.message}
+                      {errors.emailOrUsername.message}
                     </p>
                   )}
                 </div>
@@ -119,6 +135,13 @@ export default function Index() {
                   )}
                 </div>
               </div>
+
+              {/* Server-side error display */}
+              {errors.root && (
+                <div className="-mt-5 rounded-lg bg-red-100 p-3 text-sm text-red-500 dark:bg-red-900/20 dark:text-red-400">
+                  {errors.root.message}
+                </div>
+              )}
 
               <div className="flex items-center justify-between">
                 <label className="flex cursor-pointer items-center gap-[11px]">

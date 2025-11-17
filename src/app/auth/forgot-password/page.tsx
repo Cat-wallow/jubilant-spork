@@ -2,15 +2,29 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { forgotPassword } from '../../../lib/api';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement forgot password API call
-    router.push('/auth/verify-email');
+    setLoading(true);
+    setMessage('');
+    setError('');
+    try {
+      const response = await forgotPassword(email);
+      // On success, redirect to the verify email page with the email as a query param
+      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Terjadi kesalahan.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,17 +77,31 @@ export default function ForgotPasswordPage() {
               placeholder="mail@simmmple.com"
               className="h-[50px] w-full rounded-2xl border border-gray-300 px-6 font-dm text-sm font-normal leading-[100%] tracking-[-0.28px] text-gray-700 placeholder:text-gray-500 focus:border-brand-500 focus:outline-none dark:border-white/30 dark:bg-navy-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-brand-400"
               required
+              disabled={loading || !!message}
             />
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-brand-500 px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-white transition-colors hover:bg-brand-600 dark:bg-brand-400 dark:hover:bg-brand-500"
+            className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-brand-500 px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-brand-400 dark:hover:bg-brand-500"
+            disabled={loading}
           >
-            Kirim tautan reset
+            {loading ? 'Mengirim...' : 'Kirim tautan reset'}
           </button>
         </form>
+
+        {/* Messages */}
+        {message && (
+          <div className="text-center font-dm text-sm text-green-500">
+            {message}
+          </div>
+        )}
+        {error && (
+          <div className=" -my-5 w-full rounded-lg bg-red-100 py-2 text-center text-sm text-red-500 dark:bg-red-900/20 dark:text-red-400">
+            {error}
+          </div>
+        )}
 
         {/* Back to Login */}
         <button

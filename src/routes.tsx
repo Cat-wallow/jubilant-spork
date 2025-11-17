@@ -1,16 +1,5 @@
 import React from 'react';
 
-// Icon Imports
-import {
-  MdHome,
-  MdOutlineShoppingCart,
-  MdBarChart,
-  MdPerson,
-  MdLock,
-  MdMailOutline,
-  MdBusiness,
-} from 'react-icons/md';
-
 const routes = [
   {
     name: 'Dasbor',
@@ -73,7 +62,7 @@ const routes = [
       </svg>
     ),
     path: 'data-tables',
-    collapse: true,
+    collapsible: true,
   },
   {
     name: 'Akuntansi',
@@ -134,8 +123,8 @@ const routes = [
   },
   {
     name: 'Manajemen Pengguna',
-    layout: '/admin',
-    path: 'invitations',
+    layout: '/tenant',
+    path: `users`,
     icon: (
       <svg
         className="h-6 w-6"

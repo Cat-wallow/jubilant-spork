@@ -33,7 +33,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
         <div className="h-full w-full font-dm dark:bg-navy-900">
           {/* Main Content */}
           <main
-            className={`mx-2.5  flex-none transition-all dark:bg-navy-900 
+            className={`mx-2.5  flex-none transition-all dark:bg-navy-900
               md:pr-2 xl:ml-[323px]`}
           >
             {/* Routes */}
@@ -43,7 +43,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
                 brandText={getActiveRoute(routes, pathname)}
                 secondary={getActiveNavbar(routes, pathname)}
               />
-              <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
+              <div className="mx-auto min-h-screen p-2 !pt-[4px] md:p-2">
                 {children}
               </div>
               <div className="p-3">

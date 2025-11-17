@@ -1,11 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { forgotPassword } from 'lib/api'; // Assuming resend logic is the same as forgot password
 
 export default function VerifyEmailPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
+
   const [countdown, setCountdown] = useState(60);
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
 
   useEffect(() => {
     if (countdown > 0) {
@@ -14,16 +20,20 @@ export default function VerifyEmailPage() {
     }
   }, [countdown]);
 
-  const handleResend = () => {
-    if (countdown === 0) {
-      setCountdown(60);
-      // TODO: Implement resend email API call
+  const handleResend = async () => {
+    if (countdown === 0 && email) {
+      setIsResending(true);
+      setResendMessage('');
+      try {
+        await forgotPassword(email); // Re-use the forgot password API for resending
+        setResendMessage('Tautan baru telah berhasil dikirim.');
+      } catch (error) {
+        setResendMessage('Gagal mengirim ulang tautan. Coba lagi nanti.');
+      } finally {
+        setIsResending(false);
+        setCountdown(60);
+      }
     }
-  };
-
-  const handleDemoClick = () => {
-    // Demo: Simulate clicking the email link
-    router.push('/auth/new-password');
   };
 
   return (
@@ -45,12 +55,15 @@ export default function VerifyEmailPage() {
         </svg>
 
         {/* Header */}
-        <div className="flex flex-col items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
           <h1 className="font-dm text-xl font-normal leading-[56px] tracking-[-0.48px] text-navy-700 dark:text-white">
             Periksa email masuk!
           </h1>
-          <p className="text-center font-dm text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
-            Tautan verifikasi telah dikirim
+          <p className="font-dm text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
+            Tautan verifikasi telah dikirim ke{' '}
+            <span className="font-medium text-navy-700 dark:text-white">
+              {email || 'email Anda'}
+            </span>
           </p>
         </div>
 
@@ -66,14 +79,23 @@ export default function VerifyEmailPage() {
           </div>
 
           {/* Resend Button */}
-          <div className="relative h-[54px] w-full">
+          <div className="relative h-auto w-full">
             <button
               onClick={handleResend}
-              disabled={countdown > 0}
+              disabled={countdown > 0 || isResending}
               className="flex h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-gray-300 px-2 py-2.5 font-dm text-sm font-bold leading-[100%] tracking-[-0.28px] text-gray-600 transition-colors enabled:bg-brand-500 enabled:text-white enabled:hover:bg-brand-600 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-400 dark:enabled:bg-brand-400 dark:enabled:hover:bg-brand-500"
             >
-              {countdown > 0 ? `Kirim ulang (${countdown}s)` : 'Kirim ulang'}
+              {isResending
+                ? 'Mengirim ulang...'
+                : countdown > 0
+                ? `Kirim ulang (${countdown}s)`
+                : 'Kirim ulang'}
             </button>
+            {resendMessage && (
+              <p className="mt-2 text-center text-sm text-green-500">
+                {resendMessage}
+              </p>
+            )}
           </div>
         </div>
 
