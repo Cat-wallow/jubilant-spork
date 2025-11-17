@@ -14,11 +14,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+} from 'components/ui/form';
+import { Input } from 'components/ui/input';
+import { PasswordInput } from 'components/ui/password-input';
+import { Button } from 'components/ui/button';
+import { Checkbox } from 'components/ui/checkbox';
 
 export default function SignInPage() {
   const loginMutation = useLogin();
@@ -59,7 +59,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-screen max-h-screen flex-col overflow-hidden bg-white dark:bg-navy-900">
+    <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-white dark:bg-navy-900">
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex flex-1 flex-col items-center justify-end px-6 py-12 lg:px-12">
           <div className="flex w-full max-w-[410px] flex-col gap-[30px]">
@@ -137,7 +137,7 @@ export default function SignInPage() {
                             className="h-[18px] w-[18px] rounded-sm border-brand-500 dark:border-brand-400"
                           />
                         </FormControl>
-                        <FormLabel className="cursor-pointer text-sm leading-5 tracking-[-0.28px] font-normal">
+                        <FormLabel className="cursor-pointer text-sm font-normal leading-5 tracking-[-0.28px]">
                           Buat saya tetap login
                         </FormLabel>
                       </FormItem>

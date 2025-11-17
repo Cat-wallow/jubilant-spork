@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forgotPassword } from '../../../lib/api';
-import { ForgotPasswordValidator, ForgotPasswordFormInputs } from 'validators/auth.validator';
+import {
+  ForgotPasswordValidator,
+  ForgotPasswordFormInputs,
+} from 'validators/auth.validator';
 import {
   Form,
   FormControl,
@@ -12,10 +15,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+} from 'components/ui/form';
+import { Input } from 'components/ui/input';
+import { Button } from 'components/ui/button';
+import { Card } from 'components/ui/card';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();

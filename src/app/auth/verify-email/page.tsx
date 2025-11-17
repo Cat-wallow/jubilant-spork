@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { forgotPassword } from 'lib/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from 'components/ui/button';
+import { Card } from 'components/ui/card';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -88,8 +88,8 @@ export default function VerifyEmailPage() {
           {isResending
             ? 'Mengirim ulang...'
             : countdown > 0
-              ? `Kirim ulang (${countdown}s)`
-              : 'Kirim ulang'}
+            ? `Kirim ulang (${countdown}s)`
+            : 'Kirim ulang'}
         </Button>
 
         {/* Resend Message */}
