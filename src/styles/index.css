@@ -1,10 +1,94 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 244 247 254; /* #F4F7FE */
+    --foreground: 11 20 55; /* #0B1437 */
+
+    --card: 255 255 255; /* #FFF */
+    --card-foreground: 43 54 116; /* #2B3674 */
+
+    --popover: 255 255 255; /* #FFF */
+    --popover-foreground: 43 54 116; /* #2B3674 */
+
+    --primary: 51 38 135; /* #332687 - Brand color */
+    --primary-foreground: 255 255 255; /* #FFF */
+
+    --secondary: 244 247 254; /* #F4F7FE */
+    --secondary-foreground: 43 54 116; /* #2B3674 */
+
+    --muted: 244 247 254; /* #F4F7FE */
+    --muted-foreground: 163 174 208; /* #A3AED0 */
+
+    --accent: 244 247 254; /* #F4F7FE */
+    --accent-foreground: 43 54 116; /* #2B3674 */
+
+    --destructive: 191 106 2; /* #BF6A02 - Delete button */
+    --destructive-foreground: 255 255 255; /* #FFF */
+
+    --border: 217 217 217; /* #D9D9D9 */
+    --input: 217 217 217; /* #D9D9D9 */
+    --ring: 51 38 135; /* #332687 - Brand color */
+
+    --radius: 0.5rem;
+
+    /* Custom colors from Figma */
+    --brand: 51 38 135; /* #332687 */
+    --brand-hover: 44 31 118; /* Darker shade */
+    --secondary-grey: 163 174 208; /* #A3AED0 */
+    --button-primary: 0 136 255; /* #08F */
+    --status-active: 207 247 211; /* rgba(207, 247, 211, 1) */
+    --status-inactive: 255 241 194; /* rgba(255, 241, 194, 1) */
+    --role-badge: 103 80 164; /* #6750A4 with opacity */
+    --text-primary: 64 64 64; /* #404040 */
+    --text-secondary: 112 126 174; /* #707EAE */
+    --separator: 233 237 247; /* #E9EDF7 */
+  }
+
+  .dark {
+    --background: 11 20 55; /* #0B1437 */
+    --foreground: 255 255 255; /* #FFF */
+
+    --card: 27 37 75; /* #1B254B */
+    --card-foreground: 255 255 255; /* #FFF */
+
+    --popover: 27 37 75; /* #1B254B */
+    --popover-foreground: 255 255 255; /* #FFF */
+
+    --primary: 51 38 135; /* #332687 */
+    --primary-foreground: 255 255 255; /* #FFF */
+
+    --secondary: 27 37 75; /* #1B254B */
+    --secondary-foreground: 255 255 255; /* #FFF */
+
+    --muted: 27 37 75; /* #1B254B */
+    --muted-foreground: 163 174 208; /* #A3AED0 */
+
+    --accent: 27 37 75; /* #1B254B */
+    --accent-foreground: 255 255 255; /* #FFF */
+
+    --destructive: 239 68 68; /* #EF4444 */
+    --destructive-foreground: 255 255 255; /* #FFF */
+
+    --border: 45 57 107; /* #2D396B */
+    --input: 45 57 107; /* #2D396B */
+    --ring: 51 38 135; /* #332687 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
   html {
     font-family: 'DM Sans', sans-serif !important;
     font-feature-settings: 'kern' !important;
