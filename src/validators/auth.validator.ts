@@ -10,15 +10,15 @@ export const SignInValidator = z.object({
     }, 'Format email atau username tidak valid'),
   password: z
     .string()
-    .min(8, 'Password minimal 8 karakter')
+    .min(1, 'Password harus diisi')
     .max(100, 'Password terlalu panjang'),
-  keepLoggedIn: z.boolean().default(true),
+  keepLoggedIn: z.boolean(),
 });
 
 export type SignInFormInputs = z.infer<typeof SignInValidator>;
 
 export const ForgotPasswordValidator = z.object({
-  email: z.string().email('Email tidak valid'),
+  email: z.email('Email tidak valid'),
 });
 
 export type ForgotPasswordFormInputs = z.infer<typeof ForgotPasswordValidator>;

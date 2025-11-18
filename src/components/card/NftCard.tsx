@@ -1,6 +1,6 @@
 import { IoHeart, IoHeartOutline } from 'react-icons/io5';
 import { useState } from 'react';
-import Card from 'components/card';
+import Card from '@/components/card';
 import Image from 'next/image';
 
 const NftCard = (props: {
@@ -20,7 +20,7 @@ const NftCard = (props: {
     >
       <div className="h-full w-full">
         <div className="relative w-full">
-          {/* <Image 
+          {/* <Image
             width="2"
             height="20"
             src={image}

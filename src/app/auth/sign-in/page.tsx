@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useLogin } from 'hooks/useAuth';
-import { SignInValidator, SignInFormInputs } from 'validators/auth.validator';
+// import { useLogin } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import { SignInValidator, SignInFormInputs } from '@/validators/auth.validator';
 import {
   Form,
   FormControl,
@@ -14,14 +15,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from 'components/ui/form';
-import { Input } from 'components/ui/input';
-import { PasswordInput } from 'components/ui/password-input';
-import { Button } from 'components/ui/button';
-import { Checkbox } from 'components/ui/checkbox';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function SignInPage() {
-  const loginMutation = useLogin();
+  // const loginMutation = useLogin();
+  const { login, loginError, loginIsPending } = useAuth();
 
   const form = useForm<SignInFormInputs>({
     resolver: zodResolver(SignInValidator),
@@ -34,10 +36,10 @@ export default function SignInPage() {
 
   // Set server error when login fails
   useEffect(() => {
-    if (loginMutation.error) {
+    // if (loginMutation.error) {
+    if (loginError) {
       const errorMessage =
-        (loginMutation.error as any)?.message ||
-        'Login gagal, silakan coba lagi';
+        (loginError as any)?.message || 'Login gagal, silakan coba lagi';
 
       form.setError('root', {
         type: 'server',
@@ -46,12 +48,12 @@ export default function SignInPage() {
     } else {
       form.clearErrors('root');
     }
-  }, [loginMutation.error, form]);
+  }, [loginError, form]);
 
   const handleLogin = (data: SignInFormInputs) => {
     form.clearErrors('root');
 
-    loginMutation.mutate({
+    login({
       emailOrUsername: data.emailOrUsername,
       password: data.password,
       rememberMe: data.keepLoggedIn,
@@ -154,10 +156,10 @@ export default function SignInPage() {
 
                 <Button
                   type="submit"
-                  disabled={loginMutation.isPending}
+                  disabled={loginIsPending}
                   className="h-[54px] w-full rounded-2xl text-sm font-bold leading-none tracking-[-0.28px]"
                 >
-                  {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
+                  {loginIsPending ? 'Signing In...' : 'Sign In'}
                 </Button>
               </form>
             </Form>

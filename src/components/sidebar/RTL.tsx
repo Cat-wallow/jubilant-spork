@@ -8,11 +8,11 @@ import {
   renderThumb,
   renderTrack,
   renderView,
-} from 'components/scrollbar/Scrollbar';
+} from '@/components/scrollbar/Scrollbar';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import avatar4 from '/public/img/avatars/avatar4.png';
-import routes from 'routes';
-import Card from 'components/card';
+import routes from '@/components/sidebar/routes';
+import Card from '@/components/card';
 import Image from 'next/image';
 
 function SidebarHorizon(props: { variant?: string; [x: string]: any }) {

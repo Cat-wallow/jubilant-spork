@@ -1,13 +1,13 @@
-import { Card } from 'components/ui/card';
-import { Input } from 'components/ui/input';
-import { Label } from 'components/ui/label';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
+} from '@/components/ui/select';
 
 interface PackageSectionProps {
   formData: any;
@@ -19,10 +19,10 @@ export default function PackageSection({
   updateFormData,
 }: PackageSectionProps) {
   return (
-    <Card className="p-6">
+    <Card className="flex flex-col p-6">
       <h2 className="mb-6 text-xl font-semibold">Paket Layanan</h2>
 
-      <div className="space-y-4">
+      <div className="space-y-4 ">
         {/* Package Selection */}
         <div className="space-y-2">
           <Label>Pilih Paket *</Label>
@@ -46,9 +46,9 @@ export default function PackageSection({
         </div>
 
         {/* Row: Storage, Projects, Max Users */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Storage (GB) *</Label>
+        <div className=" -mt-10 flex space-x-4 space-y-4 bg-red-500">
+          <div className="w-28 space-y-2">
+            <Label>Storage*</Label>
             <Input
               type="text"
               value={formData.storage}
@@ -58,7 +58,7 @@ export default function PackageSection({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="w-28 space-y-2">
             <Label>Project *</Label>
             <Input
               type="text"
@@ -69,7 +69,7 @@ export default function PackageSection({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="w-28 space-y-2">
             <Label>Max User *</Label>
             <Input
               type="text"

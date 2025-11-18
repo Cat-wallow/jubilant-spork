@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from 'lib/api';
+import api from '@/lib/api';
 
 interface TenantUser {
   id: string;
@@ -36,7 +36,12 @@ export const useTenantUsers = (params: UseTenantUsersParams) => {
     queryFn: async () => {
       const { data } = await api.get<{
         success: boolean;
-        data: { items: TenantUser[]; total: number; page: number; size: number };
+        data: {
+          items: TenantUser[];
+          total: number;
+          page: number;
+          size: number;
+        };
       }>(`/api/v1/tenants/${tenantId}/users`, {
         params: {
           search,
@@ -59,6 +64,7 @@ export const useTenantUsers = (params: UseTenantUsersParams) => {
 
       return response;
     },
+    staleTime: 1000 * 60 * 5, // 1 minute
   });
 };
 
@@ -67,7 +73,10 @@ export const useInviteUser = (tenantId: string) => {
 
   return useMutation({
     mutationFn: async (payload: { email: string; role_id: string }) => {
-      const { data } = await api.post(`/api/v1/tenants/${tenantId}/users`, payload);
+      const { data } = await api.post(
+        `/api/v1/tenants/${tenantId}/users`,
+        payload,
+      );
       return data;
     },
     onSuccess: () => {
@@ -80,7 +89,13 @@ export const useUpdateUserRole = (tenantId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
+    mutationFn: async ({
+      userId,
+      roleId,
+    }: {
+      userId: string;
+      roleId: string;
+    }) => {
       const { data } = await api.put(
         `/api/v1/tenants/${tenantId}/users/${userId}/role`,
         { role_id: roleId },
@@ -97,7 +112,13 @@ export const useDeactivateUser = (tenantId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
+    mutationFn: async ({
+      userId,
+      reason,
+    }: {
+      userId: string;
+      reason?: string;
+    }) => {
       const { data } = await api.delete(
         `/api/v1/tenants/${tenantId}/users/${userId}`,
         { data: { reason } },

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { forgotPassword } from 'lib/api';
-import { Button } from 'components/ui/button';
-import { Card } from 'components/ui/card';
+import { forgotPassword } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -39,8 +39,8 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-white px-4 py-8 dark:bg-navy-900">
-      <Card className="flex w-full max-w-[450px] flex-col items-center justify-center gap-5 rounded-[20px] p-6 sm:p-[50px]">
+    <div className="flex min-h-screen w-full items-center justify-center  px-4 py-8 ">
+      <Card className="flex w-full max-w-[450px] flex-col items-center justify-center gap-5 rounded-[20px] p-6 shadow-xl sm:p-[50px]">
         {/* Mail Icon */}
         <svg
           className="h-[72px] w-[72px]"

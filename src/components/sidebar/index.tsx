@@ -2,8 +2,8 @@
 
 import { HiX } from 'react-icons/hi';
 import Links from './components/Links';
-import { IRoute } from 'types/navigation';
-import { useAuth } from 'contexts/AuthContext';
+import { IRoute } from '@/types/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import TenantSwitcher from './components/TenantSwitcher';
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import Dropdown from 'components/dropdown';
+import Dropdown from '@/components/dropdown';
 import { FiAlignJustify } from 'react-icons/fi';
-import NavLink from 'components/link/NavLink';
+import NavLink from '@/components/link/NavLink';
 import navbarimage from '/public/img/layout/Navbar.png';
 import { BsArrowBarUp } from 'react-icons/bs';
 import { FiSearch } from 'react-icons/fi';
@@ -159,7 +159,7 @@ const Navbar = (props: { brandText: string; [x: string]: any }) => {
             <a
               target="blank"
               href="https://horizon-ui.com/?ref=live-pro-tailwind-react"
-              className="px-full linear hover:bg-black flex cursor-pointer items-center justify-center rounded-xl py-[11px] font-bold text-navy-700 transition duration-200 hover:text-navy-700 dark:text-white dark:hover:text-white"
+              className="px-full linear flex cursor-pointer items-center justify-center rounded-xl py-[11px] font-bold text-navy-700 transition duration-200 hover:bg-black hover:text-navy-700 dark:text-white dark:hover:text-white"
             >
               Try Horizon Free
             </a>

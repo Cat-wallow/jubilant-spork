@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from 'contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import UnauthorizedPage from 'components/auth/UnauthorizedPage';
+import UnauthorizedPage from '@/components/auth/UnauthorizedPage';
 
 interface RBACProps {
   /**

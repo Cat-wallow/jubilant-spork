@@ -5,7 +5,7 @@ import {
   acceptInvitation,
   rejectInvitation,
   verifyInvitationToken,
-} from 'services/invitation.service';
+} from '@/services/invitation.service';
 import { ListInvitationsParams } from 'types/invitation';
 
 /**

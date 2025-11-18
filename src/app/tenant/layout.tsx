@@ -2,18 +2,18 @@
 // Layout components
 import { usePathname } from 'next/navigation';
 import { useContext, useState } from 'react';
-import routes from 'routes';
+import routes from '@/components/sidebar/routes';
 import {
   getActiveNavbar,
   getActiveRoute,
   isWindowAvailable,
-} from 'utils/navigation';
+} from '@/utils/navigation';
 import React from 'react';
 import { Portal } from '@chakra-ui/portal';
-import Navbar from 'components/navbar';
-import Sidebar from 'components/sidebar';
-import Footer from 'components/footer/Footer';
-import RBAC from 'components/rbac/RBAC';
+import Navbar from '@/components/navbar';
+import Sidebar from '@/components/sidebar';
+import Footer from '@/components/footer/Footer';
+import RBAC from '@/components/rbac/RBAC';
 
 export default function Admin({ children }: { children: React.ReactNode }) {
   // states and functions
@@ -22,7 +22,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
   if (isWindowAvailable()) document.documentElement.dir = 'ltr';
   return (
     <RBAC redirect>
-      <div className="flex h-full w-full bg-background-100 dark:bg-background-900">
+      <div className="bg-background-100 dark:bg-background-900 flex h-full w-full">
         <Sidebar
           routes={routes}
           open={open}

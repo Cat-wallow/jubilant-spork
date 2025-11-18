@@ -1,4 +1,4 @@
-import { IRoute } from 'types/navigation';
+import { IRoute } from '@/types/navigation';
 import Router from 'next/router';
 
 // NextJS Requirement

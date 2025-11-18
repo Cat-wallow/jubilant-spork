@@ -46,5 +46,6 @@ export interface ILoginResponse {
     role: IRole;
     availableTenants: IUserTenant[];
     permissions: string[];
+    redirectTo?: string;
   };
 }

@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import api from 'lib/api';
+import api from '@/lib/api';
 import {
   ILoginRequest,
   ILoginResponse,
@@ -12,13 +12,13 @@ import {
   IRole,
   IUserTenant,
   ISwitchTenantRequest,
-} from 'types/auth';
-import { switchTenant as switchTenantService } from 'services/tenantService';
+} from '@/types/auth';
+import { switchTenant as switchTenantService } from '@/services/tenantService';
 
 interface IAuthContext {
   // Core user data
   user: IUser | null;
-  tenant: ITenant | null;
+  tenant?: ITenant | null;
   currentRole: IRole | null;
   availableTenants: IUserTenant[];
   permissions: string[];
@@ -29,6 +29,8 @@ interface IAuthContext {
 
   // Actions
   login: (credentials: ILoginRequest) => void;
+  loginIsPending: boolean;
+  loginError: Error | null;
   logout: () => void;
   switchTenant: (data: ISwitchTenantRequest) => void;
 }
@@ -107,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       queryClient.invalidateQueries({ queryKey: ['session'] });
 
       // Redirect user based on the path provided by the backend
-      const redirectPath = response.data?.redirectTo || '/admin/default';
+      const redirectPath = response.data?.redirectTo;
       router.push(redirectPath);
     },
     onError: (error) => {
@@ -165,6 +167,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Actions
         login: loginMutation.mutate,
+        loginIsPending: loginMutation.isPending,
+        loginError: loginMutation.error,
         logout: logoutMutation.mutate,
         switchTenant: switchTenantMutation.mutate,
       }}

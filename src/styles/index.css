@@ -1,10 +1,58 @@
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-MediumItalic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-BoldItalic.ttf') format('truetype');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 222, 83.33%, 97.65%;
     --foreground: 0 0% 3.6%;
 
     --card: 0 0% 100%;
@@ -16,7 +64,7 @@
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
 
-    --accent: 262 80% 50.2%;
+    --accent: 248, 56%, 34%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
@@ -24,11 +72,11 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262 80% 50.2%;
+    --ring: 248, 56%, 34%;
 
     --radius: 0.5rem;
 
-    --primary: 262 80% 50.2%;
+    --primary: 248, 56%, 34%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -39,7 +87,7 @@
     --background: 217.2 32.6% 17.5%;
     --foreground: 210 40% 98%;
 
-    --card: 217.2 32.6% 17.5%;
+    --card: 227.06, 60%, 16.67%;
     --card-foreground: 210 40% 98%;
 
     --popover: 217.2 32.6% 17.5%;
@@ -48,7 +96,7 @@
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 217.9 32.6% 55.7%;
 
-    --accent: 262 80% 50.2%;
+    --accent: 244.92, 50.83%, 52.94%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -56,9 +104,9 @@
 
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    --ring: 262 80% 50.2%;
+    --ring: 244.92, 50.83%, 52.94%;
 
-    --primary: 262 80% 50.2%;
+    --primary: 244.92, 50.83%, 52.94%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96%;
@@ -84,8 +132,8 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif, 'Inter',
-    'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+  font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif,
+    'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
     'Droid Sans', 'Source Sans Pro';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

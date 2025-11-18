@@ -1,7 +1,7 @@
 import React from 'react';
-import Dropdown from 'components/dropdown';
+import Dropdown from '@/components/dropdown';
 import { FiAlignJustify } from 'react-icons/fi';
-import NavLink from 'components/link/NavLink';
+import NavLink from '@/components/link/NavLink';
 import navbarimage from '/public/img/layout/Navbar.png';
 import { BsArrowBarUp } from 'react-icons/bs';
 import { FiSearch } from 'react-icons/fi';
@@ -13,8 +13,8 @@ import {
 import avatar from '/public/img/avatars/avatar4.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { logout } from 'services/auth.service';
-import { useAuth } from 'contexts/AuthContext';
+import { logout } from '@/services/auth.service';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = (props: {
   onOpenSidenav: () => void;
@@ -73,7 +73,7 @@ const Navbar = (props: {
             </NavLink>
           </div>*/}
           <p className="text-center text-[23px] font-extrabold uppercase text-navy-700 hover:text-navy-700 dark:text-white dark:hover:text-white">
-            {`PT.${tenant.name}`}
+            {tenant ? tenant.name : ''}
           </p>
         </div>
         <div className="flex h-full w-96 flex-row items-center justify-center gap-6 ">

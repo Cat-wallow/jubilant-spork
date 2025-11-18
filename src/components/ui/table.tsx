@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { cn } from 'lib/utils';
+import { cn } from '@/lib/utils';
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -8,7 +8,7 @@ const Table = React.forwardRef<
   <div className="w-full overflow-auto">
     <table
       ref={ref}
-      className={cn('w-full caption-bottom text-sm', className)}
+      className={cn('w-full caption-bottom text-sm ', className)}
       {...props}
     />
   </div>

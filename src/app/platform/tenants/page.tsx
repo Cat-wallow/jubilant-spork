@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import RBAC from 'components/rbac/RBAC';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import RBAC from '@/components/rbac/RBAC';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
-import { Checkbox } from 'components/ui/checkbox';
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'components/ui/table';
+} from '@/components/ui/table';
 import TenantStats from './components/TenantStats';
 import {
   Plus,
@@ -304,8 +304,11 @@ function TenantsPageContent() {
 
 export default function TenantsPage() {
   return (
-    // <RBAC requiredPermission="platform:user_manage" unauthorizedPage={true}>
-    <TenantsPageContent />
-    // </RBAC>
+    <RBAC
+      requiredPermission="platform:tenant_management"
+      unauthorizedPage={true}
+    >
+      <TenantsPageContent />
+    </RBAC>
   );
 }

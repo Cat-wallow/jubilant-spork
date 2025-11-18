@@ -2,9 +2,9 @@
 
 import React, { useCallback, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import NavLink from 'components/link/NavLink';
-import DashIcon from 'components/icons/DashIcon';
-import RBAC from 'components/rbac/RBAC';
+import NavLink from '@/components/link/NavLink';
+import DashIcon from '@/components/icons/DashIcon';
+import RBAC from '@/components/rbac/RBAC';
 
 interface SubMenuItem {
   name: string;

@@ -1,7 +1,7 @@
 import React from 'react';
-import CardMenu from 'components/card/CardMenu';
-import Card from 'components/card';
-import Progress from 'components/progress';
+import CardMenu from '@/components/card/CardMenu';
+import Card from '@/components/card';
+import Progress from '@/components/progress';
 import { MdCancel, MdCheckCircle, MdOutlineError } from 'react-icons/md';
 
 import {

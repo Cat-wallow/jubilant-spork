@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import RBAC from 'components/rbac/RBAC';
-import { Button } from 'components/ui/button';
+import RBAC from '@/components/rbac/RBAC';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import BasicInfoSection from './components/BasicInfoSection';
 import PackageSection from './components/PackageSection';
@@ -119,8 +119,11 @@ function NewTenantPageContent() {
 
 export default function NewTenantPage() {
   return (
-    // <RBAC requiredPermission="platform:user_manage" unauthorizedPage={true}>
-    <NewTenantPageContent />
-    // </RBAC>
+    <RBAC
+      requiredPermission="platform:tenant_management"
+      unauthorizedPage={true}
+    >
+      <NewTenantPageContent />
+    </RBAC>
   );
 }

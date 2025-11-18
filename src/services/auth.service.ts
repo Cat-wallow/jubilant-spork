@@ -1,5 +1,5 @@
-import api from 'lib/api';
-import { ILoginResponse, ILoginRequest } from 'types/auth';
+import api from '@/lib/api';
+import { ILoginResponse, ILoginRequest } from '@/types/auth';
 
 export const login = async (
   credentials: ILoginRequest,

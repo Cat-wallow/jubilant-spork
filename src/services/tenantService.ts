@@ -1,5 +1,5 @@
-import api from 'lib/api';
-import { ILoginResponse, ISwitchTenantRequest } from 'types/auth';
+import api from '@/lib/api';
+import { ILoginResponse, ISwitchTenantRequest } from '@/types/auth';
 
 /**
  * Switches the user's active tenant.

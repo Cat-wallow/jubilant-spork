@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useAuth } from 'contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Tenant colors mapping - can be customized based on tenant type or other properties
 const getTenantColor = (tenantName: string): string => {
@@ -115,9 +115,9 @@ export default function TenantSwitcher() {
       </button>
 
       {isOpen && !isSwitching && (
-        <div className="border-black/15 absolute left-0 top-full z-50 mt-2 flex w-[220px] flex-col gap-px rounded-[5.25px] border bg-white p-1 shadow-[0_4px_6px_4px_rgba(0,0,0,0.10),0_2px_4px_-2px_rgba(0,0,0,0.10)] dark:border-white/15 dark:bg-navy-800">
+        <div className="absolute left-0 top-full z-50 mt-2 flex w-[220px] flex-col gap-px rounded-[5.25px] border border-black/15 bg-white p-1 shadow-[0_4px_6px_4px_rgba(0,0,0,0.10),0_2px_4px_-2px_rgba(0,0,0,0.10)] dark:border-white/15 dark:bg-navy-800">
           <div className="flex h-[24.488px] items-start px-[7px] py-[5.25px]">
-            <span className="font-inter text-slate-500 dark:text-slate-400 flex-1 text-[10.5px] font-bold leading-[14px]">
+            <span className="font-inter flex-1 text-[10.5px] font-bold leading-[14px] text-slate-500 dark:text-slate-400">
               Switch Organization
             </span>
           </div>
@@ -140,12 +140,12 @@ export default function TenantSwitcher() {
                     className="h-[7px] w-[7px] flex-shrink-0 rounded-full"
                     style={{ background: tenantColor }}
                   />
-                  <span className="font-inter text-slate-800 dark:text-slate-200 flex-1 text-start text-xs font-medium leading-[17.5px]">
+                  <span className="font-inter flex-1 text-start text-xs font-medium leading-[17.5px] text-slate-800 dark:text-slate-200">
                     {userTenant.tenant.name}
                   </span>
                   {isCurrentTenant && (
-                    <div className="border-black/15 ml-auto flex h-[19.087px] items-center justify-center gap-[3.5px] rounded-[5.25px] border px-[7px] py-[1.75px] dark:border-white/15">
-                      <span className="font-inter text-slate-800 dark:text-slate-200 text-[10.5px] font-medium leading-[14px]">
+                    <div className="ml-auto flex h-[19.087px] items-center justify-center gap-[3.5px] rounded-[5.25px] border border-black/15 px-[7px] py-[1.75px] dark:border-white/15">
+                      <span className="font-inter text-[10.5px] font-medium leading-[14px] text-slate-800 dark:text-slate-200">
                         Current
                       </span>
                     </div>
@@ -154,7 +154,7 @@ export default function TenantSwitcher() {
 
                 {/* Display user's role in this tenant */}
                 <div className="flex w-full items-center pl-[14px]">
-                  <span className="font-inter text-slate-500 dark:text-slate-400 text-[10px] leading-[14px]">
+                  <span className="font-inter text-[10px] leading-[14px] text-slate-500 dark:text-slate-400">
                     {userTenant.role.name}
                   </span>
                   {isCurrentTenant && (
