@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useInviteUser } from '@/hooks/useTenantUsers';
+import { useRoles } from '@/hooks/useRoles';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -37,14 +38,6 @@ interface InviteUserModalProps {
   onSuccess: () => void;
 }
 
-const ROLES = [
-  { id: 'admin_tenant', name: 'Admin Tenant' },
-  { id: 'wajib_pajak', name: 'Wajib Pajak / WP' },
-  { id: 'anggota_tim', name: 'Anggota Tim' },
-  { id: 'ketua_tim', name: 'Ketua Tim' },
-  { id: 'pmo', name: 'PMO (Project Manager)' },
-  { id: 'direktur', name: 'Direktur' },
-];
 
 const inviteSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -58,6 +51,7 @@ export default function InviteUserModal({
   onSuccess,
 }: InviteUserModalProps) {
   const inviteMutation = useInviteUser(tenantId);
+  const { data: roles = [], isLoading: rolesLoading } = useRoles();
   const form = useForm<z.infer<typeof inviteSchema>>({
     resolver: zodResolver(inviteSchema),
     defaultValues: { email: '', roleId: '' },
@@ -88,8 +82,11 @@ export default function InviteUserModal({
         {inviteMutation.error && (
           <p className="text-sm text-destructive">
             {(inviteMutation.error as any)?.response?.data?.message ||
-              'Gagal mengirim undangan. Silakan coba lagi.'}
+              'Invalid request data'}
           </p>
+        )}
+        {rolesLoading && (
+          <p className="text-sm text-muted-foreground">Loading roles...</p>
         )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -126,7 +123,7 @@ export default function InviteUserModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {ROLES.map((role) => (
+                      {roles.map((role) => (
                         <SelectItem key={role.id} value={role.id}>
                           {role.name}
                         </SelectItem>
@@ -141,7 +138,7 @@ export default function InviteUserModal({
               <Button type="button" variant="outline" onClick={onClose}>
                 Batal
               </Button>
-              <Button type="submit" disabled={inviteMutation.isPending}>
+              <Button type="submit" disabled={inviteMutation.isPending || rolesLoading}>
                 {inviteMutation.isPending ? 'Mengirim...' : 'Kirim Undangan'}
               </Button>
             </DialogFooter>
