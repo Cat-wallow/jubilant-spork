@@ -6,6 +6,7 @@ export type User = {
   role: string;
   status: 'active' | 'inactive';
   joinedAt: string;
+  isCurrentUser?: boolean;
 };
 
 export interface PaginatedUsersResponse {

@@ -22,7 +22,7 @@ function UsersPageContent() {
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
-  const { tenant } = useAuth();
+  const { tenant, user: currentUser } = useAuth();
 
   const { data, isLoading, isFetching, error, refetch } = useTenantUsers({
     tenantId: tenant.id,
@@ -32,7 +32,14 @@ function UsersPageContent() {
     limit: pagination.pageSize,
   });
 
-  const users = data?.items || [];
+  const users = useMemo(
+    () =>
+      (data?.items || []).map((u) => ({
+        ...u,
+        isCurrentUser: !!currentUser && u.email === currentUser.email,
+      })),
+    [data?.items, currentUser],
+  );
   const pageCount = data?.pagination?.totalPages || 0;
   const totalRows = data?.pagination?.total || 0;
 

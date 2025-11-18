@@ -145,10 +145,7 @@ export default function AcceptInvitationPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
               <XCircle className="h-10 w-10 text-red-600" />
             </div>
-            <h2 className="mt-4 text-lg font-semibold text-navy-700 dark:text-white">
-              Gagal menerima undangan
-            </h2>
-            <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">{message}</p>
+            <p className="mt-4 text-sm text-gray-700 dark:text-gray-300">{message}</p>
 
             <div className="mt-6 flex w-full flex-col gap-3">
               <Button

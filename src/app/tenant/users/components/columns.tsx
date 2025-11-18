@@ -21,8 +21,18 @@ export const columns: ColumnDef<User>[] = [
             </div>
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium">
-              {user.name || 'No Name'}
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-medium">
+                {user.name || 'No Name'}
+              </div>
+              {user.isCurrentUser && (
+                <Badge
+                  variant="outline"
+                  className="border-brand-500 bg-brand-500/10 px-2 py-[2px] text-xs font-medium text-brand-600 dark:bg-brand-500/40 dark:text-white"
+                >
+                  You
+                </Badge>
+              )}
             </div>
             <div className="text-sm text-muted-foreground">
               {user.email}
