@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { SortingState } from '@tanstack/react-table';
 
 interface TenantUser {
   id: string;
@@ -26,14 +27,27 @@ interface UseTenantUsersParams {
   status?: 'active' | 'inactive';
   page?: number;
   limit?: number;
+  sorting?: SortingState;
 }
 
 export const useTenantUsers = (params: UseTenantUsersParams) => {
-  const { tenantId, search, status, page = 1, limit = 10 } = params;
+  const {
+    tenantId,
+    search,
+    status,
+    page = 1,
+    limit = 10,
+    sorting = [],
+  } = params;
 
   return useQuery({
-    queryKey: ['tenantUsers', tenantId, { search, status, page, limit }],
+    queryKey: ['tenantUsers', tenantId, { search, status, page, limit, sorting }],
     queryFn: async () => {
+      const [sortBy, sortOrder] =
+        sorting.length > 0
+          ? [sorting[0].id, sorting[0].desc ? 'desc' : 'asc']
+          : [undefined, undefined];
+
       const { data } = await api.get<{
         success: boolean;
         data: {
@@ -48,6 +62,8 @@ export const useTenantUsers = (params: UseTenantUsersParams) => {
           status,
           page,
           size: limit,
+          sortBy,
+          sortOrder,
         },
       });
 
@@ -64,7 +80,7 @@ export const useTenantUsers = (params: UseTenantUsersParams) => {
 
       return response;
     },
-    staleTime: 1000 * 60 * 5, // 1 minute
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 

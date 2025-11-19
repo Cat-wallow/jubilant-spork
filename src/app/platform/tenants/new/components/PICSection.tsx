@@ -8,16 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UseFormReturn, Controller } from 'react-hook-form';
+import { NewTenantFormValues } from '../page'; // Assuming NewTenantFormValues is exported from page.tsx
 
 interface PICSectionProps {
-  formData: any;
-  updateFormData: (updates: any) => void;
+  form: UseFormReturn<NewTenantFormValues>;
 }
 
-export default function PICSection({
-  formData,
-  updateFormData,
-}: PICSectionProps) {
+export default function PICSection({ form }: PICSectionProps) {
   return (
     <Card className="p-6">
       <h2 className="mb-6 text-xl font-semibold">Person in Charge (PIC)</h2>
@@ -26,52 +24,70 @@ export default function PICSection({
         {/* Row 1 */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Nama PIC *</Label>
+            <Label htmlFor="picName">Nama PIC *</Label>
             <Input
+              id="picName"
               placeholder="Nama lengkap PIC"
-              value={formData.picName}
-              onChange={(e) => updateFormData({ picName: e.target.value })}
+              {...form.register('picName')}
             />
+            {form.formState.errors.picName && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.picName.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label>Jabatan</Label>
-            <Select
-              value={formData.position}
-              onValueChange={(value) => updateFormData({ position: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih jabatan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Manager">Manager</SelectItem>
-                <SelectItem value="Owner">Owner</SelectItem>
-                <SelectItem value="Director">Director</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="position">Jabatan</Label>
+            <Controller
+              control={form.control}
+              name="position"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger id="position">
+                    <SelectValue placeholder="Pilih jabatan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Manager">Manager</SelectItem>
+                    <SelectItem value="Owner">Owner</SelectItem>
+                    <SelectItem value="Director">Director</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
         </div>
 
         {/* Row 2 */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Email *</Label>
+            <Label htmlFor="email">Email *</Label>
             <Input
+              id="email"
               type="email"
               placeholder="email@example.com"
-              value={formData.email}
-              onChange={(e) => updateFormData({ email: e.target.value })}
+              {...form.register('email')}
             />
+            {form.formState.errors.email && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.email.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label>Telepon *</Label>
+            <Label htmlFor="phone">Telepon *</Label>
             <Input
+              id="phone"
               type="tel"
               placeholder="365-374-4961"
-              value={formData.phone}
-              onChange={(e) => updateFormData({ phone: e.target.value })}
+              {...form.register('phone')}
             />
+            {form.formState.errors.phone && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.phone.message}
+              </p>
+            )}
           </div>
         </div>
       </div>

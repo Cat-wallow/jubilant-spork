@@ -61,7 +61,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.6%;
 
-    --muted: 0 0% 96.1%;
+    --muted: 222, 83.33%, 97.65%;
     --muted-foreground: 0 0% 45.1%;
 
     --accent: 248, 56%, 34%;
@@ -84,7 +84,7 @@
   }
 
   .dark {
-    --background: 217.2 32.6% 17.5%;
+    --background: 227.73, 66.67%, 12.94%;
     --foreground: 210 40% 98%;
 
     --card: 227.06, 60%, 16.67%;
@@ -93,7 +93,7 @@
     --popover: 217.2 32.6% 17.5%;
     --popover-foreground: 210 40% 98%;
 
-    --muted: 215 27.9% 16.9%;
+    --muted: 227.5, 47.06%, 20%;
     --muted-foreground: 217.9 32.6% 55.7%;
 
     --accent: 244.92, 50.83%, 52.94%;

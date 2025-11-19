@@ -10,11 +10,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Upload, Search, Loader2 } from 'lucide-react';
+import {
+  Plus,
+  Upload,
+  Search as SearchIcon,
+  Filter as FilterIcon,
+  Loader2,
+} from 'lucide-react';
 import RBAC from '@/components/rbac/RBAC';
-import { Card } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-interface DataTableToolbarProps {
+interface DataTableToolbarProps<TData> {
+  table: Table<TData>;
   onInvite: () => void;
   onImport: () => void;
   searchQuery: string;
@@ -24,7 +36,8 @@ interface DataTableToolbarProps {
   isFetching?: boolean;
 }
 
-export function UsersTableToolbar({
+export function UsersTableToolbar<TData>({
+  table,
   onInvite,
   onImport,
   searchQuery,
@@ -32,23 +45,24 @@ export function UsersTableToolbar({
   statusFilter,
   onStatusFilterChange,
   isFetching,
-}: DataTableToolbarProps) {
+}: DataTableToolbarProps<TData>) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
-        <Card className="relative">
-          <Search className="absolute  left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Cari nama atau email..."
-            value={searchQuery}
-            onChange={(event) => onSearchQueryChange(event.target.value)}
-            className="h-10 w-[150px] pl-10 lg:w-[250px]"
-            disabled={isFetching}
-          />
-          {isFetching && (
-            <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
-          )}
-        </Card>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative flex-1">
+        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Cari nama atau email..."
+          value={searchQuery}
+          onChange={(event) => onSearchQueryChange(event.target.value)}
+          className="h-10 w-full pl-10 lg:w-[250px]"
+          disabled={isFetching}
+        />
+        {isFetching && (
+          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+        )}
+      </div>
+
+      <div className="flex items-center gap-2">
         <Select
           value={statusFilter}
           onValueChange={
@@ -65,11 +79,38 @@ export function UsersTableToolbar({
             <SelectItem value="inactive">Nonaktif</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      <div className="flex gap-3">
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              <FilterIcon className="mr-2 h-4 w-4" />
+              View
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <RBAC requiredPermission="tenant:user_manage">
           <Button
-            variant="secondary"
+            variant="third"
             onClick={onImport}
             className="gap-2"
             disabled={isFetching}
@@ -78,12 +119,9 @@ export function UsersTableToolbar({
             Import CSV
           </Button>
         </RBAC>
+
         <RBAC requiredPermission="tenant:user_create">
-          <Button
-            onClick={onInvite}
-            className="gap-2"
-            disabled={isFetching}
-          >
+          <Button onClick={onInvite} className="gap-2" disabled={isFetching}>
             <Plus className="h-4 w-4" />
             Undang User
           </Button>

@@ -9,16 +9,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UseFormReturn, Controller } from 'react-hook-form';
+import { NewTenantFormValues } from '../page'; // Assuming NewTenantFormValues is exported from page.tsx
 
 interface BillingSectionProps {
-  formData: any;
-  updateFormData: (updates: any) => void;
+  form: UseFormReturn<NewTenantFormValues>;
 }
 
-export default function BillingSection({
-  formData,
-  updateFormData,
-}: BillingSectionProps) {
+export default function BillingSection({ form }: BillingSectionProps) {
   return (
     <Card className="p-6">
       <h2 className="mb-6 text-xl font-semibold">Pengaturan Billing</h2>
@@ -26,29 +24,32 @@ export default function BillingSection({
       <div className="space-y-4">
         {/* Billing Cycle */}
         <div className="space-y-2">
-          <Label>Siklus Penagihan</Label>
-          <Select
-            value={formData.billingCycle}
-            onValueChange={(value) => updateFormData({ billingCycle: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih siklus" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Bulanan">Bulanan</SelectItem>
-              <SelectItem value="Tahunan">Tahunan</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="billingCycle">Siklus Penagihan</Label>
+          <Controller
+            control={form.control}
+            name="billingCycle"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger id="billingCycle">
+                  <SelectValue placeholder="Pilih siklus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Bulanan">Bulanan</SelectItem>
+                  <SelectItem value="Tahunan">Tahunan</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
 
         {/* Trial Days */}
         <div className="space-y-2">
-          <Label>Batas Hari Trial</Label>
+          <Label htmlFor="trialDays">Batas Hari Trial</Label>
           <Input
+            id="trialDays"
             type="number"
-            value={formData.trialDays}
-            onChange={(e) => updateFormData({ trialDays: e.target.value })}
             placeholder="7"
+            {...form.register('trialDays')}
           />
         </div>
 
@@ -60,15 +61,19 @@ export default function BillingSection({
               Tangguhkan otomatis akun jika terlambat bayar
             </p>
           </div>
-          <Toggle
-            pressed={formData.autoInactive}
-            onPressedChange={(pressed) =>
-              updateFormData({ autoInactive: pressed })
-            }
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-          >
-            {formData.autoInactive ? 'ON' : 'OFF'}
-          </Toggle>
+          <Controller
+            control={form.control}
+            name="autoInactive"
+            render={({ field }) => (
+              <Toggle
+                pressed={field.value}
+                onPressedChange={field.onChange}
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+              >
+                {field.value ? 'ON' : 'OFF'}
+              </Toggle>
+            )}
+          />
         </div>
       </div>
     </Card>

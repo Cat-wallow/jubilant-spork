@@ -1,17 +1,11 @@
 'use client';
 
+import * as React from 'react';
 import {
   ColumnDef,
+  Table as TableInstance,
   flexRender,
-  getCoreRowModel,
-  useReactTable,
-  SortingState,
-  getSortedRowModel,
-  ColumnFiltersState,
-  getFilteredRowModel,
-  VisibilityState,
 } from '@tanstack/react-table';
-
 import {
   Table,
   TableBody,
@@ -20,62 +14,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { DataTablePagination } from './data-table-pagination';
-import React from 'react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  pageCount: number;
-  pageIndex: number;
-  pageSize: number;
-  onPageChange: (pageIndex: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
-  totalRows: number;
+  table: TableInstance<TData>;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 export function DataTable<TData, TValue>({
+  table,
   columns,
-  data,
-  pageCount,
-  pageIndex,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
-  totalRows,
+  isLoading,
+  isError,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    pageCount,
-    manualPagination: true,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      pagination: {
-        pageIndex,
-        pageSize,
-      },
-    },
-  });
-
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -99,7 +53,28 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({
+                length: table.getState().pagination.pageSize,
+              }).map((_, i) => (
+                <TableRow key={i}>
+                  {columns.map((column, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className="h-6 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : isError ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-red-500"
+                >
+                  Failed to load data.
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -128,15 +103,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination
-        table={table}
-        pageIndex={pageIndex}
-        pageCount={pageCount}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-        totalRows={totalRows}
-      />
+
+      <DataTablePagination table={table} />
     </div>
   );
 }

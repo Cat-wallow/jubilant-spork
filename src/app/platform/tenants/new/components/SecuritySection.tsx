@@ -2,16 +2,14 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
+import { UseFormReturn, Controller } from 'react-hook-form';
+import { NewTenantFormValues } from '../page'; // Assuming NewTenantFormValues is exported from page.tsx
 
 interface SecuritySectionProps {
-  formData: any;
-  updateFormData: (updates: any) => void;
+  form: UseFormReturn<NewTenantFormValues>;
 }
 
-export default function SecuritySection({
-  formData,
-  updateFormData,
-}: SecuritySectionProps) {
+export default function SecuritySection({ form }: SecuritySectionProps) {
   return (
     <Card className="p-6">
       <h2 className="mb-6 text-xl font-semibold">Keamanan</h2>
@@ -25,40 +23,40 @@ export default function SecuritySection({
               Paksa semua pengguna menggunakan 2FA
             </p>
           </div>
-          <Toggle
-            pressed={formData.require2FA}
-            onPressedChange={(pressed) =>
-              updateFormData({ require2FA: pressed })
-            }
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-          >
-            {formData.require2FA ? 'ON' : 'OFF'}
-          </Toggle>
+          <Controller
+            control={form.control}
+            name="require2FA"
+            render={({ field }) => (
+              <Toggle
+                pressed={field.value}
+                onPressedChange={field.onChange}
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+              >
+                {field.value ? 'ON' : 'OFF'}
+              </Toggle>
+            )}
+          />
         </div>
 
         {/* Password & Session Settings */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Minimum Panjang Password</Label>
+            <Label htmlFor="minPasswordLength">Minimum Panjang Password</Label>
             <Input
+              id="minPasswordLength"
               type="number"
-              value={formData.minPasswordLength}
-              onChange={(e) =>
-                updateFormData({ minPasswordLength: e.target.value })
-              }
               placeholder="8"
+              {...form.register('minPasswordLength')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Session Timeout (menit)</Label>
+            <Label htmlFor="sessionTimeout">Session Timeout (menit)</Label>
             <Input
+              id="sessionTimeout"
               type="number"
-              value={formData.sessionTimeout}
-              onChange={(e) =>
-                updateFormData({ sessionTimeout: e.target.value })
-              }
               placeholder="10"
+              {...form.register('sessionTimeout')}
             />
           </div>
         </div>

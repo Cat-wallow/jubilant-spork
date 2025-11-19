@@ -1,16 +1,14 @@
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UseFormReturn } from 'react-hook-form';
+import { NewTenantFormValues } from '../page'; // Assuming NewTenantFormValues is exported from page.tsx
 
 interface BasicInfoSectionProps {
-  formData: any;
-  updateFormData: (updates: any) => void;
+  form: UseFormReturn<NewTenantFormValues>;
 }
 
-export default function BasicInfoSection({
-  formData,
-  updateFormData,
-}: BasicInfoSectionProps) {
+export default function BasicInfoSection({ form }: BasicInfoSectionProps) {
   return (
     <Card className="p-6">
       <h2 className="mb-6 text-xl font-semibold">Informasi Dasar</h2>
@@ -19,41 +17,51 @@ export default function BasicInfoSection({
         {/* Row 1 */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Nama Tenant *</Label>
+            <Label htmlFor="tenantName">Nama Tenant *</Label>
             <Input
+              id="tenantName"
               placeholder="PT Konsultan Pajak"
-              value={formData.tenantName}
-              onChange={(e) => updateFormData({ tenantName: e.target.value })}
+              {...form.register('tenantName')}
             />
+            {form.formState.errors.tenantName && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.tenantName.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label>Slug URL</Label>
+            <Label htmlFor="slugUrl">Slug URL</Label>
             <Input
+              id="slugUrl"
               placeholder="pt-konsultan-pajak-abc"
-              value={formData.slugUrl}
-              onChange={(e) => updateFormData({ slugUrl: e.target.value })}
+              {...form.register('slugUrl')}
             />
+            {form.formState.errors.slugUrl && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.slugUrl.message}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Row 2 */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Nama Perusahaan (Branding)</Label>
+            <Label htmlFor="companyName">Nama Perusahaan (Branding)</Label>
             <Input
+              id="companyName"
               placeholder="Nama yang ditampilkan di sistem"
-              value={formData.companyName}
-              onChange={(e) => updateFormData({ companyName: e.target.value })}
+              {...form.register('companyName')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Tagline</Label>
+            <Label htmlFor="tagline">Tagline</Label>
             <Input
+              id="tagline"
               placeholder="Solusi Pajak Terpercaya"
-              value={formData.tagline}
-              onChange={(e) => updateFormData({ tagline: e.target.value })}
+              {...form.register('tagline')}
             />
           </div>
         </div>

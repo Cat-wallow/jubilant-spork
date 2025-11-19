@@ -1,40 +1,17 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Tenant } from '@/types/tenants.d';
+import { Tenant } from '@/types/tenant';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
+import { DataTableColumnHeader } from '@/components/ui/DataTableColumnHeader';
+import { TenantActionsMenu } from './TenantActionsMenu';
 
 export const columns: ColumnDef<Tenant>[] = [
   {
     id: 'select',
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()
-        }
+        checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -51,100 +28,83 @@ export const columns: ColumnDef<Tenant>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Tenant',
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue('name')}</div>
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tenant" />
     ),
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       return (
-        <Badge variant={status === 'Active' ? 'default' : 'destructive'}>
+        <span
+          className={`inline-flex rounded px-2 py-1 text-xs font-semibold capitalize ${
+            status === 'active'
+              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+          }`}
+        >
           {status}
-        </Badge>
+        </span>
       );
     },
   },
   {
     accessorKey: 'plan',
-    header: 'Plan',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Plan" />
+    ),
     cell: ({ row }) => {
-      return <Badge variant="secondary">{row.getValue('plan')}</Badge>;
-    },
-  },
-  {
-    accessorKey: 'activeProjects',
-    header: 'Active Project',
-  },
-  {
-    accessorKey: 'users',
-    header: 'Users',
-  },
-  {
-    accessorKey: 'storage',
-    header: 'Storage',
-    cell: ({ row }) => {
-      const storage = row.getValue('storage') as {
-        used: number;
-        total: number;
-      };
-      const percentage = (storage.used / storage.total) * 100;
+      const plan = row.getValue('plan') as string;
       return (
-        <div className="space-y-1.5">
-          <Progress value={percentage} className="h-2 w-24" />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{storage.used}GB</span>
-            <span>{storage.total}GB</span>
-          </div>
-        </div>
+        <span className="inline-flex rounded bg-accent/10 px-2 py-1 text-xs font-semibold capitalize text-accent">
+          {plan}
+        </span>
       );
     },
   },
   {
-    accessorKey: 'lastUpdate',
-    header: 'Last Update',
+    accessorKey: 'max_projects',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Active Project" />
+    ),
+  },
+  {
+    accessorKey: 'max_users',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Users" />
+    ),
+  },
+  {
+    accessorKey: 'storage_quota_gb',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Storage" />
+    ),
+    cell: ({ row }) => `${row.getValue('storage_quota_gb')} GB`,
+  },
+  {
+    accessorKey: 'updated_at',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Update" />
+    ),
     cell: ({ row }) => {
-      return (
-        <div className="text-xs">{formatDate(row.getValue('lastUpdate'))}</div>
-      );
+      const date = new Date(row.getValue('updated_at'));
+      return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        // hour: '2-digit',
+        // minute: '2-digit',
+      });
     },
   },
   {
     id: 'actions',
     cell: ({ row }) => {
-      const tenant = row.original;
-      return (
-        <div className="text-right">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(tenant.id)}
-              >
-                Copy Tenant ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
+      return <TenantActionsMenu tenant={row.original} />;
     },
     enableSorting: false,
     enableHiding: false,

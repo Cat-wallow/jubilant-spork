@@ -1,15 +1,18 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { User } from '@/types/users.d'; // Assuming you'll create this type
+import { User } from '@/types/users.d';
 import { Badge } from '@/components/ui/badge';
 import UserActionsMenu from './UserActionsMenu';
 import { UserCheck, UserX } from 'lucide-react';
+import { DataTableColumnHeader } from '@/components/ui/DataTableColumnHeader'; // Import the reusable component
 
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'name',
-    header: 'User',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="User" />
+    ),
     cell: ({ row }) => {
       const user = row.original;
       return (
@@ -44,14 +47,18 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Role" />
+    ),
     cell: ({ row }) => {
       return <Badge variant="secondary">{row.getValue('role')}</Badge>;
     },
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
     cell: ({ row }) => {
       const status = row.getValue('status');
       return status === 'active' ? (
@@ -69,7 +76,9 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'joinedAt',
-    header: 'Bergabung',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Bergabung" />
+    ),
     cell: ({ row }) => {
       return (
         <div className="text-sm text-muted-foreground">

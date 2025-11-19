@@ -8,17 +8,29 @@ import ImportUsersModal from './components/ImportUsersModal';
 import { useTenantUsers } from '@/hooks/useTenantUsers';
 import { useAuth } from '@/contexts/AuthContext';
 import { columns } from './components/columns';
-import { UsersDataTable } from './components/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import UserActionsMenu from './components/UserActionsMenu';
+import {
+  ColumnFiltersState,
+  getCoreRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from '@tanstack/react-table';
+import { UsersTableToolbar } from './components/data-table-toolbar';
+import { DataTable } from '@/components/ui/data-table';
 
 function UsersPageContent() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
@@ -30,6 +42,7 @@ function UsersPageContent() {
     status: statusFilter === 'all' ? undefined : statusFilter,
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
+    sorting,
   });
 
   const users = useMemo(
@@ -41,7 +54,7 @@ function UsersPageContent() {
     [data?.items, currentUser],
   );
   const pageCount = data?.pagination?.totalPages || 0;
-  const totalRows = data?.pagination?.total || 0;
+  const totalUsers = data?.pagination?.total || 0;
 
   const tableColumns = useMemo(
     () =>
@@ -65,57 +78,68 @@ function UsersPageContent() {
     [refetch, tenant.id],
   );
 
-  if (error) {
-    return (
-      <div className="mt-3 flex h-full w-full items-center justify-center">
-        <div className="text-center">
-          <p className="mb-4 text-destructive">Failed to load users</p>
-          <Button onClick={() => refetch()}>Try Again</Button>
-        </div>
-      </div>
-    );
-  }
+  const table = useReactTable({
+    data: users,
+    columns: tableColumns,
+    pageCount,
+    state: {
+      pagination,
+      sorting,
+      columnVisibility,
+      rowSelection,
+    },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
+  });
 
   return (
-    <div className="mt-3 h-full w-full space-y-6 font-dm">
+    <div className="h-full w-full space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold ">Manajemen Pengguna</h1>
-        <p className="mt-2 text-muted-foreground">
-          Kelola user yang tergabung dalam tenant Anda
-        </p>
+      <div className="flex flex-col gap-[5px]">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Manajemen Pengguna
+        </h1>
       </div>
 
-      {/* Data Table */}
-      <div className="space-y-4">
-        {/*{isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-[30rem] w-full" />
-            <Skeleton className="h-10 w-full" />
+      {/* Main Content Card */}
+      <div className="rounded-lg border bg-card p-6">
+        {/* Title and Add Button */}
+        <div className="mb-6 flex items-start justify-between">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-bold">Daftar Pengguna</h2>
+            <p className="text-sm text-muted-foreground">
+              Kelola pengguna yang ada di dalam tenant Anda
+            </p>
           </div>
-        ) : (*/}
-        <UsersDataTable
-          columns={tableColumns}
-          data={users}
-          pageCount={pageCount}
-          pageIndex={pagination.pageIndex}
-          pageSize={pagination.pageSize}
-          onPageChange={(page) =>
-            setPagination((p) => ({ ...p, pageIndex: page }))
-          }
-          onPageSizeChange={(size) =>
-            setPagination({ pageIndex: 0, pageSize: size })
-          }
-          totalRows={totalRows}
-          onInvite={() => setShowInviteModal(true)}
-          onImport={() => setShowImportModal(true)}
+        </div>
+
+        {/* Filters and Toolbar */}
+        <UsersTableToolbar
+          table={table}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
+          onInvite={() => setShowInviteModal(true)}
+          onImport={() => setShowImportModal(true)}
+          isFetching={isFetching}
         />
-        {/*)}*/}
+
+        {/* Table */}
+        <div className="mt-6">
+          <DataTable
+            table={table}
+            columns={tableColumns}
+            isLoading={isLoading || isFetching}
+            isError={!!error}
+          />
+        </div>
       </div>
 
       {/* Modals */}
@@ -134,7 +158,7 @@ function UsersPageContent() {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onSuccess={() => {
-          setShowImportModal(false);
+          setShowInviteModal(false);
           refetch();
         }}
       />

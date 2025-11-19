@@ -1,44 +1,100 @@
 'use client';
 
-import { useState } from 'react';
 import RBAC from '@/components/rbac/RBAC';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { getTenants } from '@/services/tenant.service';
+import { useQuery } from '@tanstack/react-query';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import TenantStats from './components/TenantStats';
-import {
-  Plus,
-  Search,
-  Filter,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-} from 'lucide-react';
+  ColumnFiltersState,
+  getCoreRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import TenantStats from './components/TenantStats';
+import { DataTableToolbar } from './components/data-table-toolbar';
+import { DataTable } from '@/components/ui/data-table';
+import { columns } from './components/columns';
+import { useDebounce } from 'use-debounce';
 
 function TenantsPageContent() {
+  const router = useRouter();
+
+  // Table state
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
-  const router = useRouter();
-  const [selectedTenants, setSelectedTenants] = useState<string[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
+  const { data, isLoading, isError } = useQuery({
+    queryKey: [
+      'tenants',
+      pagination.pageIndex,
+      pagination.pageSize,
+      sorting,
+      debouncedSearch,
+      statusFilter,
+      planFilter,
+    ],
+    queryFn: () => {
+      const sortDescriptor = sorting.length > 0 ? sorting[0] : undefined;
+      const sort = sortDescriptor
+        ? {
+            column: sortDescriptor.id,
+            direction: sortDescriptor.desc ? 'desc' : 'asc',
+          }
+        : undefined;
+
+      return getTenants(
+        pagination.pageIndex + 1,
+        pagination.pageSize,
+        searchQuery,
+        statusFilter,
+        planFilter,
+        sort as any,
+      );
+    },
+    keepPreviousData: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const tenants = data?.data?.tenants || [];
+  const totalTenants = data?.data?.total || 0;
+  const pageCount = Math.ceil(totalTenants / pagination.pageSize);
+
+  const table = useReactTable({
+    data: tenants,
+    columns: columns,
+    pageCount,
+    state: {
+      pagination,
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
+  });
+
+  // Stats are mocked for now, as the API does not provide them yet.
   const stats = {
     totalClients: 29,
     pkpClients: 25,
@@ -49,83 +105,11 @@ function TenantsPageContent() {
     complianceChange: 23,
   };
 
-  const tenants = [
-    {
-      id: '1',
-      name: 'PT. Maju Bersama',
-      status: 'Active',
-      plan: 'Enterprise',
-      activeProjects: 23,
-      users: 23,
-      storage: { used: 100, total: 150 },
-      lastUpdate: '2025-09-12T13:20:00',
-    },
-    {
-      id: '2',
-      name: 'PT. Maju Jayalaya',
-      status: 'Inactive',
-      plan: 'Free',
-      activeProjects: 23,
-      users: 23,
-      storage: { used: 100, total: 150 },
-      lastUpdate: '2025-09-12T13:20:00',
-    },
-    {
-      id: '3',
-      name: 'PT. Mundur Sendiri',
-      status: 'Active',
-      plan: 'Enterprise',
-      activeProjects: 23,
-      users: 23,
-      storage: { used: 100, total: 150 },
-      lastUpdate: '2025-09-12T13:20:00',
-    },
-  ];
-
-  const filteredTenants = tenants.filter((tenant) => {
-    const matchesSearch = tenant.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesStatus =
-      statusFilter === 'all' || tenant.status === statusFilter;
-    const matchesPlan = planFilter === 'all' || tenant.plan === planFilter;
-    return matchesSearch && matchesStatus && matchesPlan;
-  });
-
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedTenants([]);
-    } else {
-      setSelectedTenants(filteredTenants.map((t) => t.id));
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const handleSelectTenant = (id: string) => {
-    if (selectedTenants.includes(id)) {
-      setSelectedTenants(selectedTenants.filter((tid) => tid !== id));
-    } else {
-      setSelectedTenants([...selectedTenants, id]);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   return (
-    <div className="mt-3 w-full space-y-6">
+    <div className=" w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-[5px]">
-        <p className="text-sm font-medium text-muted-foreground">Tenant</p>
-        <h1 className="text-4xl font-bold tracking-tight">
+        <h1 className="text-3xl font-bold tracking-tight">
           Tenant (Perusahaan Konsultan Pajak)
         </h1>
       </div>
@@ -138,176 +122,40 @@ function TenantsPageContent() {
         {/* Title and Add Button */}
         <div className="mb-6 flex items-start justify-between">
           <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-bold">
-              Daftar Tenant ({filteredTenants.length})
-            </h2>
+            <h2 className="text-2xl font-bold">Daftar Tenant</h2>
             <p className="text-sm text-muted-foreground">
               Kelola data identitas, klasifikasi pajak, dan dokumen legal client
             </p>
           </div>
-          <Button
-            onClick={() => router.push('/platform/tenants/new')}
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Tambah Tenant
-          </Button>
         </div>
 
-        {/* Filters */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-1 items-center gap-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Cari Nama Tenant"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-          </div>
-
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={planFilter} onValueChange={setPlanFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Type</SelectItem>
-              <SelectItem value="Free">Free</SelectItem>
-              <SelectItem value="Pro">Pro</SelectItem>
-              <SelectItem value="Enterprise">Enterprise</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Filters and Toolbar */}
+        <DataTableToolbar
+          table={table}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          planFilter={planFilter}
+          setPlanFilter={setPlanFilter}
+        />
 
         {/* Table */}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={selectAll}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead>Tenant</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead>Active Project</TableHead>
-              <TableHead>Users</TableHead>
-              <TableHead>Storage</TableHead>
-              <TableHead>Last Update</TableHead>
-              <TableHead className="w-20 text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTenants.map((tenant) => (
-              <TableRow key={tenant.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedTenants.includes(tenant.id)}
-                    onCheckedChange={() => handleSelectTenant(tenant.id)}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{tenant.name}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex rounded px-2 py-1 text-xs font-semibold ${
-                      tenant.status === 'Active'
-                        ? 'bg-accent/10 text-accent'
-                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                    }`}
-                  >
-                    {tenant.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="inline-flex rounded bg-accent/10 px-2 py-1 text-xs font-semibold text-accent">
-                    {tenant.plan}
-                  </span>
-                </TableCell>
-                <TableCell>{tenant.activeProjects}</TableCell>
-                <TableCell>{tenant.users}</TableCell>
-                <TableCell>
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs">
-                      <span>{tenant.storage.used}GB</span>
-                      <span>{tenant.storage.total}GB</span>
-                    </div>
-                    <div className="h-2 w-24 rounded-full bg-muted">
-                      <div
-                        className="h-2 rounded-full bg-primary"
-                        style={{
-                          width: `${
-                            (tenant.storage.used / tenant.storage.total) * 100
-                          }%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-xs">
-                  {formatDate(tenant.lastUpdate)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4 text-purple-500" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4 text-orange-500" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing 1-{filteredTenants.length} of {filteredTenants.length}{' '}
-            tenants
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="default" size="sm">
-              1
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              Next
-            </Button>
-          </div>
+        <div className="mt-6">
+          <DataTable
+            table={table}
+            columns={columns}
+            isLoading={isLoading}
+            isError={isError}
+          />
         </div>
       </div>
     </div>
   );
 }
-
 export default function TenantsPage() {
   return (
-    <RBAC
-      requiredPermission="platform:tenant_management"
-      unauthorizedPage={true}
-    >
+    <RBAC requiredPermission="platform:tenant_manage" unauthorizedPage={true}>
       <TenantsPageContent />
     </RBAC>
   );
