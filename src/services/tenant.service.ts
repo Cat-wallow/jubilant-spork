@@ -4,7 +4,7 @@ import {
   Tenant,
   CreateTenantPayload,
 } from '@/types/tenant';
-import { SortDescriptor } from '@react-types/shared';
+import { SortDescriptor } from '@/types/shared';
 
 export const getTenants = async (
   page: number,

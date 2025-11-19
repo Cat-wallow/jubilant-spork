@@ -5,7 +5,7 @@ import {
   AcceptRejectInvitationResponse,
   VerifyInvitationTokenResponse,
   ListInvitationsParams,
-} from 'types/invitation';
+} from '@/types/invitation';
 
 /**
  * Invitation Service
@@ -17,12 +17,12 @@ import {
  * GET /api/v1/users/me/invitations
  */
 export const getMyInvitations = async (
-  params?: ListInvitationsParams
+  params?: ListInvitationsParams,
 ): Promise<InvitationListResponse> => {
-  const { data } = await api.get<{ success: boolean; data: InvitationListResponse }>(
-    '/users/me/invitations',
-    { params }
-  );
+  const { data } = await api.get<{
+    success: boolean;
+    data: InvitationListResponse;
+  }>('/users/me/invitations', { params });
   return data.data;
 };
 
@@ -31,11 +31,12 @@ export const getMyInvitations = async (
  * POST /api/v1/invitations/:id/accept
  */
 export const acceptInvitation = async (
-  invitationId: string
+  invitationId: string,
 ): Promise<AcceptRejectInvitationResponse> => {
-  const { data } = await api.post<{ success: boolean; data: AcceptRejectInvitationResponse }>(
-    `/invitations/${invitationId}/accept`
-  );
+  const { data } = await api.post<{
+    success: boolean;
+    data: AcceptRejectInvitationResponse;
+  }>(`/invitations/${invitationId}/accept`);
   return data.data;
 };
 
@@ -44,11 +45,12 @@ export const acceptInvitation = async (
  * POST /api/v1/invitations/:id/reject
  */
 export const rejectInvitation = async (
-  invitationId: string
+  invitationId: string,
 ): Promise<AcceptRejectInvitationResponse> => {
-  const { data } = await api.post<{ success: boolean; data: AcceptRejectInvitationResponse }>(
-    `/invitations/${invitationId}/reject`
-  );
+  const { data } = await api.post<{
+    success: boolean;
+    data: AcceptRejectInvitationResponse;
+  }>(`/invitations/${invitationId}/reject`);
   return data.data;
 };
 
@@ -58,11 +60,11 @@ export const rejectInvitation = async (
  * Note: This is a public endpoint (no auth required)
  */
 export const verifyInvitationToken = async (
-  token: string
+  token: string,
 ): Promise<VerifyInvitationTokenResponse> => {
-  const { data } = await api.get<{ success: boolean; data: VerifyInvitationTokenResponse }>(
-    '/invitations/verify',
-    { params: { token } }
-  );
+  const { data } = await api.get<{
+    success: boolean;
+    data: VerifyInvitationTokenResponse;
+  }>('/invitations/verify', { params: { token } });
   return data.data;
 };
