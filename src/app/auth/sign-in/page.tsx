@@ -36,7 +36,6 @@ export default function SignInPage() {
 
   // Set server error when login fails
   useEffect(() => {
-    // if (loginMutation.error) {
     if (loginError) {
       const errorMessage =
         (loginError as any)?.message || 'Login gagal, silakan coba lagi';

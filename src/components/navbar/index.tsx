@@ -13,8 +13,9 @@ import {
 import avatar from '/public/img/avatars/avatar4.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { logout } from '@/services/auth.service';
+// import { logout } from '@/services/auth.service';
 import { useAuth } from '@/contexts/AuthContext';
+import { clearTokens } from '@/lib/tokenManager';
 
 const Navbar = (props: {
   onOpenSidenav: () => void;
@@ -27,17 +28,16 @@ const Navbar = (props: {
     document.body.classList.contains('dark'),
   );
   const router = useRouter();
-  const { tenant, user } = useAuth();
+  const { tenant, user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      logout();
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken'); // Also remove refresh token just in case
       router.push('/auth/sign-in');
+      clearTokens;
     }
   };
 

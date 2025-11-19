@@ -1,14 +1,47 @@
 import axios from 'axios';
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+} from './tokenManager';
 
 const api = axios.create({
-  // Prefer Kong Gateway in front of all services
   baseURL:
     process.env.NEXT_PUBLIC_GATEWAY_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     'http://localhost:8000',
   withCredentials: true, // Important for sending cookies
 });
+
+// Request interceptor to add the auth token to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+let isRefreshing = false;
+let failedQueue: {
+  resolve: (value: unknown) => void;
+  reject: (reason?: any) => void;
+}[] = [];
+
+const processQueue = (error: any, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
 // Response interceptor to handle token refresh
 api.interceptors.response.use(
@@ -16,63 +49,66 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Don't try to refresh token for these endpoints to prevent loops
-    const skipRefreshUrls = [
-      'auth/login',
-      'auth/refresh-token',
-      'auth/logout',
-      'auth/register',
-      'auth/forgot-password',
-      'auth/reset-password',
-    ];
-
+    const skipRefreshUrls = ['auth/login', 'auth/refresh-token', 'auth/logout'];
     const shouldSkipRefresh = skipRefreshUrls.some((url) =>
       originalRequest.url?.includes(url),
     );
 
-    // Conditions to try token refresh:
-    // 1. The error is 401 (Unauthorized).
-    // 2. The request hasn't been retried yet.
-    // 3. The failed request is NOT in the skip list.
-    // 4. We're not already in the process of refreshing.
-    // 5. The request doesn't have _skipRefresh flag set.
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !shouldSkipRefresh &&
-      !originalRequest._skipRefresh &&
-      !api.defaults.headers.common['X-Refreshing']
-    ) {
+    if (error.response?.status === 401 && !shouldSkipRefresh) {
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return axios(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
-      try {
-        // Set flag to prevent multiple refresh attempts
-        api.defaults.headers.common['X-Refreshing'] = 'true';
-
-        // The backend will issue a new access token cookie on successful refresh
-        await api.get('/auth/refresh-token');
-
-        // Clear the refresh flag
-        delete api.defaults.headers.common['X-Refreshing'];
-
-        // Retry the original request, the browser will send the new cookie
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Clear the refresh flag
-        delete api.defaults.headers.common['X-Refreshing'];
-
-        // Handle failed refresh - redirect to login only if we're not already there
-        console.error('Token refresh failed:', refreshError);
-
-        // Only redirect if we're not already on auth pages
-        if (
-          typeof window !== 'undefined' &&
-          !window.location.pathname.includes('/auth/')
-        ) {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        isRefreshing = false;
+        // No refresh token available, truly unauthenticated
+        clearTokens();
+        if (typeof window !== 'undefined') {
           window.location.href = '/auth/sign-in';
         }
+        return Promise.reject(error);
+      }
 
+      try {
+        const { data } = await api.post('/auth/refresh-token', {
+          refreshToken,
+        });
+
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+          data.data;
+
+        // Check if the old refresh token was in localStorage to decide new storage
+        const rememberMe =
+          typeof window !== 'undefined' &&
+          !!window.localStorage.getItem('refreshToken');
+        setTokens(newAccessToken, newRefreshToken, rememberMe);
+
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        processQueue(null, newAccessToken);
+
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        clearTokens();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/auth/sign-in';
+        }
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

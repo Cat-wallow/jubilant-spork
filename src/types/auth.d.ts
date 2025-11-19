@@ -41,6 +41,7 @@ export interface ILoginResponse {
   message: string;
   data: {
     accessToken?: string;
+    refreshToken?: string;
     user: IUser;
     tenant: ITenant;
     role: IRole;
