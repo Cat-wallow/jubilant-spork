@@ -80,7 +80,7 @@ export default function UserActionsMenu({
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const { permissions } = useAuth();
   const reactivateMutation = useReactivateUser(tenantId);
-  const canManage = permissions.includes('tenant:user_manage');
+  const canManage = permissions.includes('user:manage');
 
   const handleReactivate = async () => {
     try {
@@ -89,7 +89,6 @@ export default function UserActionsMenu({
       toast.success(`User ${user.name} berhasil diaktifkan.`);
     } catch (error) {
       console.error('Failed to reactivate user:', error);
-      toast.error('Gagal mengaktifkan user.');
     }
   };
 

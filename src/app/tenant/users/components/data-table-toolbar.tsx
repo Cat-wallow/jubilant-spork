@@ -108,7 +108,7 @@ export function UsersTableToolbar<TData>({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <RBAC requiredPermission="tenant:user_manage">
+        <RBAC requiredPermission={["user:read", "user:manage"]}>
           <Button
             variant="third"
             onClick={onImport}
@@ -120,7 +120,7 @@ export function UsersTableToolbar<TData>({
           </Button>
         </RBAC>
 
-        <RBAC requiredPermission="tenant:user_create">
+        <RBAC requiredPermission={["user:create", "user:manage"]}>
           <Button onClick={onInvite} className="gap-2" disabled={isFetching}>
             <Plus className="h-4 w-4" />
             Undang User

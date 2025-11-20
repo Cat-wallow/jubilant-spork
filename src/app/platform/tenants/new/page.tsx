@@ -208,7 +208,7 @@ function NewTenantPageContent() {
 
 export default function NewTenantPage() {
   return (
-    <RBAC requiredPermission="platform:tenant_manage" unauthorizedPage={true}>
+    <RBAC requiredPermission={["tenant:create", "tenant:manage"]} unauthorizedPage={true}>
       <NewTenantPageContent />
     </RBAC>
   );

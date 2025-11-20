@@ -54,7 +54,6 @@ function UsersPageContent() {
     [data?.items, currentUser],
   );
   const pageCount = data?.pagination?.totalPages || 0;
-  const totalUsers = data?.pagination?.total || 0;
 
   const tableColumns = useMemo(
     () =>
@@ -168,7 +167,7 @@ function UsersPageContent() {
 
 export default function TenantUsersPage() {
   return (
-    <RBAC requiredPermission={["user:manage"]} unauthorizedPage={true}>
+    <RBAC requiredPermission={["user:manage", "user:read"]} unauthorizedPage={true}>
       <UsersPageContent />
     </RBAC>
   );
