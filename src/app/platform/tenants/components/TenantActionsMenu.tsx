@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tenant } from '@/types/tenant';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface TenantActionsMenuProps {
   tenant: Tenant;
@@ -38,6 +39,11 @@ export function TenantActionsMenu({ tenant }: TenantActionsMenuProps) {
     if (isDeactivateModalOpen) {
       setIsDeactivateModalOpen(false);
     }
+    toast.success(
+      `Tenant ${tenant.name} berhasil di${
+        tenant.status === 'active' ? 'nonaktifkan' : 'aktifkan'
+      }.`
+    );
   };
 
   return (

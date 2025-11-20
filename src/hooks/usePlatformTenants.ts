@@ -1,8 +1,8 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { toggleTenantStatus } from '@/services/tenant.service';
+import { toast } from 'sonner';
 
 export function useToggleTenantStatus() {
   const queryClient = useQueryClient();
@@ -11,7 +11,6 @@ export function useToggleTenantStatus() {
     mutationFn: (tenantId: string) => toggleTenantStatus(tenantId),
     onSuccess: (data) => {
       const action = data.status === 'active' ? 'diaktifkan' : 'dinonaktifkan';
-      toast.success(`Tenant berhasil ${action}.`);
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
     },
     onError: (error: any) => {

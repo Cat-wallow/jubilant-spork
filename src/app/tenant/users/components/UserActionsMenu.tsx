@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { User } from '@/types/users';
+import { toast } from 'sonner';
 
 interface UserActionsMenuProps {
   tenantId: string;
@@ -85,8 +86,10 @@ export default function UserActionsMenu({
     try {
       await reactivateMutation.mutateAsync(user.id);
       onSuccess();
+      toast.success(`User ${user.name} berhasil diaktifkan.`);
     } catch (error) {
       console.error('Failed to reactivate user:', error);
+      toast.error('Gagal mengaktifkan user.');
     }
   };
 
@@ -270,8 +273,9 @@ function DeactivateModal({
       onSuccess();
       setIsOpen(false);
       form.reset();
+      toast.success(`User ${user.name} berhasil dinonaktifkan.`);
     } catch (error) {
-      console.error('Failed to deactivate user:', error);
+      toast.error(`${deactivateMutation.error.cause || "Gagal menonaktifkan user. Silakan coba lagi"}`);
     }
   };
 
