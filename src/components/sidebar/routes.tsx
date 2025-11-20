@@ -88,7 +88,7 @@ const routes = [
   {
     name: 'Klien /WP',
     layout: '/admin',
-    path: 'profile',
+    path: 'clients',
     icon: (
       <svg
         className="h-6 w-6"
