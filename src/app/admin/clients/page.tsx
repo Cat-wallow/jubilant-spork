@@ -2,15 +2,21 @@
 
 import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-import { useAuth } from '@/contexts/AuthContext';
-import { useClients } from '@/hooks/useClients';
 import { DataTable } from '@/components/ui/data-table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useClients } from '@/hooks/useClients';
+import { useAuth } from '@/contexts/AuthContext';
+import { SummaryCards } from './components/SummaryCards';
+import { AdvancedFilters } from './components/AdvancedFilters';
+import { CreateClientModal } from './components/CreateClientModal';
 import {
-  ColumnDef,
-  getCoreRowModel,
+  ColumnFiltersState,
+  SortingState,
   useReactTable,
+  VisibilityState,
+  getCoreRowModel,
 } from '@tanstack/react-table';
-import { Input } from '@/components/ui/input';
+import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,108 +26,183 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search as SearchIcon, X } from 'lucide-react';
+import { MoreHorizontal, Edit, Link, Trash2, Building2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Client } from '@/hooks/useClients';
 
 const columns: ColumnDef<Client>[] = [
   {
-    accessorKey: 'code',
-    header: 'Kode',
-  },
-  {
     accessorKey: 'name',
-    header: 'Nama Klien',
-    cell: ({ row }) => {
-      const client = row.original;
-      return (
+    header: 'Klien',
+    cell: ({ row }) => (
+      <div className="font-medium">
         <div className="flex flex-col">
-          <span className="text-sm font-medium">{client.name}</span>
-          {client.legal_name && (
-            <span className="text-xs text-muted-foreground">
-              {client.legal_name}
-            </span>
-          )}
+          <span className="text-sm font-medium">{row.getValue('name')}</span>
+          <span className="text-xs text-muted-foreground">{row.original.code}</span>
         </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'type',
-    header: 'Tipe',
-    cell: ({ row }) => {
-      const type = row.getValue<string>('type');
-      const label =
-        type === 'corporate'
-          ? 'Badan'
-          : type === 'individual'
-            ? 'Orang Pribadi'
-            : type;
-      return <span className="text-sm capitalize">{label}</span>;
-    },
-  },
-  {
-    accessorKey: 'npwp',
-    header: 'NPWP',
+      </div>
+    ),
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: 'Status Client',
     cell: ({ row }) => {
-      const status = (row.getValue<string>('status') || 'active').toLowerCase();
-      const isActive = status === 'active';
+      const status = row.getValue('status') as string;
       return (
-        <Badge
-          variant={isActive ? 'default' : 'destructive'}
-          className={
-            isActive
-              ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/40'
-              : ''
-          }
+        <Badge 
+          variant={status === 'active' ? 'default' : 'secondary'}
+          className={status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
         >
-          {isActive ? 'Aktif' : 'Nonaktif'}
+          {status === 'active' ? 'Active' : 'Non Aktif'}
         </Badge>
       );
     },
   },
   {
-    accessorKey: 'created_at',
-    header: 'Dibuat',
+    accessorKey: 'type',
+    header: 'Jenis Usaha',
     cell: ({ row }) => {
-      const value = row.getValue<string>('created_at');
-      if (!value) return null;
-      const date = new Date(value);
+      const type = row.getValue('type') as string;
+      const typeLabels = {
+        corporate: 'Konstruksi',
+        individual: 'Trading',
+        other: 'Manufaktur',
+      };
+      return typeLabels[type as keyof typeof typeLabels] || type;
+    },
+  },
+  {
+    accessorKey: 'npwp',
+    header: 'NPWP',
+    cell: ({ row }) => (
+      <span className="text-sm font-mono">{row.getValue('npwp') || '-'}</span>
+    ),
+  },
+  {
+    accessorKey: 'pkp_status',
+    header: 'Status PKP',
+    cell: ({ row }) => {
+      const pkpStatus = row.original.pkp_status;
       return (
-        <span className="text-sm text-muted-foreground">
-          {date.toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
+        <Badge 
+          variant={pkpStatus ? 'default' : 'secondary'}
+          className={pkpStatus ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}
+        >
+          {pkpStatus ? 'PKP' : 'NON PKP'}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'active_projects',
+    header: 'Active Project',
+    cell: ({ row }) => (
+      <span className="text-sm font-medium">{row.original.active_projects || 0}</span>
+    ),
+  },
+  {
+    accessorKey: 'updated_at',
+    header: 'Last Update',
+    cell: ({ row }) => {
+      const date = new Date(row.getValue('updated_at'));
+      return (
+        <span className="text-sm">
+          {date.toLocaleDateString('id-ID', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
           })}
         </span>
       );
     },
   },
+  {
+    accessorKey: 'deadline_project',
+    header: 'Deadline Project',
+    cell: ({ row }) => {
+      const deadline = row.original.deadline_project;
+      if (!deadline) return <span className="text-sm text-muted-foreground">-</span>;
+      
+      const date = new Date(deadline);
+      const isOverdue = date < new Date();
+      return (
+        <span className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+          {date.toLocaleDateString('id-ID', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+          })}
+        </span>
+      );
+    },
+  },
+  {
+    id: 'actions',
+    header: 'Action',
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link className="mr-2 h-4 w-4" />
+            View Details
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-red-600">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
 ];
 
 export default function ClientsPage() {
   const { tenant } = useAuth();
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<string>('');
+  const [pkpFilter, setPkpFilter] = useState<string>('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { data, isLoading, isFetching, error } = useClients({
     tenantId: tenant.id,
     search: debouncedSearchQuery,
     status: statusFilter,
     type: typeFilter,
+    pkp_status: pkpFilter,
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
   });
 
   const clients = data?.items || [];
   const pageCount = data?.pagination?.totalPages || 0;
+  
+  // Mock summary data - will be replaced with real API
+  const summaryData = {
+    totalClients: data?.pagination?.total || 0,
+    activeClients: clients.filter(c => c.status === 'active').length,
+    totalProjects: clients.reduce((sum, c) => sum + (c.active_projects || 0), 0),
+    complianceRate: 85, // Mock data
+  };
 
   const table = useReactTable({
     data: clients,
@@ -135,76 +216,92 @@ export default function ClientsPage() {
     manualPagination: true,
   });
 
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('');
+    setTypeFilter('');
+    setPkpFilter('');
+  };
+
   return (
     <div className="h-full w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-[5px]">
-        <h1 className="text-3xl font-bold tracking-tight">Klien / Wajib Pajak</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Klien (WP)</h1>
         <p className="text-sm text-muted-foreground">
-          Kelola daftar klien/WP yang ditangani oleh kantor Anda.
+          Kelola data identitas, klasifikasi pajak, dan dokumen legal client
         </p>
       </div>
 
-      {/* Main Content Card */}
-      <div className="rounded-lg border bg-card p-6">
-        {/* Filters */}
-        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:gap-3">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Cari nama, kode, atau NPWP klien..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                className="h-10 w-full pl-10 lg:w-[280px]"
-                disabled={isFetching}
-              />
-            </div>
+      {/* Summary Cards */}
+      <SummaryCards
+        totalClients={summaryData.totalClients}
+        activeClients={summaryData.activeClients}
+        totalProjects={summaryData.totalProjects}
+        complianceRate={summaryData.complianceRate}
+      />
+
+      {/* Main Content */}
+      <div className="rounded-lg border bg-card">
+        {/* Table Header */}
+        <div className="flex items-center justify-between p-6 pb-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-semibold">Daftar Klien ({summaryData.totalClients})</h2>
+            <p className="text-sm text-muted-foreground">
+              Kelola data identitas, klasifikasi pajak, dan dokumen legal client
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            {/* Add Client Button */}
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              className="gap-2"
+            >
+              <Building2 className="h-4 w-4" />
+              Tambah Klien
+            </Button>
             
-            {/* Status Filter */}
-            <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? "" : value)}>
-              <SelectTrigger className="h-10 w-full sm:w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="active">Aktif</SelectItem>
-                <SelectItem value="inactive">Nonaktif</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Type Filter - Disabled temporarily */}
-            <Select disabled>
-              <SelectTrigger className="h-10 w-full sm:w-[140px] opacity-50">
-                <SelectValue placeholder="Tipe (Coming Soon)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Tipe</SelectItem>
-                <SelectItem value="corporate">Badan</SelectItem>
-                <SelectItem value="individual">Orang Pribadi</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Clear Filters */}
-            {(statusFilter || typeFilter) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setStatusFilter('');
-                  setTypeFilter('');
-                }}
-                className="h-10 px-3"
+            {/* Items per page */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show</span>
+              <Select
+                value={pagination.pageSize.toString()}
+                onValueChange={(value) => setPagination(prev => ({ ...prev, pageSize: parseInt(value) }))}
               >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
+                <SelectTrigger className="h-8 w-[60px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground">entries</span>
+            </div>
           </div>
         </div>
 
+        {/* Advanced Filters */}
+        <div className="px-6 pb-4">
+          <AdvancedFilters
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+            pkpFilter={pkpFilter}
+            onPkpFilterChange={setPkpFilter}
+            onClearFilters={handleClearFilters}
+            isFetching={isFetching}
+          />
+        </div>
+
         {/* Table */}
-        <div className="mt-4">
+        <div className="px-6 pb-6">
           <DataTable
             table={table}
             columns={columns}
@@ -213,6 +310,17 @@ export default function ClientsPage() {
           />
         </div>
       </div>
+
+      {/* Create Client Modal */}
+      <CreateClientModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          setShowCreateModal(false);
+          // Refetch data to show new client
+          // This will be implemented when we add API integration
+        }}
+      />
     </div>
   );
 }

@@ -12,6 +12,10 @@ export interface Client {
   phone?: string | null;
   status?: string | null;
   created_at?: string | null;
+  updated_at?: string | null;
+  pkp_status?: boolean | null;
+  active_projects?: number | null;
+  deadline_project?: string | null;
 }
 
 interface ClientsResponse {
