@@ -85,32 +85,14 @@ const Navbar = (props: {
   return (
     <>
       <nav className="sticky top-2 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl">
-        <div className="relative mt-[3px] flex h-[61px] w-full flex-grow items-center justify-between gap-2 rounded-full bg-white px-8 py-2 shadow-xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none md:w-full md:flex-grow-0 md:gap-1 xl:w-full xl:gap-4">
-          <div>
-            {/*<div className="h-6 w-[224px] pt-1">
-            <a
-              className="text-sm font-normal text-navy-700 hover:underline dark:text-white dark:hover:text-white"
-              href=" "
-            >
-              Pages
-              <span className="mx-1 text-sm text-navy-700 hover:text-navy-700 dark:text-white">
-                {' '}
-                /{' '}
-              </span>
-            </a>
-            <NavLink
-              className="text-sm font-normal capitalize text-navy-700 hover:underline dark:text-white dark:hover:text-white"
-              href="#"
-            >
-              {brandText}
-            </NavLink>
-          </div>*/}
-            <p className="text-center text-[23px] font-extrabold uppercase text-navy-700 hover:text-navy-700 dark:text-white dark:hover:text-white">
+        <div className="relative flex mt-[3px] h-[61px] w-full flex-grow items-center justify-between gap-2 rounded-full bg-white px-8 py-2 shadow-xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none md:w-full md:flex-grow-0 md:gap-1 xl:w-full xl:gap-4">
+          <div className='hidden sm:flex'>
+            <p className="text-center text-[23px] text-nowrap font-extrabold uppercase text-navy-700 hover:text-navy-700 dark:text-white dark:hover:text-white">
               {tenant ? tenant.name : ''}
             </p>
           </div>
-          <div className="flex h-full w-96 flex-row items-center justify-center gap-6 ">
-            <div className="mr-2 flex h-full w-full items-center rounded-full bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white">
+          <div className="flex sm:justify-end h-full w-96 flex-row items-center justify-between gap-6 ">
+            <div className="hidden none md:flex mr-2 h-full w-full items-center rounded-full bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white">
               <p className="pl-3 pr-2 text-xl">
                 <FiSearch className="h-4 w-4 text-gray-400 dark:text-white" />
               </p>
@@ -121,12 +103,13 @@ const Navbar = (props: {
               />
             </div>
             <span
-              className="flex cursor-pointer text-xl text-gray-600 dark:text-white xl:hidden"
+              className="flex cursor-pointer text-xl  text-gray-600 dark:text-white xl:hidden"
               onClick={onOpenSidenav}
             >
               <FiAlignJustify className="h-5 w-5" />
             </span>
             {/* start Notification */}
+            <div className='flex justify-center items-center gap-6'>
             <Dropdown
               button={
                 <p className="cursor-pointer">
@@ -243,9 +226,11 @@ const Navbar = (props: {
                   >
                     Log Out
                   </button>
+
                 </div>
               </div>
             </Dropdown>
+            </div>
           </div>
         </div>
       </nav>

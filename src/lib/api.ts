@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 import {
   getAccessToken,
   getRefreshToken,
@@ -79,6 +80,7 @@ api.interceptors.response.use(
         if (typeof window !== 'undefined') {
           window.location.href = '/auth/sign-in';
         }
+        toast.error(error.response?.data?.message || error.message || 'Sesi Anda telah berakhir. Silakan login kembali.');
         return Promise.reject(error);
       }
 
@@ -106,10 +108,20 @@ api.interceptors.response.use(
         if (typeof window !== 'undefined') {
           window.location.href = '/auth/sign-in';
         }
+        toast.error(refreshError.response?.data?.message || refreshError.message || 'Gagal memperbarui sesi. Silakan login kembali.');
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // For any other error, display a generic error toast if a specific message is not provided
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else if (error.message) {
+      toast.error(error.message);
+    } else {
+      toast.error('Terjadi kesalahan tidak terduga.');
     }
 
     return Promise.reject(error);

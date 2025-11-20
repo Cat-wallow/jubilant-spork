@@ -38,7 +38,7 @@ export default function SignInPage() {
   useEffect(() => {
     if (loginError) {
       const errorMessage =
-        (loginError as any)?.message || 'Login gagal, silakan coba lagi';
+        (loginError as any)?.cause || 'Login gagal, silakan coba lagi';
 
       form.setError('root', {
         type: 'server',

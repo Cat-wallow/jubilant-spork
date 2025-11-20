@@ -155,7 +155,7 @@ function TenantsPageContent() {
 }
 export default function TenantsPage() {
   return (
-    <RBAC requiredPermission="platform:tenant_manage" unauthorizedPage={true}>
+    <RBAC requiredPermission="tenant:manage" unauthorizedPage={true}>
       <TenantsPageContent />
     </RBAC>
   );

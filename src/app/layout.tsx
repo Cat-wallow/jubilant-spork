@@ -9,7 +9,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body id={'root'}>
         <AppWrappers>{children}</AppWrappers>
-        <Toaster />
+        <Toaster duration={5000} position='top-right'/>
       </body>
     </html>
   );

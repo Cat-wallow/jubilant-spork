@@ -168,7 +168,7 @@ function UsersPageContent() {
 
 export default function TenantUsersPage() {
   return (
-    <RBAC requiredPermission="tenant:user_manage" unauthorizedPage={true}>
+    <RBAC requiredPermission={["user:manage"]} unauthorizedPage={true}>
       <UsersPageContent />
     </RBAC>
   );
