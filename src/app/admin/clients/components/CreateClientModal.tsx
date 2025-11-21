@@ -30,7 +30,20 @@ import {
   FileText, 
   MapPin, 
   User,
-  Calculator
+  Calculator,
+  Phone,
+  Mail,
+  Trash2,
+  Plus,
+  Settings,
+  Eye,
+  Hash,
+  Upload,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 // Form validation schemas
@@ -102,6 +115,90 @@ const picPkpSchema = z.object({
   pic_email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
 });
 
+const picSchema = z.object({
+  name: z.string().min(1, 'Nama PIC wajib diisi'),
+  position: z.string().min(1, 'Jabatan wajib dipilih'),
+  email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
+  phone: z.string().optional(),
+});
+
+const billingContactSchema = z.object({
+  name: z.string().min(1, 'Nama kontak billing wajib diisi'),
+  position: z.string().min(1, 'Jabatan wajib dipilih'),
+  email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
+  phone: z.string().optional(),
+});
+
+const branchSchema = z.object({
+  shareholder: z.string().optional(),
+  position: z.string().optional(),
+  country: z.string().optional(),
+  province: z.string().optional(),
+  city: z.string().optional(),
+  phone: z.string().optional(),
+  pic_name: z.string().optional(),
+  pic_position: z.string().optional(),
+  pic_email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
+  pic_phone: z.string().optional(),
+  address: z.string().optional(),
+});
+
+const accountingPreferenceSchema = z.object({
+  useDefaultCoa: z.boolean(),
+  useTenantVoucherNumbering: z.boolean(),
+  coaTemplate: z.string().optional(),
+  voucherFormat: z.string().optional(),
+  resetFrequency: z.enum(['monthly', 'annually', 'daily']).optional(),
+  paddingNumber: z.number().optional(),
+  prefix: z.string().optional(),
+  suffix: z.string().optional(),
+  manualCoa: z.array(z.object({
+    id: z.string(),
+    accountNumber: z.string().min(1, 'Nomor Akun wajib diisi'),
+    accountName: z.string().min(1, 'Nama Akun wajib diisi'),
+    description: z.string().optional(),
+  })),
+});
+
+const legalDocumentSchema = z.object({
+  aktaPendirian: z.object({
+    file: z.string().optional(),
+    fileName: z.string().optional(),
+    uploadDate: z.string().optional(),
+    status: z.enum(['uploaded', 'pending', 'missing']).default('missing'),
+  }),
+  aktaPerubahan: z.object({
+    file: z.string().optional(),
+    fileName: z.string().optional(),
+    uploadDate: z.string().optional(),
+    status: z.enum(['uploaded', 'pending', 'missing']).default('missing'),
+  }),
+  siup: z.object({
+    file: z.string().optional(),
+    fileName: z.string().optional(),
+    uploadDate: z.string().optional(),
+    status: z.enum(['uploaded', 'pending', 'missing']).default('missing'),
+  }),
+  tdp: z.object({
+    file: z.string().optional(),
+    fileName: z.string().optional(),
+    uploadDate: z.string().optional(),
+    status: z.enum(['uploaded', 'pending', 'missing']).default('missing'),
+  }),
+  npwp: z.object({
+    file: z.string().optional(),
+    fileName: z.string().optional(),
+    uploadDate: z.string().optional(),
+    status: z.enum(['uploaded', 'pending', 'missing']).default('missing'),
+  }),
+  ktpDirektur: z.object({
+    file: z.string().optional(),
+    fileName: z.string().optional(),
+    uploadDate: z.string().optional(),
+    status: z.enum(['uploaded', 'pending', 'missing']).default('missing'),
+  }),
+});
+
 type FormData = {
   basicInfo: z.infer<typeof basicInfoSchema>;
   address: z.infer<typeof addressSchema>;
@@ -110,7 +207,34 @@ type FormData = {
   taxIdentity: z.infer<typeof taxIdentitySchema>;
   taxDocument: z.infer<typeof taxDocumentSchema>;
   picPkp: z.infer<typeof picPkpSchema>;
+  pic: z.infer<typeof picSchema>;
+  billingContact: z.infer<typeof billingContactSchema>;
+  branches: z.infer<typeof branchSchema>[];
+  accountingPreferences: z.infer<typeof accountingPreferenceSchema>;
+  legalDocuments: z.infer<typeof legalDocumentSchema>;
 };
+
+interface Branch {
+  id: string;
+  shareholder?: string;
+  position?: string;
+  country?: string;
+  province?: string;
+  city?: string;
+  phone?: string;
+  pic_name?: string;
+  pic_position?: string;
+  pic_email?: string;
+  pic_phone?: string;
+  address?: string;
+}
+
+interface ManualCoaItem {
+  id: string;
+  accountNumber: string;
+  accountName: string;
+  description?: string;
+}
 
 interface CreateClientModalProps {
   open: boolean;
@@ -121,11 +245,18 @@ interface CreateClientModalProps {
 const steps = [
   { id: 1, title: 'Identitas', icon: User },
   { id: 2, title: 'Klasifikasi Usaha & Pajak', icon: Calculator },
+  { id: 3, title: 'Kontak & Cabang', icon: Phone },
+  { id: 4, title: 'Preferensi Akuntansi', icon: Settings },
+  { id: 5, title: 'Dokumen Legal', icon: FileText },
+  { id: 6, title: 'Review', icon: Eye },
 ];
 
 export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [manualCoa, setManualCoa] = useState<ManualCoaItem[]>([]);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['basicInfo', 'contacts']);
 
   // Form instances for each step
   const basicInfoForm = useForm<z.infer<typeof basicInfoSchema>>({
@@ -213,6 +344,100 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
     },
   });
 
+  const picForm = useForm<z.infer<typeof picSchema>>({
+    resolver: zodResolver(picSchema),
+    defaultValues: {
+      name: '',
+      position: '',
+      email: '',
+      phone: '',
+    },
+  });
+
+  const billingContactForm = useForm<z.infer<typeof billingContactSchema>>({
+    resolver: zodResolver(billingContactSchema),
+    defaultValues: {
+      name: '',
+      position: '',
+      email: '',
+      phone: '',
+    },
+  });
+
+  const branchForm = useForm<z.infer<typeof branchSchema>>({
+    resolver: zodResolver(branchSchema),
+    defaultValues: {
+      shareholder: '',
+      position: '',
+      country: 'Indonesia',
+      province: 'DKI Jakarta',
+      city: 'Jakarta',
+      phone: '',
+      pic_name: '',
+      pic_position: '',
+      pic_email: '',
+      pic_phone: '',
+      address: '',
+    },
+  });
+
+  const accountingForm = useForm<z.infer<typeof accountingPreferenceSchema>>({
+    resolver: zodResolver(accountingPreferenceSchema) as any,
+    defaultValues: {
+      useDefaultCoa: true,
+      useTenantVoucherNumbering: true,
+      coaTemplate: '',
+      voucherFormat: '',
+      resetFrequency: 'monthly' as const,
+      paddingNumber: 3,
+      prefix: '',
+      suffix: '',
+      manualCoa: [],
+    },
+  });
+
+  const legalDocumentForm = useForm<z.infer<typeof legalDocumentSchema>>({
+    resolver: zodResolver(legalDocumentSchema) as any,
+    defaultValues: {
+      aktaPendirian: {
+        file: '',
+        fileName: '',
+        uploadDate: '',
+        status: 'missing',
+      },
+      aktaPerubahan: {
+        file: '',
+        fileName: '',
+        uploadDate: '',
+        status: 'missing',
+      },
+      siup: {
+        file: '',
+        fileName: '',
+        uploadDate: '',
+        status: 'missing',
+      },
+      tdp: {
+        file: '',
+        fileName: '',
+        uploadDate: '',
+        status: 'missing',
+      },
+      npwp: {
+        file: '',
+        fileName: '',
+        uploadDate: '',
+        status: 'missing',
+      },
+      ktpDirektur: {
+        file: '',
+        fileName: '',
+        uploadDate: '',
+        status: 'missing',
+      },
+    },
+  });
+
   const handleNext = async () => {
     let isValid = false;
     
@@ -225,6 +450,19 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
       if (isValid) isValid = await taxIdentityForm.trigger();
       if (isValid) isValid = await taxDocumentForm.trigger();
       if (isValid) isValid = await picPkpForm.trigger();
+    } else if (currentStep === 3) {
+      isValid = await picForm.trigger();
+      if (isValid) isValid = await billingContactForm.trigger();
+      // Branch form is optional, so we don't validate it here
+    } else if (currentStep === 4) {
+      isValid = await accountingForm.trigger();
+      // Manual COA validation is optional
+    } else if (currentStep === 5) {
+      isValid = await legalDocumentForm.trigger();
+      // Legal documents validation is optional
+    } else if (currentStep === 6) {
+      // Review step - no validation needed, just proceed to submit
+      isValid = true;
     }
 
     if (isValid && currentStep < steps.length) {
@@ -238,18 +476,97 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
     }
   };
 
+  const handleAddBranch = () => {
+    const newBranch: Branch = {
+      id: Date.now().toString(),
+      ...branchForm.getValues(),
+    };
+    setBranches([...branches, newBranch]);
+    branchForm.reset();
+  };
+
+  const handleRemoveBranch = (id: string) => {
+    setBranches(branches.filter(branch => branch.id !== id));
+  };
+
+  const handleAddCoaItem = () => {
+    const newItem: ManualCoaItem = {
+      id: Date.now().toString(),
+      accountNumber: '',
+      accountName: '',
+      description: '',
+    };
+    setManualCoa([...manualCoa, newItem]);
+  };
+
+  const handleRemoveCoaItem = (id: string) => {
+    setManualCoa(manualCoa.filter(item => item.id !== id));
+  };
+
+  const handleUpdateCoaItem = (id: string, field: keyof ManualCoaItem, value: string) => {
+    setManualCoa(manualCoa.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
+  };
+
+  const generateVoucherPreview = () => {
+    const { prefix, voucherFormat, paddingNumber, suffix } = accountingForm.getValues();
+    const sampleNumber = '001'.padStart(paddingNumber || 3, '0');
+    return `${prefix || ''}${voucherFormat || 'VOU'}${sampleNumber}${suffix || ''}`;
+  };
+
+  const handleFileUpload = (docType: keyof z.infer<typeof legalDocumentSchema>, file: File) => {
+    const uploadDate = new Date().toISOString();
+    const fileUrl = URL.createObjectURL(file); // Simulated file URL
+    
+    legalDocumentForm.setValue(`${docType}.file`, fileUrl);
+    legalDocumentForm.setValue(`${docType}.fileName`, file.name);
+    legalDocumentForm.setValue(`${docType}.uploadDate`, uploadDate);
+    legalDocumentForm.setValue(`${docType}.status`, 'uploaded');
+  };
+
+  const handleRemoveFile = (docType: keyof z.infer<typeof legalDocumentSchema>) => {
+    legalDocumentForm.setValue(`${docType}.file`, '');
+    legalDocumentForm.setValue(`${docType}.fileName`, '');
+    legalDocumentForm.setValue(`${docType}.uploadDate`, '');
+    legalDocumentForm.setValue(`${docType}.status`, 'missing');
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'uploaded':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+      case 'missing':
+      default:
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'uploaded':
+        return 'Terkirim';
+      case 'pending':
+        return 'Menunggu';
+      case 'missing':
+      default:
+        return 'Belum Upload';
+    }
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
   const handleSubmit = async () => {
-    const allValid = await businessInfoForm.trigger();
-    if (!allValid) return;
-    
-    const taxIdentityValid = await taxIdentityForm.trigger();
-    if (!taxIdentityValid) return;
-    
-    const taxDocumentValid = await taxDocumentForm.trigger();
-    if (!taxDocumentValid) return;
-    
-    const picPkpValid = await picPkpForm.trigger();
-    if (!picPkpValid) return;
+    const legalValid = await legalDocumentForm.trigger();
+    if (!legalValid) return;
 
     setIsSubmitting(true);
     try {
@@ -262,6 +579,14 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
         taxIdentity: taxIdentityForm.getValues(),
         taxDocument: taxDocumentForm.getValues(),
         picPkp: picPkpForm.getValues(),
+        pic: picForm.getValues(),
+        billingContact: billingContactForm.getValues(),
+        branches: branches,
+        accountingPreferences: {
+          ...accountingForm.getValues(),
+          manualCoa: manualCoa,
+        },
+        legalDocuments: legalDocumentForm.getValues(),
       });
 
       // Simulate API call
@@ -277,6 +602,13 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
       taxIdentityForm.reset();
       taxDocumentForm.reset();
       picPkpForm.reset();
+      picForm.reset();
+      billingContactForm.reset();
+      branchForm.reset();
+      accountingForm.reset();
+      legalDocumentForm.reset();
+      setBranches([]);
+      setManualCoa([]);
     } catch (error) {
       console.error('Error creating client:', error);
     } finally {
@@ -905,14 +1237,1231 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
           </div>
         );
 
-      default:
-        return null;
+      case 3:
+        return (
+          <div className="space-y-6">
+            {/* Person In Charge (PIC) */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Person In Charge (PIC)</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="pic_name">Nama PIC *</Label>
+                  <Input
+                    id="pic_name"
+                    {...picForm.register('name')}
+                    placeholder="Masukkan nama PIC"
+                    className={picForm.formState.errors.name ? 'border-red-500' : ''}
+                  />
+                  {picForm.formState.errors.name && (
+                    <p className="text-sm text-red-500">{picForm.formState.errors.name.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="pic_position">Jabatan *</Label>
+                  <Select
+                    value={picForm.watch('position')}
+                    onValueChange={(value) => picForm.setValue('position', value)}
+                  >
+                    <SelectTrigger className={picForm.formState.errors.position ? 'border-red-500' : ''}>
+                      <SelectValue placeholder="Pilih jabatan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="director">Director</SelectItem>
+                      <SelectItem value="staff">Staff</SelectItem>
+                      <SelectItem value="lainnya">Lainnya</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {picForm.formState.errors.position && (
+                    <p className="text-sm text-red-500">{picForm.formState.errors.position.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="pic_email">Email</Label>
+                  <Input
+                    id="pic_email"
+                    {...picForm.register('email')}
+                    placeholder="email@example.com"
+                    className={picForm.formState.errors.email ? 'border-red-500' : ''}
+                  />
+                  {picForm.formState.errors.email && (
+                    <p className="text-sm text-red-500">{picForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="pic_phone">Telepon</Label>
+                  <Input
+                    id="pic_phone"
+                    {...picForm.register('phone')}
+                    placeholder="08123456789"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Kontak Billing */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Kontak Billing</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="billing_name">Nama Kontak Billing *</Label>
+                  <Input
+                    id="billing_name"
+                    {...billingContactForm.register('name')}
+                    placeholder="Masukkan nama kontak billing"
+                    className={billingContactForm.formState.errors.name ? 'border-red-500' : ''}
+                  />
+                  {billingContactForm.formState.errors.name && (
+                    <p className="text-sm text-red-500">{billingContactForm.formState.errors.name.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="billing_position">Jabatan *</Label>
+                  <Select
+                    value={billingContactForm.watch('position')}
+                    onValueChange={(value) => billingContactForm.setValue('position', value)}
+                  >
+                    <SelectTrigger className={billingContactForm.formState.errors.position ? 'border-red-500' : ''}>
+                      <SelectValue placeholder="Pilih jabatan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="account_manager">Account Manager</SelectItem>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="finance">Finance</SelectItem>
+                      <SelectItem value="billing">Billing</SelectItem>
+                      <SelectItem value="lainnya">Lainnya</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {billingContactForm.formState.errors.position && (
+                    <p className="text-sm text-red-500">{billingContactForm.formState.errors.position.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="billing_email">Email</Label>
+                  <Input
+                    id="billing_email"
+                    {...billingContactForm.register('email')}
+                    placeholder="email@example.com"
+                    className={billingContactForm.formState.errors.email ? 'border-red-500' : ''}
+                  />
+                  {billingContactForm.formState.errors.email && (
+                    <p className="text-sm text-red-500">{billingContactForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="billing_phone">Telepon</Label>
+                  <Input
+                    id="billing_phone"
+                    {...billingContactForm.register('phone')}
+                    placeholder="08123456789"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Kantor Cabang */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Kantor Cabang</h3>
+              </div>
+              
+              {/* Form Tambah Cabang */}
+              <div className="p-4 border rounded-lg bg-card">
+                <h4 className="font-medium mb-4">Tambah Kantor Cabang Baru</h4>
+                
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_shareholder">Pemegang Saham</Label>
+                    <Input
+                      id="branch_shareholder"
+                      {...branchForm.register('shareholder')}
+                      placeholder="Masukkan nama pemegang saham"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_position">Jabatan/Struktur</Label>
+                    <Select
+                      value={branchForm.watch('position')}
+                      onValueChange={(value) => branchForm.setValue('position', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih jabatan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="supervisor">Supervisor</SelectItem>
+                        <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="lainnya">Lainnya</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_country">Negara</Label>
+                    <Select
+                      value={branchForm.watch('country')}
+                      onValueChange={(value) => branchForm.setValue('country', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih negara" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Indonesia">Indonesia</SelectItem>
+                        <SelectItem value="Malaysia">Malaysia</SelectItem>
+                        <SelectItem value="Singapore">Singapore</SelectItem>
+                        <SelectItem value="Thailand">Thailand</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_province">Provinsi</Label>
+                    <Select
+                      value={branchForm.watch('province')}
+                      onValueChange={(value) => branchForm.setValue('province', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih provinsi" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DKI Jakarta">DKI Jakarta</SelectItem>
+                        <SelectItem value="Jawa Barat">Jawa Barat</SelectItem>
+                        <SelectItem value="Jawa Tengah">Jawa Tengah</SelectItem>
+                        <SelectItem value="Jawa Timur">Jawa Timur</SelectItem>
+                        <SelectItem value="Bali">Bali</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_city">Kota</Label>
+                    <Select
+                      value={branchForm.watch('city')}
+                      onValueChange={(value) => branchForm.setValue('city', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih kota" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Jakarta">Jakarta</SelectItem>
+                        <SelectItem value="Bandung">Bandung</SelectItem>
+                        <SelectItem value="Surabaya">Surabaya</SelectItem>
+                        <SelectItem value="Medan">Medan</SelectItem>
+                        <SelectItem value="Denpasar">Denpasar</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_phone">Telepon</Label>
+                    <Input
+                      id="branch_phone"
+                      {...branchForm.register('phone')}
+                      placeholder="08123456789"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_pic_name">Nama PIC</Label>
+                    <Input
+                      id="branch_pic_name"
+                      {...branchForm.register('pic_name')}
+                      placeholder="Masukkan nama PIC cabang"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_pic_position">Jabatan</Label>
+                    <Select
+                      value={branchForm.watch('pic_position')}
+                      onValueChange={(value) => branchForm.setValue('pic_position', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih jabatan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="owner">Owner</SelectItem>
+                        <SelectItem value="director">Director</SelectItem>
+                        <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="lainnya">Lainnya</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_pic_email">Email</Label>
+                    <Input
+                      id="branch_pic_email"
+                      {...branchForm.register('pic_email')}
+                      placeholder="email@example.com"
+                      className={branchForm.formState.errors.pic_email ? 'border-red-500' : ''}
+                    />
+                    {branchForm.formState.errors.pic_email && (
+                      <p className="text-sm text-red-500">{branchForm.formState.errors.pic_email.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="branch_pic_phone">Telepon</Label>
+                    <Input
+                      id="branch_pic_phone"
+                      {...branchForm.register('pic_phone')}
+                      placeholder="08123456789"
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="branch_address">Alamat Lengkap</Label>
+                    <Textarea
+                      id="branch_address"
+                      {...branchForm.register('address')}
+                      placeholder="Masukkan alamat lengkap cabang"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handleAddBranch}
+                  className="mt-4 gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Tambah Cabang
+                </Button>
+              </div>
+
+              {/* Daftar Kantor Cabang */}
+              {branches.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-medium">Daftar Kantor Cabang</h4>
+                  {branches.map((branch) => (
+                    <div key={branch.id} className="p-4 border rounded-lg bg-card">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-2">
+                          <p className="font-medium">
+                            {branch.address || 'Alamat tidak tersedia'}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            PIC: {branch.pic_name || '-'} ({branch.pic_position || '-'})
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Telepon: {branch.pic_phone || '-'}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveBranch(branch.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-6">
+            {/* Template COA */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Template COA</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Toggle Default Template */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="useDefaultCoa"
+                    checked={accountingForm.watch('useDefaultCoa') || false}
+                    onChange={(e) => accountingForm.setValue('useDefaultCoa', e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  <Label htmlFor="useDefaultCoa" className="font-medium">
+                    Gunakan Template Default
+                  </Label>
+                </div>
+                
+                {accountingForm.watch('useDefaultCoa') && (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="coaTemplate">Pilihan Template COA</Label>
+                      <Select
+                        value={accountingForm.watch('coaTemplate')}
+                        onValueChange={(value) => accountingForm.setValue('coaTemplate', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih template COA" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="trading">Trading COA Template</SelectItem>
+                          <SelectItem value="manufacturing">Manufacturing COA Template</SelectItem>
+                          <SelectItem value="service">Service COA Template</SelectItem>
+                          <SelectItem value="construction">Construction COA Template</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="gap-2"
+                      >
+                        <Eye className="h-4 w-4" />
+                        Preview
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Tambah COA Manual */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Hash className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Tambah COA Manual</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {/* COA Table */}
+                <div className="border rounded-lg">
+                  <div className="grid grid-cols-12 gap-2 p-3 bg-muted font-medium text-sm">
+                    <div className="col-span-2">Nomor Akun</div>
+                    <div className="col-span-4">Nama Akun</div>
+                    <div className="col-span-5">Deskripsi Akun</div>
+                    <div className="col-span-1">Aksi</div>
+                  </div>
+                  
+                  {manualCoa.map((item) => (
+                    <div key={item.id} className="grid grid-cols-12 gap-2 p-3 border-t">
+                      <div className="col-span-2">
+                        <Input
+                          value={item.accountNumber}
+                          onChange={(e) => handleUpdateCoaItem(item.id, 'accountNumber', e.target.value)}
+                          placeholder="1001"
+                          className="h-8"
+                        />
+                      </div>
+                      <div className="col-span-4">
+                        <Input
+                          value={item.accountName}
+                          onChange={(e) => handleUpdateCoaItem(item.id, 'accountName', e.target.value)}
+                          placeholder="Kas"
+                          className="h-8"
+                        />
+                      </div>
+                      <div className="col-span-5">
+                        <Input
+                          value={item.description || ''}
+                          onChange={(e) => handleUpdateCoaItem(item.id, 'description', e.target.value)}
+                          placeholder="Akun kas kecil"
+                          className="h-8"
+                        />
+                      </div>
+                      <div className="col-span-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveCoaItem(item.id)}
+                          className="text-red-600 hover:text-red-700 h-8 w-8 p-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <div className="p-3 border-t">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddCoaItem}
+                      className="gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Tambah Baris
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Kebijakan Penomoran Voucher */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Kebijakan Penomoran Voucher</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Toggle Tenant Policy */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="useTenantVoucherNumbering"
+                    checked={accountingForm.watch('useTenantVoucherNumbering') || false}
+                    onChange={(e) => accountingForm.setValue('useTenantVoucherNumbering', e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  <Label htmlFor="useTenantVoucherNumbering" className="font-medium">
+                    Gunakan kebijakan penomoran dari tenant
+                  </Label>
+                </div>
+                
+                {!accountingForm.watch('useTenantVoucherNumbering') && (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="voucherFormat">Format Voucher</Label>
+                      <Input
+                        id="voucherFormat"
+                        {...accountingForm.register('voucherFormat')}
+                        placeholder="VOU"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="resetFrequency">Frekuensi Reset</Label>
+                      <Select
+                        value={accountingForm.watch('resetFrequency')}
+                        onValueChange={(value) => accountingForm.setValue('resetFrequency', value as 'monthly' | 'annually' | 'daily')}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih frekuensi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monthly">Bulanan</SelectItem>
+                          <SelectItem value="annually">Tahunan</SelectItem>
+                          <SelectItem value="daily">Harian</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="paddingNumber">Padding Angka</Label>
+                      <Input
+                        id="paddingNumber"
+                        type="number"
+                        {...accountingForm.register('paddingNumber', { valueAsNumber: true })}
+                        placeholder="3"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="prefix">Prefix</Label>
+                      <Input
+                        id="prefix"
+                        {...accountingForm.register('prefix')}
+                        placeholder="CMP"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="suffix">Suffix</Label>
+                      <Input
+                        id="suffix"
+                        {...accountingForm.register('suffix')}
+                        placeholder="/2024"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Voucher Preview */}
+                <div className="p-4 border rounded-lg bg-muted">
+                  <h4 className="font-medium mb-2">Preview Nomor Voucher</h4>
+                  <p className="font-mono text-lg">{generateVoucherPreview()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-6">
+            {/* Dokumen Legal Upload */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-medium">Dokumen Legal</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Akta Pendirian */}
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                        <h4 className="font-medium">Akta Pendirian</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {getStatusText(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                      </p>
+                      {legalDocumentForm.watch('aktaPendirian.fileName') && (
+                        <p className="text-sm text-muted-foreground">
+                          File: {legalDocumentForm.watch('aktaPendirian.fileName')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="aktaPendirian"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload('aktaPendirian', file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('aktaPendirian')?.click()}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload
+                      </Button>
+                      {legalDocumentForm.watch('aktaPendirian.status') === 'uploaded' && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveFile('aktaPendirian')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Akta Perubahan */}
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                        <h4 className="font-medium">Akta Perubahan</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {getStatusText(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                      </p>
+                      {legalDocumentForm.watch('aktaPerubahan.fileName') && (
+                        <p className="text-sm text-muted-foreground">
+                          File: {legalDocumentForm.watch('aktaPerubahan.fileName')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="aktaPerubahan"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload('aktaPerubahan', file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('aktaPerubahan')?.click()}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload
+                      </Button>
+                      {legalDocumentForm.watch('aktaPerubahan.status') === 'uploaded' && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveFile('aktaPerubahan')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* SIUP */}
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(legalDocumentForm.watch('siup.status') || 'missing')}
+                        <h4 className="font-medium">SIUP</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {getStatusText(legalDocumentForm.watch('siup.status') || 'missing')}
+                      </p>
+                      {legalDocumentForm.watch('siup.fileName') && (
+                        <p className="text-sm text-muted-foreground">
+                          File: {legalDocumentForm.watch('siup.fileName')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="siup"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload('siup', file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('siup')?.click()}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload
+                      </Button>
+                      {legalDocumentForm.watch('siup.status') === 'uploaded' && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveFile('siup')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* TDP */}
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(legalDocumentForm.watch('tdp.status') || 'missing')}
+                        <h4 className="font-medium">TDP</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {getStatusText(legalDocumentForm.watch('tdp.status') || 'missing')}
+                      </p>
+                      {legalDocumentForm.watch('tdp.fileName') && (
+                        <p className="text-sm text-muted-foreground">
+                          File: {legalDocumentForm.watch('tdp.fileName')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="tdp"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload('tdp', file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('tdp')?.click()}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload
+                      </Button>
+                      {legalDocumentForm.watch('tdp.status') === 'uploaded' && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveFile('tdp')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* NPWP */}
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(legalDocumentForm.watch('npwp.status') || 'missing')}
+                        <h4 className="font-medium">NPWP</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {getStatusText(legalDocumentForm.watch('npwp.status') || 'missing')}
+                      </p>
+                      {legalDocumentForm.watch('npwp.fileName') && (
+                        <p className="text-sm text-muted-foreground">
+                          File: {legalDocumentForm.watch('npwp.fileName')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="npwp"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload('npwp', file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('npwp')?.click()}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload
+                      </Button>
+                      {legalDocumentForm.watch('npwp.status') === 'uploaded' && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveFile('npwp')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* KTP Direktur */}
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(legalDocumentForm.watch('ktpDirektur.status') || 'missing')}
+                        <h4 className="font-medium">KTP Direktur</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {getStatusText(legalDocumentForm.watch('ktpDirektur.status') || 'missing')}
+                      </p>
+                      {legalDocumentForm.watch('ktpDirektur.fileName') && (
+                        <p className="text-sm text-muted-foreground">
+                          File: {legalDocumentForm.watch('ktpDirektur.fileName')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="ktpDirektur"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload('ktpDirektur', file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('ktpDirektur')?.click()}
+                        className="gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload
+                      </Button>
+                      {legalDocumentForm.watch('ktpDirektur.status') === 'uploaded' && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveFile('ktpDirektur')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 6:
+        return (
+          <div className="space-y-6">
+            {/* Review Header */}
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <Eye className="h-6 w-6 text-primary" />
+                <h3 className="text-xl font-semibold">Review Data Klien</h3>
+              </div>
+              <p className="text-muted-foreground">
+                Periksa kembali semua data sebelum menyimpan klien baru
+              </p>
+            </div>
+
+            {/* Basic Info Section */}
+            <div className="border rounded-lg bg-card">
+              <div 
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSection('basicInfo')}
+              >
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                  <h4 className="font-medium">Informasi Dasar</h4>
+                </div>
+                {expandedSections.includes('basicInfo') ? 
+                  <ChevronUp className="h-4 w-4" /> : 
+                  <ChevronDown className="h-4 w-4" />
+                }
+              </div>
+              
+              {expandedSections.includes('basicInfo') && (
+                <div className="px-4 pb-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Nama Klien</p>
+                      <p className="font-medium">{basicInfoForm.watch('name') || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Brand Name</p>
+                      <p>{basicInfoForm.watch('brand_name') || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Tipe Klien</p>
+                      <p>{basicInfoForm.watch('type') === 'corporate' ? 'Korporasi' : 'Individu'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Telepon</p>
+                      <p>{basicInfoForm.watch('phone') || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Email</p>
+                      <p>{basicInfoForm.watch('email') || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Website</p>
+                      <p>{basicInfoForm.watch('website') || '-'}</p>
+                    </div>
+                  </div>
+                  
+                  <Separator className="my-4" />
+                  
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Alamat Lengkap</p>
+                    <p>
+                      {addressForm.watch('address')}, {addressForm.watch('city')}, {addressForm.watch('province')} {addressForm.watch('postal_code')}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Contacts Section */}
+            <div className="border rounded-lg bg-card">
+              <div 
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSection('contacts')}
+              >
+                <div className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <h4 className="font-medium">Kontak & Cabang</h4>
+                </div>
+                {expandedSections.includes('contacts') ? 
+                  <ChevronUp className="h-4 w-4" /> : 
+                  <ChevronDown className="h-4 w-4" />
+                }
+              </div>
+              
+              {expandedSections.includes('contacts') && (
+                <div className="px-4 pb-4 space-y-4">
+                  {/* PIC */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Person In Charge (PIC)</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm">Nama: {picForm.watch('name') || '-'}</p>
+                        <p className="text-sm">Jabatan: {picForm.watch('position') || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm">Email: {picForm.watch('email') || '-'}</p>
+                        <p className="text-sm">Telepon: {picForm.watch('phone') || '-'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Billing Contact */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Kontak Billing</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm">Nama: {billingContactForm.watch('name') || '-'}</p>
+                        <p className="text-sm">Jabatan: {billingContactForm.watch('position') || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm">Email: {billingContactForm.watch('email') || '-'}</p>
+                        <p className="text-sm">Telepon: {billingContactForm.watch('phone') || '-'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Branch Offices */}
+                  {branches.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">Kantor Cabang ({branches.length})</p>
+                      {branches.map((branch, index) => (
+                        <div key={branch.id} className="p-3 border rounded-sm bg-muted/30">
+                          <p className="text-sm font-medium">Cabang {index + 1}</p>
+                          <p className="text-sm">Alamat: {branch.address || '-'}</p>
+                          <p className="text-sm">PIC: {branch.pic_name || '-'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Business & Tax Section */}
+            <div className="border rounded-lg bg-card">
+              <div 
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSection('business')}
+              >
+                <div className="flex items-center gap-2">
+                  <Calculator className="h-5 w-5 text-muted-foreground" />
+                  <h4 className="font-medium">Usaha & Pajak</h4>
+                </div>
+                {expandedSections.includes('business') ? 
+                  <ChevronUp className="h-4 w-4" /> : 
+                  <ChevronDown className="h-4 w-4" />
+                }
+              </div>
+              
+              {expandedSections.includes('business') && (
+                <div className="px-4 pb-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Bidang Usaha</p>
+                      <p>{businessInfoForm.watch('businessField') || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">NPWP</p>
+                      <p>{taxIdentityForm.watch('npwpNumber') || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Status PKP</p>
+                      <p>{taxIdentityForm.watch('isPkp') ? 'PKP' : 'Non-PKP'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">NPPKP</p>
+                      <p>{taxIdentityForm.watch('nppkpNumber') || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Accounting Preferences Section */}
+            <div className="border rounded-lg bg-card">
+              <div 
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSection('accounting')}
+              >
+                <div className="flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-muted-foreground" />
+                  <h4 className="font-medium">Preferensi Akuntansi</h4>
+                </div>
+                {expandedSections.includes('accounting') ? 
+                  <ChevronUp className="h-4 w-4" /> : 
+                  <ChevronDown className="h-4 w-4" />
+                }
+              </div>
+              
+              {expandedSections.includes('accounting') && (
+                <div className="px-4 pb-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Template COA</p>
+                      <p>{accountingForm.watch('useDefaultCoa') ? 
+                        `Template: ${accountingForm.watch('coaTemplate') || 'Default'}` : 
+                        'Custom COA'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Manual COA</p>
+                      <p>{manualCoa.length} item(s)</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Penomoran Voucher</p>
+                      <p>{accountingForm.watch('useTenantVoucherNumbering') ? 
+                        'Menggunakan kebijakan tenant' : 
+                        `Custom: ${generateVoucherPreview()}`}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Legal Documents Section */}
+            <div className="border rounded-lg bg-card">
+              <div 
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSection('legal')}
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <h4 className="font-medium">Dokumen Legal</h4>
+                </div>
+                {expandedSections.includes('legal') ? 
+                  <ChevronUp className="h-4 w-4" /> : 
+                  <ChevronDown className="h-4 w-4" />
+                }
+              </div>
+              
+              {expandedSections.includes('legal') && (
+                <div className="px-4 pb-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                      <div>
+                        <p className="text-sm font-medium">Akta Pendirian</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                      <div>
+                        <p className="text-sm font-medium">Akta Perubahan</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(legalDocumentForm.watch('siup.status') || 'missing')}
+                      <div>
+                        <p className="text-sm font-medium">SIUP</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(legalDocumentForm.watch('siup.status') || 'missing')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(legalDocumentForm.watch('tdp.status') || 'missing')}
+                      <div>
+                        <p className="text-sm font-medium">TDP</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(legalDocumentForm.watch('tdp.status') || 'missing')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(legalDocumentForm.watch('npwp.status') || 'missing')}
+                      <div>
+                        <p className="text-sm font-medium">NPWP</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(legalDocumentForm.watch('npwp.status') || 'missing')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(legalDocumentForm.watch('ktpDirektur.status') || 'missing')}
+                      <div>
+                        <p className="text-sm font-medium">KTP Direktur</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(legalDocumentForm.watch('ktpDirektur.status') || 'missing')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Final Confirmation */}
+            <div className="p-4 border rounded-lg bg-primary/5">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-medium">Konfirmasi Final</p>
+                  <p className="text-sm text-muted-foreground">
+                    Pastikan semua data klien sudah benar sebelum menyimpan. Data yang telah disimpan tidak dapat diubah melalui form ini.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             Tambah Klien Baru
