@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 
 export interface Client {
@@ -33,6 +33,7 @@ interface UseClientsParams {
   search?: string;
   status?: string;
   type?: string;
+  pkp_status?: string;
   page?: number;
   limit?: number;
 }
@@ -82,5 +83,40 @@ export const useClients = (params: UseClientsParams) => {
       return response;
     },
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCreateClient = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ tenantId, data }: { tenantId: string; data: any }) => {
+      const response = await api.post('/client-wp/api/clients', data, {
+        headers: {
+          'X-Tenant-Id': tenantId,
+        },
+      });
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['clients', variables.tenantId] });
+    },
+  });
+};
+
+export const useDeleteClient = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ tenantId, id }: { tenantId: string; id: string }) => {
+      await api.delete(`/client-wp/api/clients/${id}`, {
+        headers: {
+          'X-Tenant-Id': tenantId,
+        },
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['clients', variables.tenantId] });
+    },
   });
 };

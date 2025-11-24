@@ -4,19 +4,19 @@ import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClients } from '@/hooks/useClients';
+import { useClients, useCreateClient, useDeleteClient } from '@/hooks/useClients';
 import { useAuth } from '@/contexts/AuthContext';
 import { SummaryCards } from './components/SummaryCards';
 import { AdvancedFilters } from './components/AdvancedFilters';
-import { CreateClientModal } from './components/CreateClientModal';
+import { CreateClientModalUpdated } from './components/CreateClientModalUpdated';
 import {
   ColumnFiltersState,
   SortingState,
   useReactTable,
   VisibilityState,
   getCoreRowModel,
+  ColumnDef,
 } from '@tanstack/react-table';
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,145 +36,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Client } from '@/hooks/useClients';
 
-const columns: ColumnDef<Client>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Klien',
-    cell: ({ row }) => (
-      <div className="font-medium">
-        <div className="flex flex-col">
-          <span className="text-sm font-medium">{row.getValue('name')}</span>
-          <span className="text-xs text-muted-foreground">{row.original.code}</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status Client',
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string;
-      return (
-        <Badge 
-          variant={status === 'active' ? 'default' : 'secondary'}
-          className={status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
-        >
-          {status === 'active' ? 'Active' : 'Non Aktif'}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: 'type',
-    header: 'Jenis Usaha',
-    cell: ({ row }) => {
-      const type = row.getValue('type') as string;
-      const typeLabels = {
-        corporate: 'Konstruksi',
-        individual: 'Trading',
-        other: 'Manufaktur',
-      };
-      return typeLabels[type as keyof typeof typeLabels] || type;
-    },
-  },
-  {
-    accessorKey: 'npwp',
-    header: 'NPWP',
-    cell: ({ row }) => (
-      <span className="text-sm font-mono">{row.getValue('npwp') || '-'}</span>
-    ),
-  },
-  {
-    accessorKey: 'pkp_status',
-    header: 'Status PKP',
-    cell: ({ row }) => {
-      const pkpStatus = row.original.pkp_status;
-      return (
-        <Badge 
-          variant={pkpStatus ? 'default' : 'secondary'}
-          className={pkpStatus ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}
-        >
-          {pkpStatus ? 'PKP' : 'NON PKP'}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: 'active_projects',
-    header: 'Active Project',
-    cell: ({ row }) => (
-      <span className="text-sm font-medium">{row.original.active_projects || 0}</span>
-    ),
-  },
-  {
-    accessorKey: 'updated_at',
-    header: 'Last Update',
-    cell: ({ row }) => {
-      const date = new Date(row.getValue('updated_at'));
-      return (
-        <span className="text-sm">
-          {date.toLocaleDateString('id-ID', { 
-            day: '2-digit', 
-            month: 'short', 
-            year: 'numeric' 
-          })}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: 'deadline_project',
-    header: 'Deadline Project',
-    cell: ({ row }) => {
-      const deadline = row.original.deadline_project;
-      if (!deadline) return <span className="text-sm text-muted-foreground">-</span>;
-      
-      const date = new Date(deadline);
-      const isOverdue = date < new Date();
-      return (
-        <span className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
-          {date.toLocaleDateString('id-ID', { 
-            day: '2-digit', 
-            month: 'short', 
-            year: 'numeric' 
-          })}
-        </span>
-      );
-    },
-  },
-  {
-    id: 'actions',
-    header: 'Action',
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link className="mr-2 h-4 w-4" />
-            View Details
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-red-600">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-];
-
 export default function ClientsPage() {
   const { tenant } = useAuth();
+  const createClientMutation = useCreateClient();
+  const deleteClientMutation = useDeleteClient();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -192,6 +57,156 @@ export default function ClientsPage() {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
   });
+
+  const columns = useMemo<ColumnDef<Client>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'Klien',
+        cell: ({ row }) => (
+          <div className="font-medium">
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{row.getValue('name')}</span>
+              <span className="text-xs text-muted-foreground">{row.original.code}</span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status Client',
+        cell: ({ row }) => {
+          const status = row.getValue('status') as string;
+          return (
+            <Badge 
+              variant={status === 'active' ? 'default' : 'secondary'}
+              className={status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+            >
+              {status === 'active' ? 'Active' : 'Non Aktif'}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: 'type',
+        header: 'Jenis Usaha',
+        cell: ({ row }) => {
+          const type = row.getValue('type') as string;
+          const typeLabels = {
+            corporate: 'Konstruksi',
+            individual: 'Trading',
+            other: 'Manufaktur',
+          };
+          return typeLabels[type as keyof typeof typeLabels] || type;
+        },
+      },
+      {
+        accessorKey: 'npwp',
+        header: 'NPWP',
+        cell: ({ row }) => (
+          <span className="text-sm font-mono">{row.getValue('npwp') || '-'}</span>
+        ),
+      },
+      {
+        accessorKey: 'pkp_status',
+        header: 'Status PKP',
+        cell: ({ row }) => {
+          const pkpStatus = row.original.pkp_status;
+          return (
+            <Badge 
+              variant={pkpStatus ? 'default' : 'secondary'}
+              className={pkpStatus ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}
+            >
+              {pkpStatus ? 'PKP' : 'NON PKP'}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: 'active_projects',
+        header: 'Active Project',
+        cell: ({ row }) => (
+          <span className="text-sm font-medium">{row.original.active_projects || 0}</span>
+        ),
+      },
+      {
+        accessorKey: 'updated_at',
+        header: 'Last Update',
+        cell: ({ row }) => {
+          const date = new Date(row.getValue('updated_at'));
+          return (
+            <span className="text-sm">
+              {date.toLocaleDateString('id-ID', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric' 
+              })}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: 'deadline_project',
+        header: 'Deadline Project',
+        cell: ({ row }) => {
+          const deadline = row.original.deadline_project;
+          if (!deadline) return <span className="text-sm text-muted-foreground">-</span>;
+          
+          const date = new Date(deadline);
+          const isOverdue = date < new Date();
+          return (
+            <span className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+              {date.toLocaleDateString('id-ID', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric' 
+              })}
+            </span>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        header: 'Action',
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="text-red-600 cursor-pointer"
+                onClick={() => {
+                  if (confirm('Are you sure you want to delete this client?')) {
+                    deleteClientMutation.mutate({
+                      tenantId: tenant.id,
+                      id: row.original.id,
+                    });
+                  }
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [deleteClientMutation, tenant.id]
+  );
 
   const clients = data?.items || [];
   const pageCount = data?.pagination?.totalPages || 0;
@@ -312,13 +327,20 @@ export default function ClientsPage() {
       </div>
 
       {/* Create Client Modal */}
-      <CreateClientModal
+      <CreateClientModalUpdated
         open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={() => {
-          setShowCreateModal(false);
-          // Refetch data to show new client
-          // This will be implemented when we add API integration
+        onOpenChange={setShowCreateModal}
+        onSubmit={async (data) => {
+          try {
+            await createClientMutation.mutateAsync({
+              tenantId: tenant.id,
+              data,
+            });
+            setShowCreateModal(false);
+          } catch (error) {
+            console.error('Failed to create client:', error);
+            // TODO: Show error toast
+          }
         }}
       />
     </div>
