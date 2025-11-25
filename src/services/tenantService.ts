@@ -11,9 +11,7 @@ import { ILoginResponse, ISwitchTenantRequest } from '@/types/auth';
  * @param {ISwitchTenantRequest} data - The tenant ID to switch to
  * @returns {Promise<ILoginResponse>} The updated session data with new tenant context
  */
-export const switchTenant = async (
-  data: ISwitchTenantRequest,
-): Promise<ILoginResponse> => {
+export const switchTenant = async (data: ISwitchTenantRequest): Promise<ILoginResponse> => {
   try {
     const response = await api.post('auth/switch-tenant', data);
 

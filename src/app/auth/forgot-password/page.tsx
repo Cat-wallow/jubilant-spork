@@ -4,10 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forgotPassword } from '../../../lib/api';
-import {
-  ForgotPasswordValidator,
-  ForgotPasswordFormInputs,
-} from '@/validators/auth.validator';
+import { ForgotPasswordValidator, ForgotPasswordFormInputs } from '@/validators/auth.validator';
 import {
   Form,
   FormControl,
@@ -67,17 +64,13 @@ export default function ForgotPasswordPage() {
             Lupa kata sandi?
           </h1>
           <p className="text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
-            Masukkan alamat email dan kami akan kirimkan link untuk mereset kata
-            sandi
+            Masukkan alamat email dan kami akan kirimkan link untuk mereset kata sandi
           </p>
         </div>
 
         {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
@@ -112,9 +105,7 @@ export default function ForgotPasswordPage() {
               disabled={form.formState.isSubmitting}
               className="h-[54px] w-full rounded-2xl text-sm font-bold leading-[100%] tracking-[-0.28px]"
             >
-              {form.formState.isSubmitting
-                ? 'Mengirim...'
-                : 'Kirim tautan reset'}
+              {form.formState.isSubmitting ? 'Mengirim...' : 'Kirim tautan reset'}
             </Button>
           </form>
         </Form>

@@ -46,7 +46,7 @@ const RBAC: React.FC<RBACProps> = ({
   // Check permission
   const hasPermission = requiredPermission
     ? Array.isArray(requiredPermission)
-      ? requiredPermission.some(perm => permissions.includes(perm))
+      ? requiredPermission.some((perm) => permissions.includes(perm))
       : permissions.includes(requiredPermission)
     : true;
 
@@ -74,14 +74,7 @@ const RBAC: React.FC<RBACProps> = ({
     if (!hasAccess && redirect && !unauthorizedPage) {
       router.back();
     }
-  }, [
-    isLoading,
-    isAuthenticated,
-    hasAccess,
-    redirect,
-    unauthorizedPage,
-    router,
-  ]);
+  }, [isLoading, isAuthenticated, hasAccess, redirect, unauthorizedPage, router]);
 
   // While loading authentication state, don't render anything to prevent flashes
   if (isLoading) {

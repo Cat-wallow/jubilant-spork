@@ -23,8 +23,7 @@ const getTenantColor = (tenantName: string): string => {
 };
 
 export default function TenantSwitcher() {
-  const { tenant, availableTenants, switchTenant, isLoading, currentRole } =
-    useAuth();
+  const { tenant, availableTenants, switchTenant, isLoading, currentRole } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,10 +31,7 @@ export default function TenantSwitcher() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -68,9 +64,7 @@ export default function TenantSwitcher() {
 
   // Show loading state while data is being fetched
   if (isLoading) {
-    return (
-      <div className="h-7 w-40 animate-pulse rounded-[5px] bg-gray-200 dark:bg-navy-700" />
-    );
+    return <div className="h-7 w-40 animate-pulse rounded-[5px] bg-gray-200 dark:bg-navy-700" />;
   }
 
   // Don't show tenant switcher if user only has one tenant or no tenants
@@ -100,9 +94,7 @@ export default function TenantSwitcher() {
         </span>
         {/* Dropdown indicator */}
         <svg
-          className={`h-3 w-3 transition-transform ${
-            isOpen ? 'rotate-180' : ''
-          }`}
+          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >

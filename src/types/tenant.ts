@@ -29,4 +29,8 @@ export interface CreateTenantPayload {
   maxProjects?: number;
   storageQuotaGb?: number;
   trialDays?: number;
+  logo_url?: string;
+  settings?: any;
 }
+
+export type UpdateTenantPayload = Partial<CreateTenantPayload>;

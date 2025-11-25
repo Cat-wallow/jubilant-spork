@@ -56,14 +56,10 @@ export function SummaryCards({
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {card.title}
-                  </p>
-                  <p className="text-2xl font-bold text-foreground mt-1">
-                    {card.value}
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
+                  <p className="mt-1 text-2xl font-bold text-foreground">{card.value}</p>
                 </div>
-                <div className={`p-3 rounded-full ${card.bgColor}`}>
+                <div className={`rounded-full p-3 ${card.bgColor}`}>
                   <Icon className={`h-6 w-6 ${card.color}`} />
                 </div>
               </div>

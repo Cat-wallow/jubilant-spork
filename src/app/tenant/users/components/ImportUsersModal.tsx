@@ -62,18 +62,14 @@ export default function ImportUsersModal({
     onClose();
   };
 
-  const csvHeaderValidator = (
-    file: File,
-  ): Promise<{ code: string; message: string } | null> => {
+  const csvHeaderValidator = (file: File): Promise<{ code: string; message: string } | null> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
         try {
           const text = (reader.result as string) || '';
           const firstLine = text.split(/\r?\n/)[0] || '';
-          const headers = firstLine
-            .split(',')
-            .map((h) => h.trim().toLowerCase());
+          const headers = firstLine.split(',').map((h) => h.trim().toLowerCase());
           const hasEmail = headers.includes('email');
           const hasName = headers.includes('name') || headers.includes('nama');
           const hasRole = headers.includes('role');
@@ -113,8 +109,7 @@ export default function ImportUsersModal({
   };
 
   const downloadTemplate = () => {
-    const csvContent =
-      'email,name,role\nuser@example.com,John Doe,wajib_pajak\n';
+    const csvContent = 'email,name,role\nuser@example.com,John Doe,wajib_pajak\n';
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -136,11 +131,7 @@ export default function ImportUsersModal({
           <AlertTitle>Download Template</AlertTitle>
           <AlertDescription>
             Format CSV harus: email, name, role.
-            <Button
-              variant="link"
-              onClick={downloadTemplate}
-              className="ml-1 h-auto p-0"
-            >
+            <Button variant="link" onClick={downloadTemplate} className="ml-1 h-auto p-0">
               Download di sini.
             </Button>
           </AlertDescription>
@@ -160,9 +151,7 @@ export default function ImportUsersModal({
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertTitle>Success</AlertTitle>
-            <AlertDescription>
-              Import berhasil! User akan menerima email undangan.
-            </AlertDescription>
+            <AlertDescription>Import berhasil! User akan menerima email undangan.</AlertDescription>
           </Alert>
         )}
 

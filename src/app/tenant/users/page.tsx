@@ -31,9 +31,7 @@ function UsersPageContent() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
-  const [statusFilter, setStatusFilter] = useState<
-    'all' | 'active' | 'inactive'
-  >('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const { tenant, user: currentUser } = useAuth();
 
   const { data, isLoading, isFetching, error, refetch } = useTenantUsers({
@@ -63,11 +61,7 @@ function UsersPageContent() {
             ...col,
             cell: ({ row }) => (
               <div className="text-right">
-                <UserActionsMenu
-                  user={row.original}
-                  onSuccess={refetch}
-                  tenantId={tenant.id}
-                />
+                <UserActionsMenu user={row.original} onSuccess={refetch} tenantId={tenant.id} />
               </div>
             ),
           };
@@ -101,9 +95,7 @@ function UsersPageContent() {
     <div className="h-full w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-[5px]">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Manajemen Pengguna
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Manajemen Pengguna</h1>
       </div>
 
       {/* Main Content Card */}
@@ -167,7 +159,7 @@ function UsersPageContent() {
 
 export default function TenantUsersPage() {
   return (
-    <RBAC requiredPermission={["user:manage", "user:read"]} unauthorizedPage={true}>
+    <RBAC requiredPermission={['user:manage', 'user:read']} unauthorizedPage={true}>
       <UsersPageContent />
     </RBAC>
   );

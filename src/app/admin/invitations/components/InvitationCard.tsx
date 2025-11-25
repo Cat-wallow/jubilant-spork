@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Invitation } from '@/types/invitation';
-import {
-  useAcceptInvitation,
-  useRejectInvitation,
-} from '@/hooks/useInvitations';
+import { useAcceptInvitation, useRejectInvitation } from '@/hooks/useInvitations';
 
 // Helper function to format date
 const formatDate = (dateString: string) => {
@@ -22,15 +19,10 @@ interface InvitationCardProps {
   onSuccess?: () => void;
 }
 
-export default function InvitationCard({
-  invitation,
-  onSuccess,
-}: InvitationCardProps) {
+export default function InvitationCard({ invitation, onSuccess }: InvitationCardProps) {
   const acceptMutation = useAcceptInvitation();
   const rejectMutation = useRejectInvitation();
-  const [showConfirm, setShowConfirm] = useState<'accept' | 'reject' | null>(
-    null,
-  );
+  const [showConfirm, setShowConfirm] = useState<'accept' | 'reject' | null>(null);
 
   const handleAccept = async () => {
     try {
@@ -54,10 +46,8 @@ export default function InvitationCard({
 
   const getStatusBadge = () => {
     const badges = {
-      pending:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      accepted:
-        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      accepted: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
       rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
       expired: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400',
     };
@@ -88,12 +78,7 @@ export default function InvitationCard({
           <div className="mb-3 flex items-center gap-3">
             {/* Tenant Icon */}
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -109,22 +94,14 @@ export default function InvitationCard({
                 {invitation.tenant.name}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Role:{' '}
-                <span className="font-medium text-brand-500">
-                  {invitation.role}
-                </span>
+                Role: <span className="font-medium text-brand-500">{invitation.role}</span>
               </p>
             </div>
           </div>
 
           {/* Inviter Info */}
           <div className="mb-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -142,12 +119,7 @@ export default function InvitationCard({
 
           {/* Date */}
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -187,33 +159,23 @@ export default function InvitationCard({
           {showConfirm && (
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
               <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
-                {showConfirm === 'accept'
-                  ? 'Terima undangan ini?'
-                  : 'Tolak undangan ini?'}
+                {showConfirm === 'accept' ? 'Terima undangan ini?' : 'Tolak undangan ini?'}
               </p>
               <div className="flex gap-2">
                 <button
-                  onClick={
-                    showConfirm === 'accept' ? handleAccept : handleReject
-                  }
-                  disabled={
-                    acceptMutation.isPending || rejectMutation.isPending
-                  }
+                  onClick={showConfirm === 'accept' ? handleAccept : handleReject}
+                  disabled={acceptMutation.isPending || rejectMutation.isPending}
                   className={`rounded px-3 py-1 text-xs font-medium text-white transition-colors disabled:opacity-50 ${
                     showConfirm === 'accept'
                       ? 'bg-green-500 hover:bg-green-600'
                       : 'bg-red-500 hover:bg-red-600'
                   }`}
                 >
-                  {acceptMutation.isPending || rejectMutation.isPending
-                    ? 'Loading...'
-                    : 'Ya'}
+                  {acceptMutation.isPending || rejectMutation.isPending ? 'Loading...' : 'Ya'}
                 </button>
                 <button
                   onClick={() => setShowConfirm(null)}
-                  disabled={
-                    acceptMutation.isPending || rejectMutation.isPending
-                  }
+                  disabled={acceptMutation.isPending || rejectMutation.isPending}
                   className="rounded border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Batal

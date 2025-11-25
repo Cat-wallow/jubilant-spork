@@ -37,8 +37,7 @@ export default function SignInPage() {
   // Set server error when login fails
   useEffect(() => {
     if (loginError) {
-      const errorMessage =
-        (loginError as any)?.cause || 'Login gagal, silakan coba lagi';
+      const errorMessage = (loginError as any)?.cause || 'Login gagal, silakan coba lagi';
 
       form.setError('root', {
         type: 'server',
@@ -74,10 +73,7 @@ export default function SignInPage() {
             </div>
 
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleLogin)}
-                className="space-y-6"
-              >
+              <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="emailOrUsername"

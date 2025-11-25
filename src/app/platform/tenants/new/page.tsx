@@ -1,215 +1,219 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import RBAC from '@/components/rbac/RBAC';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import BasicInfoSection from './components/BasicInfoSection';
-import PackageSection from './components/PackageSection';
-import PICSection from './components/PICSection';
-import BillingSection from './components/BillingSection';
-import BrandingSection from './components/BrandingSection';
-import SystemSettingsSection from './components/SystemSettingsSection';
-import SecuritySection from './components/SecuritySection';
-import { Plus } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useMutation } from '@tanstack/react-query';
-import { CreateTenantPayload } from '@/types/tenant';
-import { createTenant } from '@/services/tenant.service';
-import { toast } from 'sonner';
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CreateTenantPayload } from "@/types/tenant";
+import { createTenant } from "@/services/tenant.service";
+import { uploadTenantLogo } from "@/services/upload.service";
+import { inviteUser } from "@/services/user.service";
+import { toast } from "sonner";
+import RBAC from "@/components/rbac/RBAC";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import BasicInfoSection from "./components/BasicInfoSection";
+import BrandingSection from "./components/BrandingSection";
+import PICSection from "./components/PICSection";
+import SystemSettingsSection from "./components/SystemSettingsSection";
 
-// Define Zod schema for form validation
+// Expanded Zod schema for form validation including PIC details
 const formSchema = z.object({
-  tenantName: z.string().min(1, 'Nama Tenant wajib diisi'),
-  slugUrl: z
-    .string()
-    .min(1, 'Slug URL wajib diisi')
-    .regex(
-      /^[a-z0-9-]+$/,
-      'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung',
-    ),
-  companyName: z.string().optional(),
-  tagline: z.string().optional(),
-  package: z.string().optional().default('Pro - Rp.2.500.000'), // This will need to be mapped to 'plan'
-  storage: z.string().optional().default('10'), // This will need to be mapped to 'storageQuotaGb'
-  projects: z.string().optional().default('10'), // This will need to be mapped to 'maxProjects'
-  maxUsers: z.string().optional().default('20'), // This will need to be mapped to 'maxUsers'
-  picName: z.string().optional(),
-  position: z.string().optional(),
-  email: z
-    .string()
-    .email('Format email tidak valid')
-    .optional()
-    .or(z.literal('')),
-  phone: z.string().optional(),
-  billingCycle: z.string().optional().default('Bulanan'),
-  trialDays: z.string().optional().default('7'),
-  autoInactive: z.boolean().optional().default(false),
-  logo: z.any().optional(), // File upload, handle separately
-  primaryColor: z.string().optional(),
-  secondaryColor: z.string().optional(),
-  timezone: z.string().optional().default('Asia/Jakarta (WIB)'),
-  language: z.string().optional().default('Indonesia'),
-  currency: z.string().optional().default('Rupiah (IDR)'),
-  features: z
-    .object({
-      form10: z.boolean().optional(),
-      kk1: z.boolean().optional(),
-      kk2: z.boolean().optional(),
-      kk3: z.boolean().optional(),
-      kk4: z.boolean().optional(),
-      kk5: z.boolean().optional(),
-      clientManagement: z.boolean().optional(),
-      reports: z.boolean().optional(),
-      analytics: z.boolean().optional(),
-    })
-    .optional(),
-  require2FA: z.boolean().optional().default(false),
-  minPasswordLength: z.string().optional().default('8'),
-  sessionTimeout: z.string().optional().default('10'),
+	tenantName: z.string().min(1, "Nama Tenant wajib diisi"),
+	slugUrl: z
+		.string()
+		.min(1, "Slug URL wajib diisi")
+		.regex(
+			/^[a-z0-9-]+$/,
+			"Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung",
+		),
+	companyName: z.string().optional(),
+	tagline: z.string().optional(),
+	package: z.string().optional().default("Pro - Rp.2.500.000"),
+	storage: z.string().optional().default("10"),
+	projects: z.string().optional().default("10"),
+	maxUsers: z.string().optional().default("20"),
+	trialDays: z.string().optional().default("7"),
+	logo: z.instanceof(File).nullable().optional(),
+	// primaryColor: z.string().optional(), // Removed from UI
+	// secondaryColor: z.string().optional(), // Removed from UI
+	timezone: z.string().optional().default("Asia/Jakarta (WIB)"),
+	language: z.string().optional().default("Indonesia"),
+	currency: z.string().optional().default("Rupiah (IDR)"),
+	// PIC fields are now required for the second step of the process
+	picName: z.string().min(1, "Nama PIC wajib diisi"),
+	email: z.string().email("Format email tidak valid"),
+	phone: z.string().optional(),
+	roleId: z.string().min(1, "Role PIC wajib dipilih"), // New field for role
+	// billingCycle: z.string().optional(), // Not used in payload, removed from form
 });
 
 type NewTenantFormValues = z.infer<typeof formSchema>;
 
 function NewTenantPageContent() {
-  const router = useRouter();
+	const router = useRouter();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const queryClient = useQueryClient();
 
-  const form = useForm<NewTenantFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      tenantName: '',
-      slugUrl: '',
-      companyName: '',
-      tagline: '',
-      package: 'Pro - Rp.2.500.000',
-      storage: '10',
-      projects: '10',
-      maxUsers: '20',
-      picName: '',
-      position: '',
-      email: '',
-      phone: '',
-      billingCycle: 'Bulanan',
-      trialDays: '7',
-      autoInactive: false,
-      logo: null,
-      primaryColor: '#qw123d',
-      secondaryColor: '#qw123d',
-      timezone: 'Asia/Jakarta (WIB)',
-      language: 'Indonesia',
-      currency: 'Rupiah (IDR)',
-      features: {
-        form10: false,
-        kk1: false,
-        kk2: false,
-        kk3: false,
-        kk4: false,
-        kk5: false,
-        clientManagement: false,
-        reports: false,
-        analytics: false,
-      },
-      require2FA: false,
-      minPasswordLength: '8',
-      sessionTimeout: '10',
-    },
-  });
+	const form = useForm<NewTenantFormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			tenantName: "",
+			slugUrl: "",
+			companyName: "",
+			tagline: "",
+			package: "Pro - Rp.2.500.000",
+			storage: "10",
+			projects: "10",
+			maxUsers: "20",
+			trialDays: "7",
+			logo: null,
+			timezone: "Asia/Jakarta (WIB)",
+			language: "Indonesia",
+			currency: "Rupiah (IDR)",
+			picName: "",
+			email: "",
+			phone: "",
+			roleId: "",
+		},
+	});
 
-  const createTenantMutation = useMutation({
-    mutationFn: (newTenantData: CreateTenantPayload) =>
-      createTenant(newTenantData),
-    onSuccess: () => {
-      toast.success('Tenant berhasil dibuat', {
-        description: 'Tenant baru telah berhasil ditambahkan ke sistem.',
-      });
-      router.push('/platform/tenants');
-    },
-    onError: (error: any) => {
-      toast.error('Gagal membuat Tenant', {
-        description:
-          error.response?.data?.message ||
-          'Terjadi kesalahan saat membuat tenant.',
-      });
-    },
-  });
+	const createTenantMutation = useMutation({
+		mutationFn: createTenant,
+		onSuccess: () => {
+			toast.success("Tenant berhasil dibuat", {
+				description: "Tenant baru dan admin PIC telah berhasil dibuat.",
+			});
+			queryClient.invalidateQueries({ queryKey: ["tenants"] });
+			router.push("/platform/tenants");
+		},
+		onError: (error: any) => {
+			toast.error("Gagal Membuat Tenant", {
+				description:
+					error.response?.data?.message ||
+					"Terjadi kesalahan saat membuat tenant.",
+			});
+		},
+		onSettled: () => {
+			setIsSubmitting(false);
+		},
+	});
 
-  const onSubmit = (values: NewTenantFormValues) => {
-    const payload: CreateTenantPayload = {
-      name: values.tenantName,
-      slug: values.slugUrl,
-      plan: values.package?.split(' - ')[0].toLowerCase(), // Extract plan name
-      maxUsers: parseInt(values.maxUsers || '0'),
-      maxProjects: parseInt(values.projects || '0'),
-      storageQuotaGb: parseInt(values.storage || '0'),
-      trialDays: parseInt(values.trialDays || '0'),
-      // Other fields (PIC, Billing, Branding, System Settings, Security) will be handled separately if needed for the initial tenant creation
-      // or in subsequent update calls. For now, only basic info is mapped.
-    };
-    createTenantMutation.mutate(payload);
-  };
+	const onSubmit = async (values: NewTenantFormValues) => {
+		setIsSubmitting(true);
+		let logoUrl: string | undefined = undefined;
 
-  return (
-    <div className="w-full space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex flex-1 flex-col gap-1">
-          <h1 className="text-4xl font-bold tracking-tight">
-            Tambah Tenant Baru
-          </h1>
-        </div>
-        <Button
-          onClick={form.handleSubmit(onSubmit)}
-          className="gap-2"
-          disabled={createTenantMutation.isPending}
-        >
-          {createTenantMutation.isPending ? (
-            'Menyimpan...'
-          ) : (
-            <>
-              <Plus className="h-4 w-4" />
-              Simpan Tenant
-            </>
-          )}
-        </Button>
-      </div>
+		// Step 1: Upload logo if it exists
+		if (values.logo) {
+			try {
+				logoUrl = await uploadTenantLogo(values.logo);
+			} catch (error) {
+				setIsSubmitting(false);
+				return;
+			}
+		}
 
-      {/* Form */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Row 1: Basic Info + Package */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <BasicInfoSection form={form} />
-          </div>
-          <PackageSection form={form} />
-        </div>
+		// Step 2: Prepare payloads.
+		// The backend expects the main tenant data with a nested `picPayload` object.
+		const tenantPayload: CreateTenantPayload = {
+			name: values.tenantName,
+			slug: values.slugUrl,
+			plan: values.package?.split(" - ")[0].toLowerCase(),
+			maxUsers: parseInt(values.maxUsers || "0"),
+			maxProjects: parseInt(values.projects || "0"),
+			storageQuotaGb: parseInt(values.storage || "0"),
+			trialDays: parseInt(values.trialDays || "0"),
+			logo_url: logoUrl,
+			settings: {
+				companyName: values.companyName || undefined, // Set to undefined if empty
+				tagline: values.tagline,
+				timezone: values.timezone,
+				language: values.language,
+				currency: values.currency,
+			},
+		};
 
-        {/* Row 2: PIC + Billing */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <PICSection form={form} />
-          </div>
-          <BillingSection form={form} />
-        </div>
+		const picPayload = {
+			email: values.email,
+			name: values.picName,
+			phone: values.phone,
+			roleId: values.roleId,
+		};
 
-        {/* Row 3: Branding */}
-        <BrandingSection form={form} />
+		// Step 3: Mutate to create tenant, passing combined payload to the backend
+		createTenantMutation.mutate({
+			...tenantPayload,
+			picPayload,
+		} as any);
+	};
 
-        {/* Row 4: System Settings */}
-        <SystemSettingsSection form={form} />
+	return (
+		<div className="w-full space-y-6">
+			{/* Header */}
+			<div className="flex items-start justify-between">
+				<div className="flex flex-1 flex-col gap-1">
+					<h1 className="text-3xl font-bold tracking-tight">
+						Tambah Tenant Baru
+					</h1>
+				</div>
+				<Button
+					onClick={form.handleSubmit(onSubmit)}
+					className="gap-2"
+					disabled={isSubmitting}
+				>
+					{isSubmitting ? (
+						"Menyimpan..."
+					) : (
+						<>
+							<Plus className="h-4 w-4" />
+							Simpan Tenant
+						</>
+					)}
+				</Button>
+			</div>
 
-        {/* Row 5: Security */}
-        <SecuritySection form={form} />
-      </form>
-    </div>
-  );
+			{/* Form */}
+			<FormProvider {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+					{/* Row 1: Basic Info + Package */}
+					<div className="grid gap-6 lg:grid-cols-3">
+						<div className="lg:col-span-2">
+							<BasicInfoSection />
+						</div>
+						{/*<PackageSection />*/}
+						<BrandingSection />
+					</div>
+
+					{/* Row 2: PIC + Billing */}
+					<div className="grid gap-6 lg:grid-cols-3">
+						<div className="lg:col-span-2">
+							<PICSection />
+						</div>
+						{/*<BillingSection />*/}
+						<SystemSettingsSection />{" "}
+					</div>
+
+					{/* Row 3: Branding */}
+
+					{/* Row 4: System Settings */}
+
+					{/* Row 5: Security (can be removed if not used) */}
+					{/* <SecuritySection form={form} /> */}
+				</form>
+			</FormProvider>
+		</div>
+	);
 }
 
 export default function NewTenantPage() {
-  return (
-    <RBAC requiredPermission={["tenant:create", "tenant:manage"]} unauthorizedPage={true}>
-      <NewTenantPageContent />
-    </RBAC>
-  );
+	return (
+		<RBAC
+			requiredPermission={["tenant:create", "tenant:manage"]}
+			unauthorizedPage={true}
+		>
+			<NewTenantPageContent />
+		</RBAC>
+	);
 }

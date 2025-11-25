@@ -19,9 +19,7 @@ export default function SecuritySection({ form }: SecuritySectionProps) {
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">Wajib 2FA</p>
-            <p className="text-xs text-muted-foreground">
-              Paksa semua pengguna menggunakan 2FA
-            </p>
+            <p className="text-xs text-muted-foreground">Paksa semua pengguna menggunakan 2FA</p>
           </div>
           <Controller
             control={form.control}

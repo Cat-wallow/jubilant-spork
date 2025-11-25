@@ -45,12 +45,7 @@ export default function BillingSection({ form }: BillingSectionProps) {
         {/* Trial Days */}
         <div className="space-y-2">
           <Label htmlFor="trialDays">Batas Hari Trial</Label>
-          <Input
-            id="trialDays"
-            type="number"
-            placeholder="7"
-            {...form.register('trialDays')}
-          />
+          <Input id="trialDays" type="number" placeholder="7" {...form.register('trialDays')} />
         </div>
 
         {/* Auto Inactive Toggle */}

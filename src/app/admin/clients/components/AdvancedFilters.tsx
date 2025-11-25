@@ -55,8 +55,8 @@ export function AdvancedFilters({
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-3">
         <Select
-          value={statusFilter || "all"}
-          onValueChange={(value) => onStatusFilterChange(value === "all" ? "" : value)}
+          value={statusFilter || 'all'}
+          onValueChange={(value) => onStatusFilterChange(value === 'all' ? '' : value)}
           disabled={isFetching}
         >
           <SelectTrigger className="h-10 w-[140px]">
@@ -70,8 +70,8 @@ export function AdvancedFilters({
         </Select>
 
         <Select
-          value={typeFilter || "all"}
-          onValueChange={(value) => onTypeFilterChange(value === "all" ? "" : value)}
+          value={typeFilter || 'all'}
+          onValueChange={(value) => onTypeFilterChange(value === 'all' ? '' : value)}
           disabled={isFetching}
         >
           <SelectTrigger className="h-10 w-[140px]">
@@ -86,8 +86,8 @@ export function AdvancedFilters({
         </Select>
 
         <Select
-          value={pkpFilter || "all"}
-          onValueChange={(value) => onPkpFilterChange(value === "all" ? "" : value)}
+          value={pkpFilter || 'all'}
+          onValueChange={(value) => onPkpFilterChange(value === 'all' ? '' : value)}
           disabled={isFetching}
         >
           <SelectTrigger className="h-10 w-[140px]">
@@ -101,7 +101,7 @@ export function AdvancedFilters({
         </Select>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="ml-auto flex items-center gap-2">
           {hasActiveFilters && (
             <Button
               variant="outline"
@@ -113,7 +113,7 @@ export function AdvancedFilters({
               Clear
             </Button>
           )}
-          
+
           <Button variant="outline" className="h-10 px-4" disabled={isFetching}>
             <FilterIcon className="mr-2 h-4 w-4" />
             Filter

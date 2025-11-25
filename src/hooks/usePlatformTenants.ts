@@ -15,8 +15,7 @@ export function useToggleTenantStatus() {
     },
     onError: (error: any) => {
       toast.error('Gagal memperbarui status tenant.', {
-        description:
-          error.response?.data?.message || 'Terjadi kesalahan pada server.',
+        description: error.response?.data?.message || 'Terjadi kesalahan pada server.',
       });
     },
   });

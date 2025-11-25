@@ -38,14 +38,7 @@ interface UseClientsParams {
 }
 
 export const useClients = (params: UseClientsParams) => {
-  const {
-    tenantId,
-    search,
-    status,
-    type,
-    page = 1,
-    limit = 10,
-  } = params;
+  const { tenantId, search, status, type, page = 1, limit = 10 } = params;
 
   return useQuery<ClientsResponse>({
     queryKey: ['clients', tenantId, { search, status, type, page, limit }],

@@ -42,7 +42,7 @@ export function TenantActionsMenu({ tenant }: TenantActionsMenuProps) {
     toast.success(
       `Tenant ${tenant.name} berhasil di${
         tenant.status === 'active' ? 'nonaktifkan' : 'aktifkan'
-      }.`
+      }.`,
     );
   };
 
@@ -58,9 +58,7 @@ export function TenantActionsMenu({ tenant }: TenantActionsMenuProps) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={() => router.push(`/platform/tenants/${tenant.id}/edit`)}
-          >
+          <DropdownMenuItem onSelect={() => router.push(`/platform/tenants/${tenant.id}/edit`)}>
             <Edit className="mr-2 h-4 w-4" />
             Edit Tenant
           </DropdownMenuItem>
@@ -82,25 +80,17 @@ export function TenantActionsMenu({ tenant }: TenantActionsMenuProps) {
       </DropdownMenu>
 
       {/* Deactivate Confirmation Dialog */}
-      <Dialog
-        open={isDeactivateModalOpen}
-        onOpenChange={setIsDeactivateModalOpen}
-      >
+      <Dialog open={isDeactivateModalOpen} onOpenChange={setIsDeactivateModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nonaktifkan Tenant</DialogTitle>
             <DialogDescription>
-              Apakah Anda yakin ingin menonaktifkan tenant{' '}
-              <strong>{tenant.name}</strong>? Tenant dapat diaktifkan kembali
-              nanti.
+              Apakah Anda yakin ingin menonaktifkan tenant <strong>{tenant.name}</strong>? Tenant
+              dapat diaktifkan kembali nanti.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsDeactivateModalOpen(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setIsDeactivateModalOpen(false)}>
               Batal
             </Button>
             <Button
@@ -109,9 +99,7 @@ export function TenantActionsMenu({ tenant }: TenantActionsMenuProps) {
               onClick={handleToggleStatus}
               disabled={toggleStatusMutation.isPending}
             >
-              {toggleStatusMutation.isPending
-                ? 'Menonaktifkan...'
-                : 'Nonaktifkan'}
+              {toggleStatusMutation.isPending ? 'Menonaktifkan...' : 'Nonaktifkan'}
             </Button>
           </DialogFooter>
         </DialogContent>

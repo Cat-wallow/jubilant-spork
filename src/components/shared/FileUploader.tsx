@@ -2,18 +2,18 @@
 
 import { useCallback, useState, useEffect } from 'react';
 import { useDropzone, DropzoneOptions, FileRejection } from 'react-dropzone';
-import { Upload, File as FileIcon, X, CheckCircle } from 'lucide-react';
+import { Upload, File as FileIcon, X, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+
 
 // Define the props for the component
 interface FileUploaderProps {
   value: File[] | null;
   onValueChange: (files: File[] | null) => void;
   dropzoneOptions?: DropzoneOptions;
-  customValidator?: (
-    file: File,
-  ) => Promise<{ code: string; message: string } | null>;
+  customValidator?: (file: File) => Promise<{ code: string; message: string } | null>;
   className?: string;
   disabled?: boolean;
   texts?: {
@@ -21,6 +21,8 @@ interface FileUploaderProps {
     subtitle?: string;
     fileTypes?: string;
   };
+  existingFileUrl?: string | null;
+  onRemoveExisting?: () => void;
 }
 
 export function FileUploader({
@@ -31,13 +33,23 @@ export function FileUploader({
   className,
   disabled,
   texts = {},
+  existingFileUrl,
+  onRemoveExisting,
 }: FileUploaderProps) {
   const [internalErrors, setInternalErrors] = useState<FileRejection[]>([]);
+
+  const handleRemoveExisting = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if(onRemoveExisting) {
+      onRemoveExisting();
+    }
+  };
+
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       setInternalErrors([]); // Clear previous errors
-
+      
       if (fileRejections.length > 0) {
         setInternalErrors(fileRejections);
         onValueChange(null);
@@ -46,13 +58,9 @@ export function FileUploader({
 
       if (acceptedFiles.length > 0) {
         if (customValidator) {
-          const validationResults = await Promise.all(
-            acceptedFiles.map(customValidator),
-          );
+          const validationResults = await Promise.all(acceptedFiles.map(customValidator));
           const validationErrors = validationResults
-            .map((error, index) =>
-              error ? { file: acceptedFiles[index], errors: [error] } : null,
-            )
+            .map((error, index) => (error ? { file: acceptedFiles[index], errors: [error] } : null))
             .filter((e): e is FileRejection => e !== null);
 
           if (validationErrors.length > 0) {
@@ -96,30 +104,31 @@ export function FileUploader({
     fileTypes = 'Any file',
   } = texts;
 
+  const hasNewFile = value && value.length > 0;
+  const showExistingFile = existingFileUrl && !hasNewFile;
+
+
   return (
     <div className="w-full">
       <div
         {...getRootProps()}
         className={cn(
           'relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-colors',
-          isDragActive
-            ? 'border-primary bg-accent'
-            : 'border-border hover:border-primary/50',
+          isDragActive ? 'border-primary bg-accent' : 'border-border hover:border-primary/50',
           disabled && 'cursor-not-allowed opacity-50',
+          (hasNewFile || showExistingFile) && 'p-4', // Reduce padding when showing a file
           className,
         )}
       >
         <input {...getInputProps()} />
 
-        {value && value.length > 0 ? (
+        {hasNewFile ? (
           <div className="space-y-2 text-center">
             <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
             {value.map((file) => (
               <div key={file.name}>
                 <p className="font-medium">{file.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {formatBytes(file.size)}
-                </p>
+                <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
               </div>
             ))}
             <Button
@@ -133,17 +142,31 @@ export function FileUploader({
               }}
               disabled={disabled}
             >
-              Remove file
+              Ganti file
             </Button>
           </div>
+        ) : showExistingFile ? (
+             <div className="space-y-2 text-center">
+                <ImageIcon className="mx-auto h-12 w-12 text-gray-500" />
+                 <p className="font-medium">Logo saat ini:</p>
+                 <Image src={existingFileUrl} alt="Existing Logo" width={64} height={64} className="mx-auto rounded-md" />
+                 <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="text-destructive"
+                    onClick={handleRemoveExisting}
+                    disabled={disabled}
+                >
+                    Hapus Logo
+                </Button>
+             </div>
         ) : (
           <div className="space-y-2">
             <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
             <div className="text-sm">
               <span className="font-semibold text-primary">{title}</span>
-              {subtitle && (
-                <span className="text-muted-foreground"> {subtitle}</span>
-              )}
+              {subtitle && <span className="text-muted-foreground"> {subtitle}</span>}
             </div>
             <p className="text-xs text-muted-foreground">{fileTypes}</p>
           </div>

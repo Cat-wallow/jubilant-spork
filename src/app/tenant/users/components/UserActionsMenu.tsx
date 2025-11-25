@@ -5,11 +5,7 @@ import { MoreVertical, Edit, UserX, UserCheck } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import {
-  useUpdateUserRole,
-  useDeactivateUser,
-  useReactivateUser,
-} from '@/hooks/useTenantUsers';
+import { useUpdateUserRole, useDeactivateUser, useReactivateUser } from '@/hooks/useTenantUsers';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -71,11 +67,7 @@ const deactivateSchema = z.object({
   reason: z.string().optional(),
 });
 
-export default function UserActionsMenu({
-  tenantId,
-  user,
-  onSuccess,
-}: UserActionsMenuProps) {
+export default function UserActionsMenu({ tenantId, user, onSuccess }: UserActionsMenuProps) {
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const { permissions } = useAuth();
@@ -192,9 +184,7 @@ function ChangeRoleModal({
           </DialogDescription>
         </DialogHeader>
         {updateRoleMutation.error && (
-          <p className="text-sm text-destructive">
-            Gagal mengubah role. Silakan coba lagi.
-          </p>
+          <p className="text-sm text-destructive">Gagal mengubah role. Silakan coba lagi.</p>
         )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -204,10 +194,7 @@ function ChangeRoleModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role Baru*</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih role..." />
@@ -226,11 +213,7 @@ function ChangeRoleModal({
               )}
             />
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Batal
               </Button>
               <Button type="submit" disabled={updateRoleMutation.isPending}>
@@ -274,7 +257,9 @@ function DeactivateModal({
       form.reset();
       toast.success(`User ${user.name} berhasil dinonaktifkan.`);
     } catch (error) {
-      toast.error(`${deactivateMutation.error.cause || "Gagal menonaktifkan user. Silakan coba lagi"}`);
+      toast.error(
+        `${deactivateMutation.error.cause || 'Gagal menonaktifkan user. Silakan coba lagi'}`,
+      );
     }
   };
 
@@ -284,14 +269,11 @@ function DeactivateModal({
         <DialogHeader>
           <DialogTitle>Nonaktifkan User</DialogTitle>
           <DialogDescription>
-            Apakah Anda yakin ingin menonaktifkan:{' '}
-            <strong>{user.name || user.email}</strong>?
+            Apakah Anda yakin ingin menonaktifkan: <strong>{user.name || user.email}</strong>?
           </DialogDescription>
         </DialogHeader>
         {deactivateMutation.error && (
-          <p className="text-sm text-destructive">
-            Gagal menonaktifkan user. Silakan coba lagi.
-          </p>
+          <p className="text-sm text-destructive">Gagal menonaktifkan user. Silakan coba lagi.</p>
         )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -302,31 +284,18 @@ function DeactivateModal({
                 <FormItem>
                   <FormLabel>Alasan (opsional)</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Masukkan alasan menonaktifkan user..."
-                      {...field}
-                    />
+                    <Textarea placeholder="Masukkan alasan menonaktifkan user..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Batal
               </Button>
-              <Button
-                type="submit"
-                variant="destructive"
-                disabled={deactivateMutation.isPending}
-              >
-                {deactivateMutation.isPending
-                  ? 'Menonaktifkan...'
-                  : 'Nonaktifkan'}
+              <Button type="submit" variant="destructive" disabled={deactivateMutation.isPending}>
+                {deactivateMutation.isPending ? 'Menonaktifkan...' : 'Nonaktifkan'}
               </Button>
             </DialogFooter>
           </form>

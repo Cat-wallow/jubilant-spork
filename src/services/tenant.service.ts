@@ -1,9 +1,5 @@
 import api from '@/lib/api';
-import {
-  PaginatedTenantsResponse,
-  Tenant,
-  CreateTenantPayload,
-} from '@/types/tenant';
+import { PaginatedTenantsResponse, Tenant, CreateTenantPayload, UpdateTenantPayload } from '@/types/tenant';
 import { SortDescriptor } from '@/types/shared';
 
 export const getTenants = async (
@@ -25,19 +21,22 @@ export const getTenants = async (
     params.append('sortOrder', sort.direction);
   }
 
-  const response = await api.get<PaginatedTenantsResponse>(
-    `/tenant?${params.toString()}`,
-  );
+  const response = await api.get<PaginatedTenantsResponse>(`/tenant?${params.toString()}`);
   return response.data;
 };
 
-export const createTenant = async (
-  payload: CreateTenantPayload,
-): Promise<Tenant> => {
-  const response = await api.post<{ success: boolean; data: Tenant }>(
-    '/tenants',
-    payload,
-  );
+export const getTenantById = async (id: string): Promise<Tenant> => {
+  const response = await api.get<{ success: boolean; data: Tenant }>(`/tenant/${id}`);
+  return response.data.data;
+};
+
+export const createTenant = async (payload: CreateTenantPayload): Promise<Tenant> => {
+  const response = await api.post<{ success: boolean; data: Tenant }>('/tenant', payload);
+  return response.data.data;
+};
+
+export const updateTenant = async (id: string, payload: UpdateTenantPayload): Promise<Tenant> => {
+  const response = await api.put<{ success: boolean; data: Tenant }>(`/tenant/${id}`, payload);
   return response.data.data;
 };
 

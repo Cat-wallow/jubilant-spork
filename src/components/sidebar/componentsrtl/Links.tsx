@@ -22,18 +22,11 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
 
   const createLinks = (routes: RoutesType[]) => {
     return routes.map((route, index) => {
-      if (
-        route.layout === '/admin' ||
-        route.layout === '/auth' ||
-        route.layout === '/rtl'
-      ) {
+      if (route.layout === '/admin' || route.layout === '/auth' || route.layout === '/rtl') {
         return (
           <NavLink key={index} href={route.layout + '/' + route.path}>
             <div className="relative mb-3 flex hover:cursor-pointer">
-              <li
-                className="my-[3px] flex cursor-pointer items-center px-8"
-                key={index}
-              >
+              <li className="my-[3px] flex cursor-pointer items-center px-8" key={index}>
                 <span
                   className={`${
                     activeRoute(route.path) === true

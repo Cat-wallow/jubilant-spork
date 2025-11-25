@@ -34,7 +34,7 @@ function TenantsPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
-  const debouncedSearch = useDebounce(searchQuery, 300);
+  const debouncedSearch = useDebounce(searchQuery, 400);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [
@@ -106,16 +106,14 @@ function TenantsPageContent() {
   };
 
   return (
-    <div className=" w-full space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-[5px]">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Tenant (Perusahaan Konsultan Pajak)
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Tenant (Perusahaan Konsultan Pajak)</h1>
       </div>
 
       {/* Stats */}
-      <TenantStats stats={stats} />
+      {/*<TenantStats stats={stats} />*/}
 
       {/* Main Content Card */}
       <div className="rounded-lg border bg-card p-6">
@@ -142,12 +140,7 @@ function TenantsPageContent() {
 
         {/* Table */}
         <div className="mt-6">
-          <DataTable
-            table={table}
-            columns={columns}
-            isLoading={isLoading}
-            isError={isError}
-          />
+          <DataTable table={table} columns={columns} isLoading={isLoading} isError={isError} />
         </div>
       </div>
     </div>
@@ -155,7 +148,7 @@ function TenantsPageContent() {
 }
 export default function TenantsPage() {
   return (
-    <RBAC requiredPermission={["tenant:manage", "tenant:read"]} unauthorizedPage={true}>
+    <RBAC requiredPermission={['tenant:manage', 'tenant:read']} unauthorizedPage={true}>
       <TenantsPageContent />
     </RBAC>
   );

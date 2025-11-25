@@ -20,7 +20,7 @@ export default function PackageSection({ form }: PackageSectionProps) {
     <Card className="flex flex-col p-6">
       <h2 className="mb-6 text-xl font-semibold">Paket Layanan</h2>
 
-      <div className="space-y-4 ">
+      <div className="space-y-4">
         {/* Package Selection */}
         <div className="space-y-2">
           <Label htmlFor="package">Pilih Paket *</Label>
@@ -34,9 +34,7 @@ export default function PackageSection({ form }: PackageSectionProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Free - Rp.0">Free - Rp.0</SelectItem>
-                  <SelectItem value="Pro - Rp.2.500.000">
-                    Pro - Rp.2.500.000
-                  </SelectItem>
+                  <SelectItem value="Pro - Rp.2.500.000">Pro - Rp.2.500.000</SelectItem>
                   <SelectItem value="Enterprise - Rp.5.000.000">
                     Enterprise - Rp.5.000.000
                   </SelectItem>
@@ -45,15 +43,13 @@ export default function PackageSection({ form }: PackageSectionProps) {
             )}
           />
           {form.formState.errors.package && (
-            <p className="text-sm text-red-500">
-              {form.formState.errors.package.message}
-            </p>
+            <p className="text-sm">{form.formState.errors.package.message}</p>
           )}
         </div>
 
         {/* Row: Storage, Projects, Max Users */}
-        <div className=" -mt-10 flex space-x-4 space-y-4 bg-red-500">
-          <div className="w-28 space-y-2">
+        <div className="flex flex-row items-start space-x-4">
+          <div className="flex-1 space-y-2">
             <Label htmlFor="storage">Storage*</Label>
             <Input
               id="storage"
@@ -64,7 +60,7 @@ export default function PackageSection({ form }: PackageSectionProps) {
             />
           </div>
 
-          <div className="w-28 space-y-2">
+          <div className="flex-1 space-y-2">
             <Label htmlFor="projects">Project *</Label>
             <Input
               id="projects"
@@ -75,7 +71,7 @@ export default function PackageSection({ form }: PackageSectionProps) {
             />
           </div>
 
-          <div className="w-28 space-y-2">
+          <div className="flex-1 space-y-2">
             <Label htmlFor="maxUsers">Max User *</Label>
             <Input
               id="maxUsers"

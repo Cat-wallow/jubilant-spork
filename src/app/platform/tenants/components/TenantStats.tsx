@@ -22,9 +22,7 @@ export default function TenantStats({ stats }: TenantStatsProps) {
           <Users className="h-7 w-7 fill-primary text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
-            Total Client
-          </p>
+          <p className="text-sm font-semibold text-muted-foreground">Total Client</p>
           <p className="text-2xl font-bold">{stats.totalClients}</p>
           <p className="text-xs text-muted-foreground">
             {stats.pkpClients} PKP / {stats.nonPkpClients} Non-PKP
@@ -38,9 +36,7 @@ export default function TenantStats({ stats }: TenantStatsProps) {
           <Briefcase className="h-7 w-7 text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
-            Active Client
-          </p>
+          <p className="text-sm font-semibold text-muted-foreground">Active Client</p>
           <p className="text-2xl font-bold">{stats.activeClients}</p>
         </div>
       </Card>
@@ -51,9 +47,7 @@ export default function TenantStats({ stats }: TenantStatsProps) {
           <Briefcase className="h-7 w-7 text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
-            Total Project
-          </p>
+          <p className="text-sm font-semibold text-muted-foreground">Total Project</p>
           <p className="text-2xl font-bold">{stats.totalProjects}</p>
           <p className="text-xs text-muted-foreground">Dari semua klien</p>
         </div>
@@ -65,17 +59,13 @@ export default function TenantStats({ stats }: TenantStatsProps) {
           <TrendingUp className="h-7 w-7 text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground">
-            Compliance Rate
-          </p>
+          <p className="text-sm font-semibold text-muted-foreground">Compliance Rate</p>
           <p className="text-2xl font-bold">{stats.complianceRate}%</p>
           <div className="flex gap-1">
             <span className="text-xs font-semibold text-green-600 dark:text-green-400">
               +{stats.complianceChange}%
             </span>
-            <span className="text-xs text-muted-foreground">
-              from last quarter
-            </span>
+            <span className="text-xs text-muted-foreground">from last quarter</span>
           </div>
         </div>
       </Card>

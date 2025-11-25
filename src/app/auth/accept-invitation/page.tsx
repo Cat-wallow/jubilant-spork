@@ -69,8 +69,8 @@ export default function AcceptInvitationPage() {
     status === 'success'
       ? 'Undangan Diterima'
       : status === 'error'
-      ? 'Gagal Menerima Undangan'
-      : 'Memproses Undangan';
+        ? 'Gagal Menerima Undangan'
+        : 'Memproses Undangan';
 
   const subtitle =
     status === 'loading'
@@ -108,7 +108,9 @@ export default function AcceptInvitationPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-10 w-10 text-green-600" />
             </div>
-            <h2 className="mt-4 text-lg font-semibold text-navy-700 dark:text-white">🎉 Berhasil!</h2>
+            <h2 className="mt-4 text-lg font-semibold text-navy-700 dark:text-white">
+              🎉 Berhasil!
+            </h2>
             <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">{message}</p>
 
             {isNewUser && (
@@ -118,7 +120,8 @@ export default function AcceptInvitationPage() {
                   <div className="flex-1">
                     <p className="text-sm font-medium text-blue-900">Cek email kamu</p>
                     <p className="mt-1 text-xs text-blue-700">
-                      Kami sudah mengirimkan kredensial login ke email kamu. Periksa inbox atau folder spam.
+                      Kami sudah mengirimkan kredensial login ke email kamu. Periksa inbox atau
+                      folder spam.
                     </p>
                   </div>
                 </div>
@@ -175,4 +178,3 @@ export default function AcceptInvitationPage() {
     </div>
   );
 }
-

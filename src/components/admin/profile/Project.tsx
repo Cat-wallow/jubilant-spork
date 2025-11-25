@@ -9,12 +9,10 @@ const Project = () => {
   return (
     <Card extra={'w-full p-4 h-full'}>
       <div className="mb-8 w-full">
-        <p className="text-xl font-bold text-navy-700 dark:text-white">
-          All projects
-        </p>
+        <p className="text-xl font-bold text-navy-700 dark:text-white">All projects</p>
         <p className="mt-2 text-base text-gray-600">
-          Here you can find more details about your projects. Keep you user
-          engaged by providing meaningful information.
+          Here you can find more details about your projects. Keep you user engaged by providing
+          meaningful information.
         </p>
       </div>
       {/* Project 1 */}

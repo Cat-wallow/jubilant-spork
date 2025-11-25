@@ -8,10 +8,7 @@ export const SignInValidator = z.object({
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(value) || value.length >= 3;
     }, 'Format email atau username tidak valid'),
-  password: z
-    .string()
-    .min(1, 'Password harus diisi')
-    .max(100, 'Password terlalu panjang'),
+  password: z.string().min(1, 'Password harus diisi').max(100, 'Password terlalu panjang'),
   keepLoggedIn: z.boolean(),
 });
 

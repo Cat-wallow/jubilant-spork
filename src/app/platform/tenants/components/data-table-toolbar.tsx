@@ -100,20 +100,17 @@ export function DataTableToolbar<TData>({
                   {column.id === 'max_projects'
                     ? 'Active Projects'
                     : column.id === 'max_users'
-                    ? 'Users'
-                    : column.id === 'storage_quota_gb'
-                    ? 'Storage'
-                    : column.id}
+                      ? 'Users'
+                      : column.id === 'storage_quota_gb'
+                        ? 'Storage'
+                        : column.id}
                 </DropdownMenuCheckboxItem>
               );
             })}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button
-        onClick={() => router.push('/platform/tenants/new')}
-        className="gap-2"
-      >
+      <Button onClick={() => router.push('/platform/tenants/new')} className="gap-2">
         <Plus className="h-4 w-4" />
         Tambah Tenant
       </Button>

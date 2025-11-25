@@ -4,12 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,12 +18,12 @@ import {
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Building2, 
-  FileText, 
-  MapPin, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  FileText,
+  MapPin,
   User,
   Calculator,
   Phone,
@@ -43,7 +38,7 @@ import {
   Clock,
   AlertCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 
 // Form validation schemas
@@ -67,7 +62,11 @@ const addressSchema = z.object({
 
 const corporateSchema = z.object({
   nik: z.string().optional(),
-  npwp: z.string().regex(/^\d{2}\.\d{3}\.\d{3}\.\d-\d{3}\.\d{3}$/, 'Format NPWP tidak valid').optional().or(z.literal('')),
+  npwp: z
+    .string()
+    .regex(/^\d{2}\.\d{3}\.\d{3}\.\d-\d{3}\.\d{3}$/, 'Format NPWP tidak valid')
+    .optional()
+    .or(z.literal('')),
   nib: z.string().optional(),
   deed_number: z.string().optional(),
   notary_name: z.string().optional(),
@@ -152,12 +151,14 @@ const accountingPreferenceSchema = z.object({
   paddingNumber: z.number().optional(),
   prefix: z.string().optional(),
   suffix: z.string().optional(),
-  manualCoa: z.array(z.object({
-    id: z.string(),
-    accountNumber: z.string().min(1, 'Nomor Akun wajib diisi'),
-    accountName: z.string().min(1, 'Nama Akun wajib diisi'),
-    description: z.string().optional(),
-  })),
+  manualCoa: z.array(
+    z.object({
+      id: z.string(),
+      accountNumber: z.string().min(1, 'Nomor Akun wajib diisi'),
+      accountName: z.string().min(1, 'Nama Akun wajib diisi'),
+      description: z.string().optional(),
+    }),
+  ),
 });
 
 const legalDocumentSchema = z.object({
@@ -440,7 +441,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
 
   const handleNext = async () => {
     let isValid = false;
-    
+
     if (currentStep === 1) {
       isValid = await basicInfoForm.trigger();
       if (isValid) isValid = await addressForm.trigger();
@@ -486,7 +487,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
   };
 
   const handleRemoveBranch = (id: string) => {
-    setBranches(branches.filter(branch => branch.id !== id));
+    setBranches(branches.filter((branch) => branch.id !== id));
   };
 
   const handleAddCoaItem = () => {
@@ -500,13 +501,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
   };
 
   const handleRemoveCoaItem = (id: string) => {
-    setManualCoa(manualCoa.filter(item => item.id !== id));
+    setManualCoa(manualCoa.filter((item) => item.id !== id));
   };
 
   const handleUpdateCoaItem = (id: string, field: keyof ManualCoaItem, value: string) => {
-    setManualCoa(manualCoa.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ));
+    setManualCoa(manualCoa.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
   };
 
   const generateVoucherPreview = () => {
@@ -518,7 +517,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
   const handleFileUpload = (docType: keyof z.infer<typeof legalDocumentSchema>, file: File) => {
     const uploadDate = new Date().toISOString();
     const fileUrl = URL.createObjectURL(file); // Simulated file URL
-    
+
     legalDocumentForm.setValue(`${docType}.file`, fileUrl);
     legalDocumentForm.setValue(`${docType}.fileName`, file.name);
     legalDocumentForm.setValue(`${docType}.uploadDate`, uploadDate);
@@ -557,10 +556,8 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
   };
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => 
-      prev.includes(section) 
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
+    setExpandedSections((prev) =>
+      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section],
     );
   };
 
@@ -590,8 +587,8 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
       });
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       onSuccess?.();
       onClose();
       // Reset all forms
@@ -627,7 +624,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <Building2 className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Informasi Dasar</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nama *</Label>
@@ -638,7 +635,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     className={basicInfoForm.formState.errors.name ? 'border-red-500' : ''}
                   />
                   {basicInfoForm.formState.errors.name && (
-                    <p className="text-sm text-red-500">{basicInfoForm.formState.errors.name.message}</p>
+                    <p className="text-sm text-red-500">
+                      {basicInfoForm.formState.errors.name.message}
+                    </p>
                   )}
                 </div>
 
@@ -655,9 +654,13 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                   <Label htmlFor="type">Tipe Klien *</Label>
                   <Select
                     value={basicInfoForm.watch('type')}
-                    onValueChange={(value) => basicInfoForm.setValue('type', value as 'corporate' | 'individual')}
+                    onValueChange={(value) =>
+                      basicInfoForm.setValue('type', value as 'corporate' | 'individual')
+                    }
                   >
-                    <SelectTrigger className={basicInfoForm.formState.errors.type ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={basicInfoForm.formState.errors.type ? 'border-red-500' : ''}
+                    >
                       <SelectValue placeholder="Pilih tipe klien" />
                     </SelectTrigger>
                     <SelectContent>
@@ -666,7 +669,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {basicInfoForm.formState.errors.type && (
-                    <p className="text-sm text-red-500">{basicInfoForm.formState.errors.type.message}</p>
+                    <p className="text-sm text-red-500">
+                      {basicInfoForm.formState.errors.type.message}
+                    </p>
                   )}
                 </div>
 
@@ -687,7 +692,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     placeholder="https://example.com"
                   />
                   {basicInfoForm.formState.errors.website && (
-                    <p className="text-sm text-red-500">{basicInfoForm.formState.errors.website.message}</p>
+                    <p className="text-sm text-red-500">
+                      {basicInfoForm.formState.errors.website.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -701,7 +708,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <MapPin className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Alamat</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="address">Alamat Lengkap</Label>
@@ -759,15 +766,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <FileText className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Informasi Korporasi</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="nik">NIK</Label>
-                  <Input
-                    id="nik"
-                    {...corporateForm.register('nik')}
-                    placeholder="Masukkan NIK"
-                  />
+                  <Input id="nik" {...corporateForm.register('nik')} placeholder="Masukkan NIK" />
                 </div>
 
                 <div className="space-y-2">
@@ -779,17 +782,15 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     className={corporateForm.formState.errors.npwp ? 'border-red-500' : ''}
                   />
                   {corporateForm.formState.errors.npwp && (
-                    <p className="text-sm text-red-500">{corporateForm.formState.errors.npwp.message}</p>
+                    <p className="text-sm text-red-500">
+                      {corporateForm.formState.errors.npwp.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="nib">NIB</Label>
-                  <Input
-                    id="nib"
-                    {...corporateForm.register('nib')}
-                    placeholder="Masukkan NIB"
-                  />
+                  <Input id="nib" {...corporateForm.register('nib')} placeholder="Masukkan NIB" />
                 </div>
 
                 <div className="space-y-2">
@@ -877,7 +878,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <Building2 className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Informasi Bisnis</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="business_type">Jenis Usaha *</Label>
@@ -885,7 +886,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     value={businessInfoForm.watch('business_type')}
                     onValueChange={(value) => businessInfoForm.setValue('business_type', value)}
                   >
-                    <SelectTrigger className={businessInfoForm.formState.errors.business_type ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={
+                        businessInfoForm.formState.errors.business_type ? 'border-red-500' : ''
+                      }
+                    >
                       <SelectValue placeholder="Pilih jenis usaha" />
                     </SelectTrigger>
                     <SelectContent>
@@ -897,7 +902,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {businessInfoForm.formState.errors.business_type && (
-                    <p className="text-sm text-red-500">{businessInfoForm.formState.errors.business_type.message}</p>
+                    <p className="text-sm text-red-500">
+                      {businessInfoForm.formState.errors.business_type.message}
+                    </p>
                   )}
                 </div>
 
@@ -907,7 +914,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     value={businessInfoForm.watch('industry_sector')}
                     onValueChange={(value) => businessInfoForm.setValue('industry_sector', value)}
                   >
-                    <SelectTrigger className={businessInfoForm.formState.errors.industry_sector ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={
+                        businessInfoForm.formState.errors.industry_sector ? 'border-red-500' : ''
+                      }
+                    >
                       <SelectValue placeholder="Pilih sektor industri" />
                     </SelectTrigger>
                     <SelectContent>
@@ -919,7 +930,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {businessInfoForm.formState.errors.industry_sector && (
-                    <p className="text-sm text-red-500">{businessInfoForm.formState.errors.industry_sector.message}</p>
+                    <p className="text-sm text-red-500">
+                      {businessInfoForm.formState.errors.industry_sector.message}
+                    </p>
                   )}
                 </div>
 
@@ -946,7 +959,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     value={businessInfoForm.watch('business_scale')}
                     onValueChange={(value) => businessInfoForm.setValue('business_scale', value)}
                   >
-                    <SelectTrigger className={businessInfoForm.formState.errors.business_scale ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={
+                        businessInfoForm.formState.errors.business_scale ? 'border-red-500' : ''
+                      }
+                    >
                       <SelectValue placeholder="Pilih skala bisnis" />
                     </SelectTrigger>
                     <SelectContent>
@@ -956,7 +973,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {businessInfoForm.formState.errors.business_scale && (
-                    <p className="text-sm text-red-500">{businessInfoForm.formState.errors.business_scale.message}</p>
+                    <p className="text-sm text-red-500">
+                      {businessInfoForm.formState.errors.business_scale.message}
+                    </p>
                   )}
                 </div>
 
@@ -979,13 +998,15 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <FileText className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Identitas Perpajakan</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Status PKP</Label>
                   <Select
                     value={taxIdentityForm.watch('pkp_status')}
-                    onValueChange={(value) => taxIdentityForm.setValue('pkp_status', value as 'pkp' | 'non_pkp')}
+                    onValueChange={(value) =>
+                      taxIdentityForm.setValue('pkp_status', value as 'pkp' | 'non_pkp')
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih status PKP" />
@@ -1012,7 +1033,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     value={taxIdentityForm.watch('taxpayer_type')}
                     onValueChange={(value) => taxIdentityForm.setValue('taxpayer_type', value)}
                   >
-                    <SelectTrigger className={taxIdentityForm.formState.errors.taxpayer_type ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={
+                        taxIdentityForm.formState.errors.taxpayer_type ? 'border-red-500' : ''
+                      }
+                    >
                       <SelectValue placeholder="Pilih tipe wajib pajak" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1023,7 +1048,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {taxIdentityForm.formState.errors.taxpayer_type && (
-                    <p className="text-sm text-red-500">{taxIdentityForm.formState.errors.taxpayer_type.message}</p>
+                    <p className="text-sm text-red-500">
+                      {taxIdentityForm.formState.errors.taxpayer_type.message}
+                    </p>
                   )}
                 </div>
 
@@ -1038,32 +1065,38 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
 
                 <div className="space-y-2 md:col-span-2">
                   <Label>Jenis Pajak yang Berlaku</Label>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Jenis Pajak yang dipilih akan mempengaruhi template COA dan requirement dokumen yang akan dibuat secara otomatis
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Jenis Pajak yang dipilih akan mempengaruhi template COA dan requirement dokumen
+                    yang akan dibuat secara otomatis
                   </p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                     {[
                       'PPh 29',
-                      'PPh 23/26', 
+                      'PPh 23/26',
                       'PPN',
                       'PPh 21/26',
                       'PPh 4 ayat 2',
                       'PBB',
                       'PPh 22',
                       'PPh 15',
-                      'Lainnya'
+                      'Lainnya',
                     ].map((tax) => (
                       <div key={tax} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
                           id={`tax-${tax}`}
-                          checked={taxIdentityForm.watch('applicable_taxes')?.includes(tax) || false}
+                          checked={
+                            taxIdentityForm.watch('applicable_taxes')?.includes(tax) || false
+                          }
                           onChange={(e) => {
                             const currentTaxes = taxIdentityForm.watch('applicable_taxes') || [];
                             if (e.target.checked) {
                               taxIdentityForm.setValue('applicable_taxes', [...currentTaxes, tax]);
                             } else {
-                              taxIdentityForm.setValue('applicable_taxes', currentTaxes.filter(t => t !== tax));
+                              taxIdentityForm.setValue(
+                                'applicable_taxes',
+                                currentTaxes.filter((t) => t !== tax),
+                              );
                             }
                           }}
                           className="rounded border-gray-300"
@@ -1086,24 +1119,26 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <FileText className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Informasi Surat Perpajakan</h3>
               </div>
-              
+
               {/* Surat Keterangan Terdaftar */}
-              <div className="space-y-3 p-4 border rounded-lg">
+              <div className="space-y-3 rounded-lg border p-4">
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     id="has_registered_letter"
                     checked={taxDocumentForm.watch('has_registered_letter') || false}
-                    onChange={(e) => taxDocumentForm.setValue('has_registered_letter', e.target.checked)}
+                    onChange={(e) =>
+                      taxDocumentForm.setValue('has_registered_letter', e.target.checked)
+                    }
                     className="rounded border-gray-300"
                   />
                   <Label htmlFor="has_registered_letter" className="font-medium">
                     Surat Keterangan Terdaftar
                   </Label>
                 </div>
-                
+
                 {taxDocumentForm.watch('has_registered_letter') && (
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-3 pl-6">
+                  <div className="grid grid-cols-1 gap-3 pl-6 md:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="registered_letter_description">Deskripsi</Label>
                       <Input
@@ -1133,22 +1168,24 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
               </div>
 
               {/* Surat Pengukuhan Pengusaha Kena Pajak */}
-              <div className="space-y-3 p-4 border rounded-lg">
+              <div className="space-y-3 rounded-lg border p-4">
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     id="has_pkp_confirmation"
                     checked={taxDocumentForm.watch('has_pkp_confirmation') || false}
-                    onChange={(e) => taxDocumentForm.setValue('has_pkp_confirmation', e.target.checked)}
+                    onChange={(e) =>
+                      taxDocumentForm.setValue('has_pkp_confirmation', e.target.checked)
+                    }
                     className="rounded border-gray-300"
                   />
                   <Label htmlFor="has_pkp_confirmation" className="font-medium">
                     Surat Pengukuhan Pengusaha Kena Pajak
                   </Label>
                 </div>
-                
+
                 {taxDocumentForm.watch('has_pkp_confirmation') && (
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-3 pl-6">
+                  <div className="grid grid-cols-1 gap-3 pl-6 md:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="pkp_confirmation_description">Deskripsi</Label>
                       <Input
@@ -1200,7 +1237,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <User className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">PIC PKP</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="pic_name">PIC/AR Kantor Pajak</Label>
@@ -1229,7 +1266,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     className={picPkpForm.formState.errors.pic_email ? 'border-red-500' : ''}
                   />
                   {picPkpForm.formState.errors.pic_email && (
-                    <p className="text-sm text-red-500">{picPkpForm.formState.errors.pic_email.message}</p>
+                    <p className="text-sm text-red-500">
+                      {picPkpForm.formState.errors.pic_email.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -1246,7 +1285,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <User className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Person In Charge (PIC)</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="pic_name">Nama PIC *</Label>
@@ -1267,7 +1306,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     value={picForm.watch('position')}
                     onValueChange={(value) => picForm.setValue('position', value)}
                   >
-                    <SelectTrigger className={picForm.formState.errors.position ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={picForm.formState.errors.position ? 'border-red-500' : ''}
+                    >
                       <SelectValue placeholder="Pilih jabatan" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1279,7 +1320,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {picForm.formState.errors.position && (
-                    <p className="text-sm text-red-500">{picForm.formState.errors.position.message}</p>
+                    <p className="text-sm text-red-500">
+                      {picForm.formState.errors.position.message}
+                    </p>
                   )}
                 </div>
 
@@ -1298,11 +1341,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
 
                 <div className="space-y-2">
                   <Label htmlFor="pic_phone">Telepon</Label>
-                  <Input
-                    id="pic_phone"
-                    {...picForm.register('phone')}
-                    placeholder="08123456789"
-                  />
+                  <Input id="pic_phone" {...picForm.register('phone')} placeholder="08123456789" />
                 </div>
               </div>
             </div>
@@ -1315,7 +1354,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <Mail className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Kontak Billing</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="billing_name">Nama Kontak Billing *</Label>
@@ -1326,7 +1365,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     className={billingContactForm.formState.errors.name ? 'border-red-500' : ''}
                   />
                   {billingContactForm.formState.errors.name && (
-                    <p className="text-sm text-red-500">{billingContactForm.formState.errors.name.message}</p>
+                    <p className="text-sm text-red-500">
+                      {billingContactForm.formState.errors.name.message}
+                    </p>
                   )}
                 </div>
 
@@ -1336,7 +1377,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     value={billingContactForm.watch('position')}
                     onValueChange={(value) => billingContactForm.setValue('position', value)}
                   >
-                    <SelectTrigger className={billingContactForm.formState.errors.position ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={
+                        billingContactForm.formState.errors.position ? 'border-red-500' : ''
+                      }
+                    >
                       <SelectValue placeholder="Pilih jabatan" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1348,7 +1393,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </SelectContent>
                   </Select>
                   {billingContactForm.formState.errors.position && (
-                    <p className="text-sm text-red-500">{billingContactForm.formState.errors.position.message}</p>
+                    <p className="text-sm text-red-500">
+                      {billingContactForm.formState.errors.position.message}
+                    </p>
                   )}
                 </div>
 
@@ -1361,7 +1408,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     className={billingContactForm.formState.errors.email ? 'border-red-500' : ''}
                   />
                   {billingContactForm.formState.errors.email && (
-                    <p className="text-sm text-red-500">{billingContactForm.formState.errors.email.message}</p>
+                    <p className="text-sm text-red-500">
+                      {billingContactForm.formState.errors.email.message}
+                    </p>
                   )}
                 </div>
 
@@ -1384,11 +1433,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <Building2 className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Kantor Cabang</h3>
               </div>
-              
+
               {/* Form Tambah Cabang */}
-              <div className="p-4 border rounded-lg bg-card">
-                <h4 className="font-medium mb-4">Tambah Kantor Cabang Baru</h4>
-                
+              <div className="rounded-lg border bg-card p-4">
+                <h4 className="mb-4 font-medium">Tambah Kantor Cabang Baru</h4>
+
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="branch_shareholder">Pemegang Saham</Label>
@@ -1519,7 +1568,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       className={branchForm.formState.errors.pic_email ? 'border-red-500' : ''}
                     />
                     {branchForm.formState.errors.pic_email && (
-                      <p className="text-sm text-red-500">{branchForm.formState.errors.pic_email.message}</p>
+                      <p className="text-sm text-red-500">
+                        {branchForm.formState.errors.pic_email.message}
+                      </p>
                     )}
                   </div>
 
@@ -1543,11 +1594,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                   </div>
                 </div>
 
-                <Button
-                  type="button"
-                  onClick={handleAddBranch}
-                  className="mt-4 gap-2"
-                >
+                <Button type="button" onClick={handleAddBranch} className="mt-4 gap-2">
                   <Plus className="h-4 w-4" />
                   Tambah Cabang
                 </Button>
@@ -1558,12 +1605,10 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <div className="space-y-3">
                   <h4 className="font-medium">Daftar Kantor Cabang</h4>
                   {branches.map((branch) => (
-                    <div key={branch.id} className="p-4 border rounded-lg bg-card">
-                      <div className="flex justify-between items-start">
+                    <div key={branch.id} className="rounded-lg border bg-card p-4">
+                      <div className="flex items-start justify-between">
                         <div className="space-y-2">
-                          <p className="font-medium">
-                            {branch.address || 'Alamat tidak tersedia'}
-                          </p>
+                          <p className="font-medium">{branch.address || 'Alamat tidak tersedia'}</p>
                           <p className="text-sm text-muted-foreground">
                             PIC: {branch.pic_name || '-'} ({branch.pic_position || '-'})
                           </p>
@@ -1598,7 +1643,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <FileText className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Template COA</h3>
               </div>
-              
+
               <div className="space-y-4">
                 {/* Toggle Default Template */}
                 <div className="flex items-center space-x-2">
@@ -1613,7 +1658,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     Gunakan Template Default
                   </Label>
                 </div>
-                
+
                 {accountingForm.watch('useDefaultCoa') && (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
@@ -1633,13 +1678,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="flex items-end">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="gap-2"
-                      >
+                      <Button type="button" variant="outline" className="gap-2">
                         <Eye className="h-4 w-4" />
                         Preview
                       </Button>
@@ -1657,23 +1698,25 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <Hash className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Tambah COA Manual</h3>
               </div>
-              
+
               <div className="space-y-4">
                 {/* COA Table */}
-                <div className="border rounded-lg">
-                  <div className="grid grid-cols-12 gap-2 p-3 bg-muted font-medium text-sm">
+                <div className="rounded-lg border">
+                  <div className="grid grid-cols-12 gap-2 bg-muted p-3 text-sm font-medium">
                     <div className="col-span-2">Nomor Akun</div>
                     <div className="col-span-4">Nama Akun</div>
                     <div className="col-span-5">Deskripsi Akun</div>
                     <div className="col-span-1">Aksi</div>
                   </div>
-                  
+
                   {manualCoa.map((item) => (
-                    <div key={item.id} className="grid grid-cols-12 gap-2 p-3 border-t">
+                    <div key={item.id} className="grid grid-cols-12 gap-2 border-t p-3">
                       <div className="col-span-2">
                         <Input
                           value={item.accountNumber}
-                          onChange={(e) => handleUpdateCoaItem(item.id, 'accountNumber', e.target.value)}
+                          onChange={(e) =>
+                            handleUpdateCoaItem(item.id, 'accountNumber', e.target.value)
+                          }
                           placeholder="1001"
                           className="h-8"
                         />
@@ -1681,7 +1724,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <div className="col-span-4">
                         <Input
                           value={item.accountName}
-                          onChange={(e) => handleUpdateCoaItem(item.id, 'accountName', e.target.value)}
+                          onChange={(e) =>
+                            handleUpdateCoaItem(item.id, 'accountName', e.target.value)
+                          }
                           placeholder="Kas"
                           className="h-8"
                         />
@@ -1689,7 +1734,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <div className="col-span-5">
                         <Input
                           value={item.description || ''}
-                          onChange={(e) => handleUpdateCoaItem(item.id, 'description', e.target.value)}
+                          onChange={(e) =>
+                            handleUpdateCoaItem(item.id, 'description', e.target.value)
+                          }
                           placeholder="Akun kas kecil"
                           className="h-8"
                         />
@@ -1700,15 +1747,15 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                           variant="outline"
                           size="sm"
                           onClick={() => handleRemoveCoaItem(item.id)}
-                          className="text-red-600 hover:text-red-700 h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
                   ))}
-                  
-                  <div className="p-3 border-t">
+
+                  <div className="border-t p-3">
                     <Button
                       type="button"
                       variant="outline"
@@ -1731,7 +1778,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <Settings className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Kebijakan Penomoran Voucher</h3>
               </div>
-              
+
               <div className="space-y-4">
                 {/* Toggle Tenant Policy */}
                 <div className="flex items-center space-x-2">
@@ -1739,14 +1786,16 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     type="checkbox"
                     id="useTenantVoucherNumbering"
                     checked={accountingForm.watch('useTenantVoucherNumbering') || false}
-                    onChange={(e) => accountingForm.setValue('useTenantVoucherNumbering', e.target.checked)}
+                    onChange={(e) =>
+                      accountingForm.setValue('useTenantVoucherNumbering', e.target.checked)
+                    }
                     className="rounded border-gray-300"
                   />
                   <Label htmlFor="useTenantVoucherNumbering" className="font-medium">
                     Gunakan kebijakan penomoran dari tenant
                   </Label>
                 </div>
-                
+
                 {!accountingForm.watch('useTenantVoucherNumbering') && (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
@@ -1762,7 +1811,12 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <Label htmlFor="resetFrequency">Frekuensi Reset</Label>
                       <Select
                         value={accountingForm.watch('resetFrequency')}
-                        onValueChange={(value) => accountingForm.setValue('resetFrequency', value as 'monthly' | 'annually' | 'daily')}
+                        onValueChange={(value) =>
+                          accountingForm.setValue(
+                            'resetFrequency',
+                            value as 'monthly' | 'annually' | 'daily',
+                          )
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih frekuensi" />
@@ -1787,11 +1841,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
 
                     <div className="space-y-2">
                       <Label htmlFor="prefix">Prefix</Label>
-                      <Input
-                        id="prefix"
-                        {...accountingForm.register('prefix')}
-                        placeholder="CMP"
-                      />
+                      <Input id="prefix" {...accountingForm.register('prefix')} placeholder="CMP" />
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
@@ -1804,10 +1854,10 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </div>
                   </div>
                 )}
-                
+
                 {/* Voucher Preview */}
-                <div className="p-4 border rounded-lg bg-muted">
-                  <h4 className="font-medium mb-2">Preview Nomor Voucher</h4>
+                <div className="rounded-lg border bg-muted p-4">
+                  <h4 className="mb-2 font-medium">Preview Nomor Voucher</h4>
                   <p className="font-mono text-lg">{generateVoucherPreview()}</p>
                 </div>
               </div>
@@ -1824,18 +1874,22 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 <FileText className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Dokumen Legal</h3>
               </div>
-              
+
               <div className="space-y-4">
                 {/* Akta Pendirian */}
-                <div className="p-4 border rounded-lg bg-card">
+                <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        {getStatusIcon(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                        {getStatusIcon(
+                          legalDocumentForm.watch('aktaPendirian.status') || 'missing',
+                        )}
                         <h4 className="font-medium">Akta Pendirian</h4>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {getStatusText(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                        {getStatusText(
+                          legalDocumentForm.watch('aktaPendirian.status') || 'missing',
+                        )}
                       </p>
                       {legalDocumentForm.watch('aktaPendirian.fileName') && (
                         <p className="text-sm text-muted-foreground">
@@ -1880,15 +1934,19 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 </div>
 
                 {/* Akta Perubahan */}
-                <div className="p-4 border rounded-lg bg-card">
+                <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        {getStatusIcon(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                        {getStatusIcon(
+                          legalDocumentForm.watch('aktaPerubahan.status') || 'missing',
+                        )}
                         <h4 className="font-medium">Akta Perubahan</h4>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {getStatusText(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                        {getStatusText(
+                          legalDocumentForm.watch('aktaPerubahan.status') || 'missing',
+                        )}
                       </p>
                       {legalDocumentForm.watch('aktaPerubahan.fileName') && (
                         <p className="text-sm text-muted-foreground">
@@ -1933,7 +1991,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 </div>
 
                 {/* SIUP */}
-                <div className="p-4 border rounded-lg bg-card">
+                <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -1986,7 +2044,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 </div>
 
                 {/* TDP */}
-                <div className="p-4 border rounded-lg bg-card">
+                <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -2039,7 +2097,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 </div>
 
                 {/* NPWP */}
-                <div className="p-4 border rounded-lg bg-card">
+                <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -2092,7 +2150,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 </div>
 
                 {/* KTP Direktur */}
-                <div className="p-4 border rounded-lg bg-card">
+                <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -2152,7 +2210,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
         return (
           <div className="space-y-6">
             {/* Review Header */}
-            <div className="text-center space-y-2">
+            <div className="space-y-2 text-center">
               <div className="flex items-center justify-center gap-2">
                 <Eye className="h-6 w-6 text-primary" />
                 <h3 className="text-xl font-semibold">Review Data Klien</h3>
@@ -2163,24 +2221,25 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             </div>
 
             {/* Basic Info Section */}
-            <div className="border rounded-lg bg-card">
-              <div 
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="rounded-lg border bg-card">
+              <div
+                className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-muted/50"
                 onClick={() => toggleSection('basicInfo')}
               >
                 <div className="flex items-center gap-2">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <h4 className="font-medium">Informasi Dasar</h4>
                 </div>
-                {expandedSections.includes('basicInfo') ? 
-                  <ChevronUp className="h-4 w-4" /> : 
+                {expandedSections.includes('basicInfo') ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
                   <ChevronDown className="h-4 w-4" />
-                }
+                )}
               </div>
-              
+
               {expandedSections.includes('basicInfo') && (
-                <div className="px-4 pb-4 space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3 px-4 pb-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Nama Klien</p>
                       <p className="font-medium">{basicInfoForm.watch('name') || '-'}</p>
@@ -2191,7 +2250,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Tipe Klien</p>
-                      <p>{basicInfoForm.watch('type') === 'corporate' ? 'Korporasi' : 'Individu'}</p>
+                      <p>
+                        {basicInfoForm.watch('type') === 'corporate' ? 'Korporasi' : 'Individu'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Telepon</p>
@@ -2206,13 +2267,14 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <p>{basicInfoForm.watch('website') || '-'}</p>
                     </div>
                   </div>
-                  
+
                   <Separator className="my-4" />
-                  
+
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-muted-foreground">Alamat Lengkap</p>
                     <p>
-                      {addressForm.watch('address')}, {addressForm.watch('city')}, {addressForm.watch('province')} {addressForm.watch('postal_code')}
+                      {addressForm.watch('address')}, {addressForm.watch('city')},{' '}
+                      {addressForm.watch('province')} {addressForm.watch('postal_code')}
                     </p>
                   </div>
                 </div>
@@ -2220,27 +2282,30 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             </div>
 
             {/* Contacts Section */}
-            <div className="border rounded-lg bg-card">
-              <div 
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="rounded-lg border bg-card">
+              <div
+                className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-muted/50"
                 onClick={() => toggleSection('contacts')}
               >
                 <div className="flex items-center gap-2">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <h4 className="font-medium">Kontak & Cabang</h4>
                 </div>
-                {expandedSections.includes('contacts') ? 
-                  <ChevronUp className="h-4 w-4" /> : 
+                {expandedSections.includes('contacts') ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
                   <ChevronDown className="h-4 w-4" />
-                }
+                )}
               </div>
-              
+
               {expandedSections.includes('contacts') && (
-                <div className="px-4 pb-4 space-y-4">
+                <div className="space-y-4 px-4 pb-4">
                   {/* PIC */}
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Person In Charge (PIC)</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Person In Charge (PIC)
+                    </p>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <p className="text-sm">Nama: {picForm.watch('name') || '-'}</p>
                         <p className="text-sm">Jabatan: {picForm.watch('position') || '-'}</p>
@@ -2251,28 +2316,34 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Billing Contact */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-muted-foreground">Kontak Billing</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <p className="text-sm">Nama: {billingContactForm.watch('name') || '-'}</p>
-                        <p className="text-sm">Jabatan: {billingContactForm.watch('position') || '-'}</p>
+                        <p className="text-sm">
+                          Jabatan: {billingContactForm.watch('position') || '-'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm">Email: {billingContactForm.watch('email') || '-'}</p>
-                        <p className="text-sm">Telepon: {billingContactForm.watch('phone') || '-'}</p>
+                        <p className="text-sm">
+                          Telepon: {billingContactForm.watch('phone') || '-'}
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Branch Offices */}
                   {branches.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">Kantor Cabang ({branches.length})</p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Kantor Cabang ({branches.length})
+                      </p>
                       {branches.map((branch, index) => (
-                        <div key={branch.id} className="p-3 border rounded-sm bg-muted/30">
+                        <div key={branch.id} className="rounded-sm border bg-muted/30 p-3">
                           <p className="text-sm font-medium">Cabang {index + 1}</p>
                           <p className="text-sm">Alamat: {branch.address || '-'}</p>
                           <p className="text-sm">PIC: {branch.pic_name || '-'}</p>
@@ -2285,24 +2356,25 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             </div>
 
             {/* Business & Tax Section */}
-            <div className="border rounded-lg bg-card">
-              <div 
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="rounded-lg border bg-card">
+              <div
+                className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-muted/50"
                 onClick={() => toggleSection('business')}
               >
                 <div className="flex items-center gap-2">
                   <Calculator className="h-5 w-5 text-muted-foreground" />
                   <h4 className="font-medium">Usaha & Pajak</h4>
                 </div>
-                {expandedSections.includes('business') ? 
-                  <ChevronUp className="h-4 w-4" /> : 
+                {expandedSections.includes('business') ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
                   <ChevronDown className="h-4 w-4" />
-                }
+                )}
               </div>
-              
+
               {expandedSections.includes('business') && (
-                <div className="px-4 pb-4 space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3 px-4 pb-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Bidang Usaha</p>
                       <p>{businessInfoForm.watch('businessField') || '-'}</p>
@@ -2325,29 +2397,32 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             </div>
 
             {/* Accounting Preferences Section */}
-            <div className="border rounded-lg bg-card">
-              <div 
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="rounded-lg border bg-card">
+              <div
+                className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-muted/50"
                 onClick={() => toggleSection('accounting')}
               >
                 <div className="flex items-center gap-2">
                   <Settings className="h-5 w-5 text-muted-foreground" />
                   <h4 className="font-medium">Preferensi Akuntansi</h4>
                 </div>
-                {expandedSections.includes('accounting') ? 
-                  <ChevronUp className="h-4 w-4" /> : 
+                {expandedSections.includes('accounting') ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
                   <ChevronDown className="h-4 w-4" />
-                }
+                )}
               </div>
-              
+
               {expandedSections.includes('accounting') && (
-                <div className="px-4 pb-4 space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3 px-4 pb-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Template COA</p>
-                      <p>{accountingForm.watch('useDefaultCoa') ? 
-                        `Template: ${accountingForm.watch('coaTemplate') || 'Default'}` : 
-                        'Custom COA'}</p>
+                      <p>
+                        {accountingForm.watch('useDefaultCoa')
+                          ? `Template: ${accountingForm.watch('coaTemplate') || 'Default'}`
+                          : 'Custom COA'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Manual COA</p>
@@ -2355,9 +2430,11 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Penomoran Voucher</p>
-                      <p>{accountingForm.watch('useTenantVoucherNumbering') ? 
-                        'Menggunakan kebijakan tenant' : 
-                        `Custom: ${generateVoucherPreview()}`}</p>
+                      <p>
+                        {accountingForm.watch('useTenantVoucherNumbering')
+                          ? 'Menggunakan kebijakan tenant'
+                          : `Custom: ${generateVoucherPreview()}`}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -2365,30 +2442,33 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             </div>
 
             {/* Legal Documents Section */}
-            <div className="border rounded-lg bg-card">
-              <div 
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="rounded-lg border bg-card">
+              <div
+                className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-muted/50"
                 onClick={() => toggleSection('legal')}
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <h4 className="font-medium">Dokumen Legal</h4>
                 </div>
-                {expandedSections.includes('legal') ? 
-                  <ChevronUp className="h-4 w-4" /> : 
+                {expandedSections.includes('legal') ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
                   <ChevronDown className="h-4 w-4" />
-                }
+                )}
               </div>
-              
+
               {expandedSections.includes('legal') && (
-                <div className="px-4 pb-4 space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3 px-4 pb-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
                       <div>
                         <p className="text-sm font-medium">Akta Pendirian</p>
                         <p className="text-sm text-muted-foreground">
-                          {getStatusText(legalDocumentForm.watch('aktaPendirian.status') || 'missing')}
+                          {getStatusText(
+                            legalDocumentForm.watch('aktaPendirian.status') || 'missing',
+                          )}
                         </p>
                       </div>
                     </div>
@@ -2397,7 +2477,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <div>
                         <p className="text-sm font-medium">Akta Perubahan</p>
                         <p className="text-sm text-muted-foreground">
-                          {getStatusText(legalDocumentForm.watch('aktaPerubahan.status') || 'missing')}
+                          {getStatusText(
+                            legalDocumentForm.watch('aktaPerubahan.status') || 'missing',
+                          )}
                         </p>
                       </div>
                     </div>
@@ -2433,7 +2515,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <div>
                         <p className="text-sm font-medium">KTP Direktur</p>
                         <p className="text-sm text-muted-foreground">
-                          {getStatusText(legalDocumentForm.watch('ktpDirektur.status') || 'missing')}
+                          {getStatusText(
+                            legalDocumentForm.watch('ktpDirektur.status') || 'missing',
+                          )}
                         </p>
                       </div>
                     </div>
@@ -2443,13 +2527,14 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             </div>
 
             {/* Final Confirmation */}
-            <div className="p-4 border rounded-lg bg-primary/5">
+            <div className="rounded-lg border bg-primary/5 p-4">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+                <CheckCircle className="mt-0.5 h-5 w-5 text-primary" />
                 <div className="space-y-1">
                   <p className="font-medium">Konfirmasi Final</p>
                   <p className="text-sm text-muted-foreground">
-                    Pastikan semua data klien sudah benar sebelum menyimpan. Data yang telah disimpan tidak dapat diubah melalui form ini.
+                    Pastikan semua data klien sudah benar sebelum menyimpan. Data yang telah
+                    disimpan tidak dapat diubah melalui form ini.
                   </p>
                 </div>
               </div>
@@ -2461,11 +2546,9 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-6xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
-            Tambah Klien Baru
-          </DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Tambah Klien Baru</DialogTitle>
         </DialogHeader>
 
         {/* Stepper */}
@@ -2474,24 +2557,28 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             const Icon = step.icon;
             const isActive = currentStep === step.id;
             const isCompleted = currentStep > step.id;
-            
+
             return (
               <div key={step.id} className="flex items-center">
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
                       isActive
                         ? 'border-primary bg-primary text-primary-foreground'
                         : isCompleted
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-muted-foreground text-muted-foreground'
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-muted-foreground text-muted-foreground'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
                   </div>
                   <span
                     className={`text-sm font-medium ${
-                      isActive ? 'text-primary' : isCompleted ? 'text-primary' : 'text-muted-foreground'
+                      isActive
+                        ? 'text-primary'
+                        : isCompleted
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
                     }`}
                   >
                     {step.title}
@@ -2499,7 +2586,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-8 h-0.5 mx-4 ${
+                    className={`mx-4 h-0.5 w-8 ${
                       currentStep > step.id ? 'bg-primary' : 'bg-muted-foreground'
                     }`}
                   />
@@ -2510,23 +2597,17 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
         </div>
 
         {/* Form Content */}
-        <div className="py-4">
-          {renderStepContent()}
-        </div>
+        <div className="py-4">{renderStepContent()}</div>
 
         {/* Actions */}
-        <div className="flex justify-between pt-4 border-t">
+        <div className="flex justify-between border-t pt-4">
           <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
+            <Button variant="outline" onClick={handlePrevious} disabled={currentStep === 1}>
+              <ChevronLeft className="mr-2 h-4 w-4" />
               Previous
             </Button>
           </div>
-          
+
           <div className="flex space-x-2">
             <Button variant="outline" onClick={onClose}>
               Batal
@@ -2534,7 +2615,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
             {currentStep < steps.length ? (
               <Button onClick={handleNext}>
                 Next
-                <ChevronRight className="h-4 w-4 ml-2" />
+                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
               <Button onClick={handleSubmit} disabled={isSubmitting}>

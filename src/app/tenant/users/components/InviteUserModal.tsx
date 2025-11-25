@@ -38,7 +38,6 @@ interface InviteUserModalProps {
   onSuccess: () => void;
 }
 
-
 const inviteSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
   roleId: z.string().min(1, { message: 'Role is required.' }),
@@ -75,19 +74,14 @@ export default function InviteUserModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Undang User Baru</DialogTitle>
-          <DialogDescription>
-            Masukkan email dan role untuk mengirim undangan.
-          </DialogDescription>
+          <DialogDescription>Masukkan email dan role untuk mengirim undangan.</DialogDescription>
         </DialogHeader>
         {inviteMutation.error && (
           <p className="text-sm text-destructive">
-            {(inviteMutation.error as any)?.response?.data?.message ||
-              'Invalid request data'}
+            {(inviteMutation.error as any)?.response?.data?.message || 'Invalid request data'}
           </p>
         )}
-        {rolesLoading && (
-          <p className="text-sm text-muted-foreground">Loading roles...</p>
-        )}
+        {rolesLoading && <p className="text-sm text-muted-foreground">Loading roles...</p>}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -97,11 +91,7 @@ export default function InviteUserModal({
                 <FormItem>
                   <FormLabel>Email*</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="user@example.com"
-                      {...field}
-                    />
+                    <Input type="email" placeholder="user@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,10 +103,7 @@ export default function InviteUserModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role*</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih role..." />

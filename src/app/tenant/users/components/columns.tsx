@@ -10,24 +10,19 @@ import { DataTableColumnHeader } from '@/components/ui/DataTableColumnHeader'; /
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'name',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User" />
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="User" />,
     cell: ({ row }) => {
       const user = row.original;
       return (
         <div className="flex items-center">
           <div className="h-10 w-10 flex-shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground">
-              {user.name?.charAt(0).toUpperCase() ||
-                user.email.charAt(0).toUpperCase()}
+              {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
             </div>
           </div>
           <div className="ml-4">
             <div className="flex items-center gap-2">
-              <div className="text-sm font-medium">
-                {user.name || 'No Name'}
-              </div>
+              <div className="text-sm font-medium">{user.name || 'No Name'}</div>
               {user.isCurrentUser && (
                 <Badge
                   variant="outline"
@@ -37,9 +32,7 @@ export const columns: ColumnDef<User>[] = [
                 </Badge>
               )}
             </div>
-            <div className="text-sm text-muted-foreground">
-              {user.email}
-            </div>
+            <div className="text-sm text-muted-foreground">{user.email}</div>
           </div>
         </div>
       );
@@ -47,22 +40,21 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'role',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
     cell: ({ row }) => {
       return <Badge variant="secondary">{row.getValue('role')}</Badge>;
     },
   },
   {
     accessorKey: 'status',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     cell: ({ row }) => {
       const status = row.getValue('status');
       return status === 'active' ? (
-        <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/40">
+        <Badge
+          variant="default"
+          className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/40"
+        >
           <UserCheck className="mr-1 h-3 w-3" />
           Aktif
         </Badge>
@@ -76,9 +68,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'joinedAt',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Bergabung" />
-    ),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Bergabung" />,
     cell: ({ row }) => {
       return (
         <div className="text-sm text-muted-foreground">

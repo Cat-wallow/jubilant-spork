@@ -16,8 +16,7 @@ function parseAssetPrefix(image: string) {
 export function Image(props: { [x: string]: any }) {
   const { src, alt, className, nextProps = {}, ...rest } = props;
 
-  const imageUrl =
-    typeof src === 'string' ? src : ((src as any)?.src as string);
+  const imageUrl = typeof src === 'string' ? src : ((src as any)?.src as string);
   return (
     <div className={`relative overflow-hidden ${className}`} {...rest}>
       <NextImage

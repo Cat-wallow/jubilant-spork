@@ -19,8 +19,8 @@ function CardMenu(props: { transparent?: boolean; vertical?: boolean }) {
             transparent
               ? 'bg-none text-white hover:bg-none active:bg-none'
               : vertical
-              ? 'bg-none text-navy-700 dark:text-white'
-              : 'bg-lightPrimary p-2 text-brand-500 hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10'
+                ? 'bg-none text-navy-700 dark:text-white'
+                : 'bg-lightPrimary p-2 text-brand-500 hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10'
           } linear justify-center rounded-lg font-bold transition duration-200`}
         >
           {vertical ? (

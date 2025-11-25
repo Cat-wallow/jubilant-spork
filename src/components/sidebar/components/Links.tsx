@@ -23,9 +23,7 @@ const subMenuItems: SubMenuItem[] = [
 export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
   const pathname = usePathname();
   const { routes } = props;
-  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
 
   const activeRoute = useCallback(
     (routeName: string) => {
@@ -55,7 +53,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
       ) {
         if (route.name === 'Manajemen Pengguna') {
           return (
-            <RBAC requiredPermission={["user:manage", "user:read"]} key={index}>
+            <RBAC requiredPermission={['user:manage', 'user:read']} key={index}>
               <NavLink href={route.layout + '/' + route.path}>
                 <div className="group relative flex w-full items-center gap-[73px] hover:cursor-pointer">
                   <div className="flex flex-1 items-center gap-[15px]">

@@ -10,13 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Plus,
-  Upload,
-  Search as SearchIcon,
-  Filter as FilterIcon,
-  Loader2,
-} from 'lucide-react';
+import { Plus, Upload, Search as SearchIcon, Filter as FilterIcon, Loader2 } from 'lucide-react';
 import RBAC from '@/components/rbac/RBAC';
 import {
   DropdownMenu,
@@ -65,9 +59,7 @@ export function UsersTableToolbar<TData>({
       <div className="flex items-center gap-2">
         <Select
           value={statusFilter}
-          onValueChange={
-            onStatusFilterChange as (value: string) => void | undefined
-          }
+          onValueChange={onStatusFilterChange as (value: string) => void | undefined}
           disabled={isFetching}
         >
           <SelectTrigger className="w-[180px]">
@@ -97,9 +89,7 @@ export function UsersTableToolbar<TData>({
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -108,19 +98,14 @@ export function UsersTableToolbar<TData>({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <RBAC requiredPermission={["user:read", "user:manage"]}>
-          <Button
-            variant="third"
-            onClick={onImport}
-            className="gap-2"
-            disabled={isFetching}
-          >
+        <RBAC requiredPermission={['user:read', 'user:manage']}>
+          <Button variant="third" onClick={onImport} className="gap-2" disabled={isFetching}>
             <Upload className="h-4 w-4" />
             Import CSV
           </Button>
         </RBAC>
 
-        <RBAC requiredPermission={["user:create", "user:manage"]}>
+        <RBAC requiredPermission={['user:create', 'user:manage']}>
           <Button onClick={onInvite} className="gap-2" disabled={isFetching}>
             <Plus className="h-4 w-4" />
             Undang User

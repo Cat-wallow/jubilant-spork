@@ -15,9 +15,7 @@ export default function InvitationsPage() {
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams?.get('token');
 
-  const [activeTab, setActiveTab] = useState<
-    'all' | 'pending' | 'accepted' | 'rejected'
-  >('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -46,9 +44,7 @@ export default function InvitationsPage() {
       <div className="mt-3 flex h-full w-full items-center justify-center">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-brand-500"></div>
-          <p className="text-gray-600 dark:text-gray-400">
-            Loading invitations...
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Loading invitations...</p>
         </div>
       </div>
     );
@@ -72,8 +68,7 @@ export default function InvitationsPage() {
 
   const invitations = data?.invitations || [];
   const pagination = data?.pagination;
-  const tabCounts = counts ||
-    data?.counts || { all: 0, pending: 0, accepted: 0, rejected: 0 };
+  const tabCounts = counts || data?.counts || { all: 0, pending: 0, accepted: 0, rejected: 0 };
 
   return (
     <div className="mt-3 h-full w-full">
@@ -104,19 +99,14 @@ export default function InvitationsPage() {
             {tokenVerification.valid
               ? '✅ Undangan valid! Silakan terima atau tolak undangan di bawah.'
               : `❌ ${
-                  tokenVerification.message ||
-                  'Token undangan tidak valid atau sudah kadaluarsa.'
+                  tokenVerification.message || 'Token undangan tidak valid atau sudah kadaluarsa.'
                 }`}
           </p>
         </div>
       )}
 
       {/* Tabs */}
-      <InvitationTabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        counts={tabCounts}
-      />
+      <InvitationTabs activeTab={activeTab} onTabChange={setActiveTab} counts={tabCounts} />
 
       {/* Invitations List */}
       <div className="mt-6">
@@ -163,9 +153,8 @@ export default function InvitationsPage() {
       {pagination && pagination.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Showing {(page - 1) * limit + 1} to{' '}
-            {Math.min(page * limit, pagination.total)} of {pagination.total}{' '}
-            invitations
+            Showing {(page - 1) * limit + 1} to {Math.min(page * limit, pagination.total)} of{' '}
+            {pagination.total} invitations
           </p>
           <div className="flex gap-2">
             <button
@@ -176,9 +165,7 @@ export default function InvitationsPage() {
               Previous
             </button>
             <button
-              onClick={() =>
-                setPage((p) => Math.min(pagination.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page === pagination.totalPages}
               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >

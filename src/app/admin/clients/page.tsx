@@ -55,9 +55,11 @@ const columns: ColumnDef<Client>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       return (
-        <Badge 
+        <Badge
           variant={status === 'active' ? 'default' : 'secondary'}
-          className={status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+          className={
+            status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }
         >
           {status === 'active' ? 'Active' : 'Non Aktif'}
         </Badge>
@@ -80,9 +82,7 @@ const columns: ColumnDef<Client>[] = [
   {
     accessorKey: 'npwp',
     header: 'NPWP',
-    cell: ({ row }) => (
-      <span className="text-sm font-mono">{row.getValue('npwp') || '-'}</span>
-    ),
+    cell: ({ row }) => <span className="font-mono text-sm">{row.getValue('npwp') || '-'}</span>,
   },
   {
     accessorKey: 'pkp_status',
@@ -90,7 +90,7 @@ const columns: ColumnDef<Client>[] = [
     cell: ({ row }) => {
       const pkpStatus = row.original.pkp_status;
       return (
-        <Badge 
+        <Badge
           variant={pkpStatus ? 'default' : 'secondary'}
           className={pkpStatus ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}
         >
@@ -113,10 +113,10 @@ const columns: ColumnDef<Client>[] = [
       const date = new Date(row.getValue('updated_at'));
       return (
         <span className="text-sm">
-          {date.toLocaleDateString('id-ID', { 
-            day: '2-digit', 
-            month: 'short', 
-            year: 'numeric' 
+          {date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
           })}
         </span>
       );
@@ -128,15 +128,15 @@ const columns: ColumnDef<Client>[] = [
     cell: ({ row }) => {
       const deadline = row.original.deadline_project;
       if (!deadline) return <span className="text-sm text-muted-foreground">-</span>;
-      
+
       const date = new Date(deadline);
       const isOverdue = date < new Date();
       return (
-        <span className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
-          {date.toLocaleDateString('id-ID', { 
-            day: '2-digit', 
-            month: 'short', 
-            year: 'numeric' 
+        <span className={`text-sm ${isOverdue ? 'font-medium text-red-600' : ''}`}>
+          {date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
           })}
         </span>
       );
@@ -195,11 +195,11 @@ export default function ClientsPage() {
 
   const clients = data?.items || [];
   const pageCount = data?.pagination?.totalPages || 0;
-  
+
   // Mock summary data - will be replaced with real API
   const summaryData = {
     totalClients: data?.pagination?.total || 0,
-    activeClients: clients.filter(c => c.status === 'active').length,
+    activeClients: clients.filter((c) => c.status === 'active').length,
     totalProjects: clients.reduce((sum, c) => sum + (c.active_projects || 0), 0),
     complianceRate: 85, // Mock data
   };
@@ -251,23 +251,22 @@ export default function ClientsPage() {
               Kelola data identitas, klasifikasi pajak, dan dokumen legal client
             </p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             {/* Add Client Button */}
-            <Button 
-              onClick={() => setShowCreateModal(true)}
-              className="gap-2"
-            >
+            <Button onClick={() => setShowCreateModal(true)} className="gap-2">
               <Building2 className="h-4 w-4" />
               Tambah Klien
             </Button>
-            
+
             {/* Items per page */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Show</span>
               <Select
                 value={pagination.pageSize.toString()}
-                onValueChange={(value) => setPagination(prev => ({ ...prev, pageSize: parseInt(value) }))}
+                onValueChange={(value) =>
+                  setPagination((prev) => ({ ...prev, pageSize: parseInt(value) }))
+                }
               >
                 <SelectTrigger className="h-8 w-[60px]">
                   <SelectValue />

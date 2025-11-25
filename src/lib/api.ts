@@ -1,11 +1,6 @@
 import axios from 'axios';
 import { toast } from 'sonner';
-import {
-  getAccessToken,
-  getRefreshToken,
-  setTokens,
-  clearTokens,
-} from './tokenManager';
+import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './tokenManager';
 
 const api = axios.create({
   baseURL:
@@ -51,9 +46,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     const skipRefreshUrls = ['auth/login', 'auth/refresh-token', 'auth/logout'];
-    const shouldSkipRefresh = skipRefreshUrls.some((url) =>
-      originalRequest.url?.includes(url),
-    );
+    const shouldSkipRefresh = skipRefreshUrls.some((url) => originalRequest.url?.includes(url));
 
     if (error.response?.status === 401 && !shouldSkipRefresh) {
       if (isRefreshing) {
@@ -80,7 +73,11 @@ api.interceptors.response.use(
         if (typeof window !== 'undefined') {
           window.location.href = '/auth/sign-in';
         }
-        toast.error(error.response?.data?.message || error.message || 'Sesi Anda telah berakhir. Silakan login kembali.');
+        toast.error(
+          error.response?.data?.message ||
+            error.message ||
+            'Sesi Anda telah berakhir. Silakan login kembali.',
+        );
         return Promise.reject(error);
       }
 
@@ -89,13 +86,11 @@ api.interceptors.response.use(
           refreshToken,
         });
 
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-          data.data;
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = data.data;
 
         // Check if the old refresh token was in localStorage to decide new storage
         const rememberMe =
-          typeof window !== 'undefined' &&
-          !!window.localStorage.getItem('refreshToken');
+          typeof window !== 'undefined' && !!window.localStorage.getItem('refreshToken');
         setTokens(newAccessToken, newRefreshToken, rememberMe);
 
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
@@ -108,7 +103,11 @@ api.interceptors.response.use(
         if (typeof window !== 'undefined') {
           window.location.href = '/auth/sign-in';
         }
-        toast.error(refreshError.response?.data?.message || refreshError.message || 'Gagal memperbarui sesi. Silakan login kembali.');
+        toast.error(
+          refreshError.response?.data?.message ||
+            refreshError.message ||
+            'Gagal memperbarui sesi. Silakan login kembali.',
+        );
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

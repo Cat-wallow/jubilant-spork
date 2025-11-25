@@ -3,10 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  NewPasswordValidator,
-  NewPasswordFormInputs,
-} from '@/validators/auth.validator';
+import { NewPasswordValidator, NewPasswordFormInputs } from '@/validators/auth.validator';
 import {
   Form,
   FormControl,
@@ -67,10 +64,7 @@ export default function NewPasswordPage() {
 
         {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="newPassword"

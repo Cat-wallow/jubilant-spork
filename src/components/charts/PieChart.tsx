@@ -8,15 +8,7 @@ const Chart = dynamic(() => import('react-apexcharts'), {
 const PieChart = (props: any) => {
   const { chartData, chartOptions } = props;
 
-  return (
-    <Chart
-      options={chartOptions}
-      type="pie"
-      width="100%"
-      height="100%"
-      series={chartData}
-    />
-  );
+  return <Chart options={chartOptions} type="pie" width="100%" height="100%" series={chartData} />;
 };
 
 export default PieChart;

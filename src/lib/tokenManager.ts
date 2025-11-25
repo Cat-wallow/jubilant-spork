@@ -5,8 +5,7 @@ const REFRESH_TOKEN_KEY = 'refreshToken';
 
 type StorageType = 'localStorage' | 'sessionStorage';
 
-let tokenStorage: Storage =
-  typeof window !== 'undefined' ? window.sessionStorage : ({} as Storage);
+let tokenStorage: Storage = typeof window !== 'undefined' ? window.sessionStorage : ({} as Storage);
 let storageType: StorageType = 'sessionStorage';
 
 const getStorage = (): Storage => {
@@ -29,11 +28,7 @@ const setStorageType = (rememberMe: boolean) => {
   tokenStorage = getStorage();
 };
 
-export const setTokens = (
-  accessToken: string,
-  refreshToken: string,
-  rememberMe: boolean
-) => {
+export const setTokens = (accessToken: string, refreshToken: string, rememberMe: boolean) => {
   setStorageType(rememberMe);
   getStorage().setItem(ACCESS_TOKEN_KEY, accessToken);
   getStorage().setItem(REFRESH_TOKEN_KEY, refreshToken);
@@ -41,28 +36,18 @@ export const setTokens = (
 
 export const getAccessToken = (): string | null => {
   // Try getting from either storage, localStorage first
-  let token =
-    typeof window !== 'undefined' ? window.localStorage.getItem(ACCESS_TOKEN_KEY) : null;
+  let token = typeof window !== 'undefined' ? window.localStorage.getItem(ACCESS_TOKEN_KEY) : null;
   if (!token) {
-    token =
-      typeof window !== 'undefined'
-        ? window.sessionStorage.getItem(ACCESS_TOKEN_KEY)
-        : null;
+    token = typeof window !== 'undefined' ? window.sessionStorage.getItem(ACCESS_TOKEN_KEY) : null;
   }
   return token;
 };
 
 export const getRefreshToken = (): string | null => {
   // Try getting from either storage, localStorage first
-  let token =
-    typeof window !== 'undefined'
-      ? window.localStorage.getItem(REFRESH_TOKEN_KEY)
-      : null;
+  let token = typeof window !== 'undefined' ? window.localStorage.getItem(REFRESH_TOKEN_KEY) : null;
   if (!token) {
-    token =
-      typeof window !== 'undefined'
-        ? window.sessionStorage.getItem(REFRESH_TOKEN_KEY)
-        : null;
+    token = typeof window !== 'undefined' ? window.sessionStorage.getItem(REFRESH_TOKEN_KEY) : null;
   }
   return token;
 };

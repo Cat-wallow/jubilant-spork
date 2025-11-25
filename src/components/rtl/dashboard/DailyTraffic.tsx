@@ -8,14 +8,9 @@ const DailyTraffic = () => {
     <Card extra="pb-7 p-[20px]">
       <div className="flex flex-row justify-between">
         <div className="ms-1 pt-2">
-          <p className="text-sm font-medium leading-4 text-gray-600">
-            Daily Traffic
-          </p>
+          <p className="text-sm font-medium leading-4 text-gray-600">Daily Traffic</p>
           <p className="text-[34px] font-bold text-navy-700 dark:text-white">
-            2.579{' '}
-            <span className="text-sm font-medium leading-6 text-gray-600">
-              Visitors
-            </span>
+            2.579 <span className="text-sm font-medium leading-6 text-gray-600">Visitors</span>
           </p>
         </div>
         <div className="mt-2 flex items-start">
@@ -27,10 +22,7 @@ const DailyTraffic = () => {
       </div>
 
       <div className="h-[300px] w-full pb-0 pt-10">
-        <BarChart
-          chartData={barChartDataDailyTraffic}
-          chartOptions={barChartOptionsDailyTraffic}
-        />
+        <BarChart chartData={barChartDataDailyTraffic} chartOptions={barChartOptionsDailyTraffic} />
       </div>
     </Card>
   );
