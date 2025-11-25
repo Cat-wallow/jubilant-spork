@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,7 +27,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MoreHorizontal, Edit, Link, Trash2, Building2 } from 'lucide-react';
+import {
+  MoreHorizontal,
+  Plus,
+  FileDown,
+  Filter,
+  Edit,
+  Link,
+  Trash2,
+  Search,
+  Eye,
+  Building2,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +50,7 @@ import { Client } from '@/hooks/useClients';
 
 export default function ClientsPage() {
   const { tenant } = useAuth();
+  const router = useRouter();
   const createClientMutation = useCreateClient();
   const deleteClientMutation = useDeleteClient();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
@@ -177,12 +190,12 @@ export default function ClientsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`/admin/clients/${row.original.id}/edit`)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link className="mr-2 h-4 w-4" />
+              <DropdownMenuItem onClick={() => router.push(`/admin/clients/${row.original.id}`)}>
+                <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
               <DropdownMenuSeparator />
