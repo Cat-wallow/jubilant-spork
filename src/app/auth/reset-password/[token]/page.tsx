@@ -55,10 +55,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full flex-col items-start gap-[15px]"
-        >
+        <form onSubmit={handleSubmit} className="flex w-full flex-col items-start gap-[15px]">
           {/* Password Field */}
           <div className="relative w-full">
             <label
@@ -110,16 +107,8 @@ export default function ResetPasswordPage() {
         </form>
 
         {/* Messages */}
-        {message && (
-          <div className="text-center font-dm text-sm text-green-500">
-            {message}
-          </div>
-        )}
-        {error && (
-          <div className="text-center font-dm text-sm text-red-500">
-            {error}
-          </div>
-        )}
+        {message && <div className="text-center font-dm text-sm text-green-500">{message}</div>}
+        {error && <div className="text-center font-dm text-sm text-red-500">{error}</div>}
       </div>
 
       {/* Footer */}

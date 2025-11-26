@@ -3,10 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  NewPasswordValidator,
-  NewPasswordFormInputs,
-} from 'validators/auth.validator';
+import { NewPasswordValidator, NewPasswordFormInputs } from '@/validators/auth.validator';
 import {
   Form,
   FormControl,
@@ -14,10 +11,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from 'components/ui/form';
-import { PasswordInput } from 'components/ui/password-input';
-import { Button } from 'components/ui/button';
-import { Card } from 'components/ui/card';
+} from '@/components/ui/form';
+import { PasswordInput } from '@/components/ui/password-input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function NewPasswordPage() {
   const router = useRouter();
@@ -67,10 +64,7 @@ export default function NewPasswordPage() {
 
         {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="newPassword"

@@ -1,9 +1,7 @@
-import api from 'lib/api';
-import { ILoginResponse, ILoginRequest } from 'types/auth';
+import api from '@/lib/api';
+import { ILoginResponse, ILoginRequest } from '@/types/auth';
 
-export const login = async (
-  credentials: ILoginRequest,
-): Promise<ILoginResponse> => {
+export const login = async (credentials: ILoginRequest): Promise<ILoginResponse> => {
   try {
     const { data } = await api.post<ILoginResponse>('auth/login', credentials);
     return data;
@@ -24,9 +22,7 @@ export const login = async (
     }
 
     if (error.response?.status === 429) {
-      throw new Error(
-        'Terlalu banyak percobaan login. Silakan coba lagi nanti.',
-      );
+      throw new Error('Terlalu banyak percobaan login. Silakan coba lagi nanti.');
     }
 
     // Network errors
@@ -44,9 +40,6 @@ export const logout = async (): Promise<void> => {
     await api.post('auth/logout');
   } catch (error) {
     // Even if logout fails on server, we should still clear client state
-    console.warn(
-      'Logout request failed, but continuing with local cleanup:',
-      error,
-    );
+    console.warn('Logout request failed, but continuing with local cleanup:', error);
   }
 };

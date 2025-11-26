@@ -11,12 +11,9 @@ export default function UnauthorizedPage() {
       <div className="mb-4 text-red-500">
         <ShieldAlert className="h-16 w-16" />
       </div>
-      <h1 className="text-3xl font-bold text-navy-700 dark:text-white">
-        Akses Ditolak
-      </h1>
+      <h1 className="text-3xl font-bold text-navy-700 dark:text-white">Akses Ditolak</h1>
       <p className="mt-2 max-w-md text-base text-gray-600 dark:text-gray-400">
-        Maaf, Anda tidak memiliki izin yang diperlukan untuk mengakses halaman
-        ini.
+        Maaf, Anda tidak memiliki izin yang diperlukan untuk mengakses halaman ini.
       </p>
       <div className="mt-8 flex gap-4">
         <button

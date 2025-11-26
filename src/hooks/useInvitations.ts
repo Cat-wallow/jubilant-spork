@@ -5,8 +5,8 @@ import {
   acceptInvitation,
   rejectInvitation,
   verifyInvitationToken,
-} from 'services/invitation.service';
-import { ListInvitationsParams } from 'types/invitation';
+} from '@/services/invitation.service';
+import { ListInvitationsParams } from '@/types/invitation';
 
 /**
  * React Query Hooks for Invitation Management
@@ -35,13 +35,13 @@ export const useAcceptInvitation = () => {
     onSuccess: (data) => {
       // Invalidate invitations list
       queryClient.invalidateQueries({ queryKey: ['invitations'] });
-      
+
       // Invalidate user data (to refresh tenant list)
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      
+
       // Show success message (you can use toast here)
       console.log('✅ Invitation accepted:', data.message);
-      
+
       // Optional: Redirect to dashboard or tenant page
       // router.push('/admin/default');
     },
@@ -63,7 +63,7 @@ export const useRejectInvitation = () => {
     onSuccess: (data) => {
       // Invalidate invitations list
       queryClient.invalidateQueries({ queryKey: ['invitations'] });
-      
+
       // Show success message
       console.log('✅ Invitation rejected:', data.message);
     },

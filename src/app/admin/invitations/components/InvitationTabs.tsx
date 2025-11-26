@@ -26,26 +26,20 @@ export default function InvitationTabs({ activeTab, onTabChange, counts }: Invit
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`
-              whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors
-              ${
-                activeTab === tab.key
-                  ? 'border-brand-500 text-brand-600 dark:text-brand-400'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-              }
-            `}
+            className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+              activeTab === tab.key
+                ? 'border-brand-500 text-brand-600 dark:text-brand-400'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            } `}
           >
             {tab.label}
             {tab.count > 0 && (
               <span
-                className={`
-                  ml-2 rounded-full px-2.5 py-0.5 text-xs font-medium
-                  ${
-                    activeTab === tab.key
-                      ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400'
-                      : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-                  }
-                `}
+                className={`ml-2 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  activeTab === tab.key
+                    ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                } `}
               >
                 {tab.count}
               </span>

@@ -7,7 +7,7 @@ import Nft6 from '/public/img/nfts/Nft6.png';
 import Image from 'next/image';
 
 import { FaEthereum } from 'react-icons/fa';
-import Card from 'components/card';
+import Card from '@/components/card';
 
 const HistoryCard = () => {
   const HistoryData = [
@@ -59,9 +59,7 @@ const HistoryCard = () => {
     <Card extra={'mt-3 !z-5 overflow-hidden'}>
       {/* HistoryCard Header */}
       <div className="flex items-center justify-between rounded-t-3xl p-3">
-        <div className="text-lg font-bold text-navy-700 dark:text-white">
-          History
-        </div>
+        <div className="text-lg font-bold text-navy-700 dark:text-white">History</div>
         <button className="linear rounded-[20px] bg-lightPrimary px-4 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20">
           See all
         </button>
@@ -85,14 +83,8 @@ const HistoryCard = () => {
               />
             </div>
             <div className="flex flex-col">
-              <h5 className="text-base font-bold text-navy-700 dark:text-white">
-                {' '}
-                {data.title}
-              </h5>
-              <p className="mt-1 text-sm font-normal text-gray-600">
-                {' '}
-                {data.owner}{' '}
-              </p>
+              <h5 className="text-base font-bold text-navy-700 dark:text-white"> {data.title}</h5>
+              <p className="mt-1 text-sm font-normal text-gray-600"> {data.owner} </p>
             </div>
           </div>
 
