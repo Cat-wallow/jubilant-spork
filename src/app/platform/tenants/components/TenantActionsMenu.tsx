@@ -52,12 +52,10 @@ export function TenantActionsMenu({ tenant }: TenantActionsMenuProps) {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
-            <MoreVertical className="h-4 w-4" />
+            <MoreVertical className=" h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+        <DropdownMenuContent  align="center">
           <DropdownMenuItem onSelect={() => router.push(`/platform/tenants/${tenant.id}/edit`)}>
             <Edit className="mr-2 h-4 w-4" />
             Edit Tenant

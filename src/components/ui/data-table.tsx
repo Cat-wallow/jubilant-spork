@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody >
             {isLoading ? (
               Array.from({
                 length: table.getState().pagination.pageSize,

@@ -9,7 +9,7 @@ export default function TenantDetailPage() {
   const tenantId = params.id as string;
 
   return (
-    <RBAC requiredPermission="tenant:view" unauthorizedPage={true}>
+    <RBAC requiredPermission="tenant:read" unauthorizedPage={true}>
       <TenantDetailContent tenantId={tenantId} />
     </RBAC>
   );
