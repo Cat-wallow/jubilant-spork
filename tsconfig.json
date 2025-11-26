@@ -2,7 +2,7 @@
   "compilerOptions": {
     "typeRoots": ["node_modules/@types", "src/types"],
     "target": "es2016",
-    "lib": ["dom", "dom.iterable", "esnext", "es2015.iterable"],
+    "lib": ["dom", "dom.iterable", "esnext", "es2020"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -19,10 +19,9 @@
     "noImplicitThis": true,
     "strictNullChecks": false,
     "downlevelIteration": true,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@/public/*": ["./src/assets/public/*"],
-      "@/components/*": ["./src/components/*"]
+      "@/*": ["./src/*"]
     },
     "incremental": true,
     "plugins": [

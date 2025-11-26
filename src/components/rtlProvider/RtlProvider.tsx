@@ -10,8 +10,7 @@ let options = {
   ltr: { key: 'css-en' },
 };
 export function RtlProvider({ children }: any) {
-  const dir =
-    isWindowAvailable() && document.documentElement.dir == 'ar' ? 'rtl' : 'ltr';
+  const dir = isWindowAvailable() && document.documentElement.dir == 'ar' ? 'rtl' : 'ltr';
   const cache = createCache(options[dir]);
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }

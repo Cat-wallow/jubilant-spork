@@ -1,15 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-MediumItalic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans/DMSans-BoldItalic.ttf') format('truetype');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 244 247 254; /* #F4F7FE */
-    --foreground: 11 20 55; /* #0B1437 */
+    --background: 222, 83.33%, 97.65%;
+    --foreground: 0 0% 3.6%;
 
     --card: 255 255 255; /* #FFF */
     --card-foreground: 43 54 116; /* #2B3674 */
@@ -17,64 +61,53 @@
     --popover: 255 255 255; /* #FFF */
     --popover-foreground: 43 54 116; /* #2B3674 */
 
-    --primary: 51 38 135; /* #332687 - Brand color */
-    --primary-foreground: 255 255 255; /* #FFF */
+    --muted: 222, 83.33%, 97.65%, 1;
+    --muted-foreground: 0 0% 45.1%;
 
-    --secondary: 244 247 254; /* #F4F7FE */
-    --secondary-foreground: 43 54 116; /* #2B3674 */
+    --accent: 248, 56%, 34%;
+    --accent-foreground: 210 40% 98%;
 
     --muted: 244 247 254; /* #F4F7FE */
     --muted-foreground: 163 174 208; /* #A3AED0 */
 
-    --accent: 244 247 254; /* #F4F7FE */
-    --accent-foreground: 43 54 116; /* #2B3674 */
-
-    --destructive: 191 106 2; /* #BF6A02 - Delete button */
-    --destructive-foreground: 255 255 255; /* #FFF */
-
-    --border: 217 217 217; /* #D9D9D9 */
-    --input: 217 217 217; /* #D9D9D9 */
-    --ring: 51 38 135; /* #332687 - Brand color */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 248, 56%, 34%;
 
     --radius: 0.5rem;
 
-    /* Custom colors from Figma */
-    --brand: 51 38 135; /* #332687 */
-    --brand-hover: 44 31 118; /* Darker shade */
-    --secondary-grey: 163 174 208; /* #A3AED0 */
-    --button-primary: 0 136 255; /* #08F */
-    --status-active: 207 247 211; /* rgba(207, 247, 211, 1) */
-    --status-inactive: 255 241 194; /* rgba(255, 241, 194, 1) */
-    --role-badge: 103 80 164; /* #6750A4 with opacity */
-    --text-primary: 64 64 64; /* #404040 */
-    --text-secondary: 112 126 174; /* #707EAE */
-    --separator: 233 237 247; /* #E9EDF7 */
+    --primary: 248, 56%, 34%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
   }
 
   .dark {
-    --background: 11 20 55; /* #0B1437 */
-    --foreground: 255 255 255; /* #FFF */
+    --background: 227.73, 66.67%, 12.94%;
+    --foreground: 210 40% 98%;
 
-    --card: 27 37 75; /* #1B254B */
-    --card-foreground: 255 255 255; /* #FFF */
+    --card: 227.06, 60%, 16.67%;
+    --card-foreground: 210 40% 98%;
 
     --popover: 27 37 75; /* #1B254B */
     --popover-foreground: 255 255 255; /* #FFF */
 
-    --primary: 51 38 135; /* #332687 */
-    --primary-foreground: 255 255 255; /* #FFF */
+    --muted: 227.5, 47.06%, 20%;
+    --muted-foreground: 217.9 32.6% 55.7%;
 
-    --secondary: 27 37 75; /* #1B254B */
-    --secondary-foreground: 255 255 255; /* #FFF */
+    --accent: 244.92, 50.83%, 52.94%;
+    --accent-foreground: 210 40% 98%;
 
     --muted: 27 37 75; /* #1B254B */
     --muted-foreground: 163 174 208; /* #A3AED0 */
 
-    --accent: 27 37 75; /* #1B254B */
-    --accent-foreground: 255 255 255; /* #FFF */
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 244.92, 50.83%, 52.94%;
 
-    --destructive: 239 68 68; /* #EF4444 */
-    --destructive-foreground: 255 255 255; /* #FFF */
+    --primary: 244.92, 50.83%, 52.94%;
+    --primary-foreground: 210 40% 98%;
 
     --border: 45 57 107; /* #2D396B */
     --input: 45 57 107; /* #2D396B */
@@ -115,16 +148,27 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif, 'Inter',
-    'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-    'Droid Sans', 'Source Sans Pro';
+  font-family:
+    'DM Sans',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif,
+    'Inter',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Source Sans Pro';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .scrollbar-hide {

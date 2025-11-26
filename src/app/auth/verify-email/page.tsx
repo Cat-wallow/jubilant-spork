@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { forgotPassword } from 'lib/api';
-import { Button } from 'components/ui/button';
-import { Card } from 'components/ui/card';
+import { forgotPassword } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -39,8 +39,8 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-white px-4 py-8 dark:bg-navy-900">
-      <Card className="flex w-full max-w-[450px] flex-col items-center justify-center gap-5 rounded-[20px] p-6 sm:p-[50px]">
+    <div className="flex min-h-screen w-full items-center justify-center px-4 py-8">
+      <Card className="flex w-full max-w-[450px] flex-col items-center justify-center gap-5 rounded-[20px] p-6 shadow-xl sm:p-[50px]">
         {/* Mail Icon */}
         <svg
           className="h-[72px] w-[72px]"
@@ -72,9 +72,8 @@ export default function VerifyEmailPage() {
         {/* Instructions Box */}
         <div className="w-full rounded-[15px] border border-gray-300 p-[15px] dark:border-white/30">
           <p className="text-sm font-normal leading-[150%] text-gray-600 dark:text-gray-400">
-            Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata
-            sandi. Jika tidak menerima email dalam 60 detik, kirim ulang email
-            verifikasi.
+            Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata sandi. Jika tidak
+            menerima email dalam 60 detik, kirim ulang email verifikasi.
           </p>
         </div>
 
@@ -88,17 +87,15 @@ export default function VerifyEmailPage() {
           {isResending
             ? 'Mengirim ulang...'
             : countdown > 0
-            ? `Kirim ulang (${countdown}s)`
-            : 'Kirim ulang'}
+              ? `Kirim ulang (${countdown}s)`
+              : 'Kirim ulang'}
         </Button>
 
         {/* Resend Message */}
         {resendMessage && (
           <p
             className={`text-center text-sm ${
-              resendMessage.includes('berhasil')
-                ? 'text-green-500'
-                : 'text-red-500'
+              resendMessage.includes('berhasil') ? 'text-green-500' : 'text-red-500'
             }`}
           >
             {resendMessage}

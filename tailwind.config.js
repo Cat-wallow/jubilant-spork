@@ -9,11 +9,34 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    container: {
-      center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1400px',
+    screens: {
+      sm: '576px',
+      'sm-max': {
+        max: '576px',
+      },
+      md: '768px',
+      'md-max': {
+        max: '768px',
+      },
+      lg: '992px',
+      'lg-max': {
+        max: '992px',
+      },
+      xl: '1200px',
+      'xl-max': {
+        max: '1200px',
+      },
+      '2xl': '1320px',
+      '2xl-max': {
+        max: '1320px',
+      },
+      '3xl': '1600px',
+      '3xl-max': {
+        max: '1600px',
+      },
+      '4xl': '1850px',
+      '4xl-max': {
+        max: '1850px',
       },
     },
     extend: {
@@ -180,16 +203,6 @@ module.exports = {
         '3xl': '14px 17px 40px 4px',
         inset: 'inset 0px 18px 22px',
         darkinset: '0px 4px 4px inset',
-      },
-      backgroundImage: {
-        ballanceDashboard: "url('/src//public/img/dashboards/balanceImg.png')",
-        ellispisModeCarInterface:
-          "url('https://i.ibb.co/Y3nrFfd/elipse-light.png')",
-        ellispisModeCarInterfaceDark:
-          "url('https://i.ibb.co/g66yJnm/Ellipse-94.png')",
-        homeButton:
-          'linear-gradient(112.83deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0) 110.84%)',
-        smartHomeDropzone: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='13' ry='13' stroke='%23E0E5F2FF' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='5' stroke-linecap='square'/%3e%3c/svg%3e")`,
       },
       colors: {
         white: '#ffffff',
@@ -364,22 +377,18 @@ module.exports = {
           800: '#9d174d',
           900: '#831843',
         },
-        background: {
-          DEFAULT: 'hsl(var(--background))',
-          100: 'rgb(244 247 254)',
-          900: '#070f2e',
-        },
+        background: 'hsl(var(--background))',
         brand: {
-          "50": "#E7E4F7",
-          "100": "#C7C0EF",
-          "200": "#A399E3",
-          "300": "#7C72D6",
-          "400": "#544AC4",
-          "500": "#332687",
-          "600": "#2C1F76",
-          "700": "#241963",
-          "800": "#1A124F",
-          "900": "#120C3D"
+          50: '#E7E4F7',
+          100: '#C7C0EF',
+          200: '#A399E3',
+          300: '#7C72D6',
+          400: '#544AC4',
+          500: '#332687',
+          600: '#2C1F76',
+          700: '#241963',
+          800: '#1A124F',
+          900: '#120C3D',
         },
         horizonGreen: {
           50: '#E1FFF4',
@@ -493,6 +502,13 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        chart: {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -501,12 +517,20 @@ module.exports = {
       },
       keyframes: {
         'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
         },
         'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
         },
       },
       orange: {

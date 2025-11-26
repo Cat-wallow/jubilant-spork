@@ -2,19 +2,17 @@ import { MdModeEditOutline } from 'react-icons/md';
 import image1 from '/public/img/profile/image1.png';
 import image2 from '/public/img/profile/image2.png';
 import image3 from '/public/img/profile/image3.png';
-import Card from 'components/card';
+import Card from '@/components/card';
 import Image from 'next/image';
 
 const Project = () => {
   return (
     <Card extra={'w-full p-4 h-full'}>
       <div className="mb-8 w-full">
-        <p className="text-xl font-bold text-navy-700 dark:text-white">
-          All projects
-        </p>
+        <p className="text-xl font-bold text-navy-700 dark:text-white">All projects</p>
         <p className="mt-2 text-base text-gray-600">
-          Here you can find more details about your projects. Keep you user
-          engaged by providing meaningful information.
+          Here you can find more details about your projects. Keep you user engaged by providing
+          meaningful information.
         </p>
       </div>
       {/* Project 1 */}

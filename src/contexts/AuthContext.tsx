@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import api from 'lib/api';
+import api from '@/lib/api';
 import {
   ILoginRequest,
   ILoginResponse,
@@ -12,13 +12,14 @@ import {
   IRole,
   IUserTenant,
   ISwitchTenantRequest,
-} from 'types/auth';
-import { switchTenant as switchTenantService } from 'services/tenantService';
+} from '@/types/auth';
+import { switchTenant as switchTenantService } from '@/services/tenantService';
+import { setTokens, clearTokens, getRefreshToken } from '@/lib/tokenManager';
 
 interface IAuthContext {
   // Core user data
   user: IUser | null;
-  tenant: ITenant | null;
+  tenant?: ITenant | null;
   currentRole: IRole | null;
   availableTenants: IUserTenant[];
   permissions: string[];
@@ -29,50 +30,28 @@ interface IAuthContext {
 
   // Actions
   login: (credentials: ILoginRequest) => void;
+  loginIsPending: boolean;
+  loginError: Error | null;
   logout: () => void;
   switchTenant: (data: ISwitchTenantRequest) => void;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
-// Function to fetch the current session information
+// Function to fetch the current session information.
+// Token refresh is now handled by the axios interceptor in @/lib/api.
 const getMe = async (): Promise<ILoginResponse> => {
-  try {
-    // First, try to get the user session
-    const { data } = await api.get('auth/me');
-    return data as ILoginResponse;
-  } catch (error: any) {
-    // If it fails with 401, it might be an expired access token
-    if (error.response?.status === 401) {
-      try {
-        // Attempt to refresh the token
-        await api.get('auth/refresh-token');
-
-        // If refresh is successful, retry getting the user session
-        const { data } = await api.get('auth/me');
-        return data as ILoginResponse;
-      } catch (refreshError) {
-        // If refreshing fails, then the session is truly invalid
-        console.error('Session refresh failed, redirecting to login.');
-        throw refreshError;
-      }
-    }
-    // For other errors, just re-throw
-    throw error;
-  }
+  const { data } = await api.get('auth/me');
+  return data as ILoginResponse;
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Check if we're on auth pages to prevent unnecessary session checks
   const isOnAuthPage =
-    typeof window !== 'undefined' &&
-    (window.location.pathname.includes('/auth/') ||
-      window.location.pathname === '/auth');
+    typeof window !== 'undefined' && window.location.pathname.startsWith('/auth');
 
-  // Use a query to fetch the session, this will act as our session check
   const {
     data: sessionResponse,
     isLoading,
@@ -80,38 +59,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   } = useQuery<ILoginResponse>({
     queryKey: ['session'],
     queryFn: getMe,
-    retry: (failureCount, error: any) => {
-      // Don't retry on 401 (will be handled by interceptor) or 403
-      if (error?.response?.status === 401 || error?.response?.status === 403) {
-        return false;
-      }
-      // Retry up to 2 times for other errors with exponential backoff
-      return failureCount < 2;
-    },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    refetchOnWindowFocus: true, // Refetch when user comes back to the window
-    refetchOnReconnect: true, // Refetch when internet reconnects
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     enabled: typeof window !== 'undefined' && !isOnAuthPage,
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: ILoginRequest) => {
+      // Clear any leftover tokens before attempting a new login
+      clearTokens();
       queryClient.setQueryData(['session'], null);
       const { data } = await api.post('auth/login', credentials);
-      return data as ILoginResponse;
+      return {
+        response: data as ILoginResponse,
+        rememberMe: credentials.rememberMe,
+      };
     },
-    onSuccess: (response) => {
-      // Store the entire session response in the query cache
+    onSuccess: ({ response, rememberMe }) => {
+      const { accessToken, refreshToken } = response.data;
+
+      // If tokens are in the response body, it's a session-only login
+      if (accessToken) {
+        setTokens(accessToken, refreshToken, rememberMe ?? false);
+      }
+
       queryClient.setQueryData(['session'], response);
       queryClient.invalidateQueries({ queryKey: ['session'] });
 
-      // Redirect user based on the path provided by the backend
-      const redirectPath = response.data?.redirectTo || '/admin/default';
+      const redirectPath = response.data?.redirectTo;
       router.push(redirectPath);
     },
     onError: (error) => {
       console.error('Login failed:', error);
+      clearTokens();
       queryClient.setQueryData(['session'], null);
     },
   });
@@ -119,52 +101,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const switchTenantMutation = useMutation({
     mutationFn: (data: ISwitchTenantRequest) => switchTenantService(data),
     onSuccess: (response) => {
-      // Update the session data in the cache with new tenant context
       queryClient.setQueryData(['session'], response);
-
-      // Refresh the page to reload all data with new tenant context
       window.location.reload();
     },
     onError: (error) => {
       console.error('Tenant switch failed:', error);
-      // Optionally show error toast/notification here
     },
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => api.post('auth/logout'),
+    mutationFn: () => {
+      const refreshToken = getRefreshToken();
+      return api.post('auth/logout', { refreshToken });
+    },
     onSuccess: () => {
-      queryClient.clear();
-      queryClient.setQueryData(['session'], null);
+      clearTokens();
+      queryClient.clear(); // Clear all queries
       router.push('/auth/sign-in');
     },
     onError: () => {
+      // Still clear everything on the client-side even if backend logout fails
+      clearTokens();
       queryClient.clear();
-      queryClient.setQueryData(['session'], null);
       router.push('/auth/sign-in');
     },
   });
 
-  // Extract data from the session response
   const sessionData = sessionResponse?.data;
   const isAuthenticated = !!sessionData && !isError;
 
   return (
     <AuthContext.Provider
       value={{
-        // Core data
         user: sessionData?.user || null,
         tenant: sessionData?.tenant || null,
         currentRole: sessionData?.role || null,
         availableTenants: sessionData?.availableTenants || [],
         permissions: sessionData?.permissions || [],
-
-        // Auth state
         isAuthenticated,
         isLoading,
-
-        // Actions
         login: loginMutation.mutate,
+        loginIsPending: loginMutation.isPending,
+        loginError: loginMutation.error,
         logout: logoutMutation.mutate,
         switchTenant: switchTenantMutation.mutate,
       }}

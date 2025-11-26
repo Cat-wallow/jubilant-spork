@@ -1,32 +1,27 @@
 import React from 'react';
-import Dropdown from 'components/dropdown';
+import Dropdown from '@/components/dropdown';
 import { FiAlignJustify } from 'react-icons/fi';
-import NavLink from 'components/link/NavLink';
+import NavLink from '@/components/link/NavLink';
 import navbarimage from '/public/img/layout/Navbar.png';
 import { BsArrowBarUp } from 'react-icons/bs';
 import { FiSearch } from 'react-icons/fi';
 import { RiMoonFill, RiSunFill } from 'react-icons/ri';
 import Image from 'next/image';
-import {
-  IoMdNotificationsOutline,
-  IoMdInformationCircleOutline,
-} from 'react-icons/io';
+import { IoMdNotificationsOutline, IoMdInformationCircleOutline } from 'react-icons/io';
 import avatar from '/public/img/avatars/avatar4.png';
 
 const Navbar = (props: { brandText: string; [x: string]: any }) => {
   const { onOpenSidenav, brandText, mini, hovered } = props;
-  const [darkmode, setDarkmode] = React.useState(
-    document.body.classList.contains('dark'),
-  );
+  const [darkmode, setDarkmode] = React.useState(document.body.classList.contains('dark'));
   return (
     <nav
       className={`duration-175 linear fixed left-3 top-3 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/30 transition-all ${
         mini === false
           ? 'w-[calc(100vw_-_6%)] md:w-[calc(100vw_-_8%)] lg:w-[calc(100vw_-_6%)] xl:w-[calc(100vw_-_350px)] 2xl:w-[calc(100vw_-_365px)]'
           : mini === true && hovered === true
-          ? 'w-[calc(100vw_-_6%)] md:w-[calc(100vw_-_8%)] lg:w-[calc(100vw_-_6%)] xl:w-[calc(100vw_-_350px)] 2xl:w-[calc(100vw_-_365px)]'
-          : 'w-[calc(100vw_-_6%)] md:w-[calc(100vw_-_8%)] lg:w-[calc(100vw_-_6%)] xl:w-[calc(100vw_-_180px)] 2xl:w-[calc(100vw_-_195px)]'
-      }  p-2 backdrop-blur-xl dark:bg-[#0b14374d] md:left-[30px] md:top-4 xl:top-[20px]`}
+            ? 'w-[calc(100vw_-_6%)] md:w-[calc(100vw_-_8%)] lg:w-[calc(100vw_-_6%)] xl:w-[calc(100vw_-_350px)] 2xl:w-[calc(100vw_-_365px)]'
+            : 'w-[calc(100vw_-_6%)] md:w-[calc(100vw_-_8%)] lg:w-[calc(100vw_-_6%)] xl:w-[calc(100vw_-_180px)] 2xl:w-[calc(100vw_-_195px)]'
+      } p-2 backdrop-blur-xl dark:bg-[#0b14374d] md:left-[30px] md:top-4 xl:top-[20px]`}
     >
       <div className="ml-[6px]">
         <div className="h-6 w-[224px] pt-1">
@@ -69,7 +64,7 @@ const Navbar = (props: { brandText: string; [x: string]: any }) => {
           />
         </div>
         <span
-          className="flex cursor-pointer text-xl text-gray-600 dark:text-white xl:hidden "
+          className="flex cursor-pointer text-xl text-gray-600 dark:text-white xl:hidden"
           onClick={onOpenSidenav}
         >
           <FiAlignJustify className="h-5 w-5" />
@@ -86,12 +81,8 @@ const Navbar = (props: { brandText: string; [x: string]: any }) => {
         >
           <div className="flex w-[360px] flex-col gap-3 rounded-[20px] bg-white p-4 shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none sm:w-[460px]">
             <div className="flex items-center justify-between">
-              <p className="text-base font-bold text-navy-700 dark:text-white">
-                Notification
-              </p>
-              <p className="text-sm font-bold text-navy-700 dark:text-white">
-                Mark all read
-              </p>
+              <p className="text-base font-bold text-navy-700 dark:text-white">Notification</p>
+              <p className="text-sm font-bold text-navy-700 dark:text-white">Mark all read</p>
             </div>
 
             <button className="flex w-full items-center">
@@ -159,7 +150,7 @@ const Navbar = (props: { brandText: string; [x: string]: any }) => {
             <a
               target="blank"
               href="https://horizon-ui.com/?ref=live-pro-tailwind-react"
-              className="px-full linear hover:bg-black flex cursor-pointer items-center justify-center rounded-xl py-[11px] font-bold text-navy-700 transition duration-200 hover:text-navy-700 dark:text-white dark:hover:text-white"
+              className="px-full linear flex cursor-pointer items-center justify-center rounded-xl py-[11px] font-bold text-navy-700 transition duration-200 hover:bg-black hover:text-navy-700 dark:text-white dark:hover:text-white"
             >
               Try Horizon Free
             </a>
@@ -204,13 +195,10 @@ const Navbar = (props: { brandText: string; [x: string]: any }) => {
                 </p>{' '}
               </div>
             </div>
-            <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20 " />
+            <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20" />
 
             <div className="ml-4 mt-3 flex flex-col">
-              <a
-                href=" "
-                className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
-              >
+              <a href=" " className="text-sm text-gray-800 dark:text-white hover:dark:text-white">
                 Profile Settings
               </a>
               <a
@@ -219,10 +207,7 @@ const Navbar = (props: { brandText: string; [x: string]: any }) => {
               >
                 Newsletter Settings
               </a>
-              <a
-                href=" "
-                className="mt-3 text-sm font-medium text-red-500 hover:text-red-500"
-              >
+              <a href=" " className="mt-3 text-sm font-medium text-red-500 hover:text-red-500">
                 Log Out
               </a>
             </div>

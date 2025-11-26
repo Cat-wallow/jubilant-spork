@@ -1,66 +1,54 @@
-import { Card } from 'components/ui/card';
-import { Input } from 'components/ui/input';
-import { Label } from 'components/ui/label';
-import { Button } from 'components/ui/button';
-import { Upload } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { useFormContext } from 'react-hook-form';
+import { FileUploader } from '@/components/shared/FileUploader';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 interface BrandingSectionProps {
-  formData: any;
-  updateFormData: (updates: any) => void;
+    existingLogoUrl?: string | null;
+    onRemoveLogo?: () => void;
 }
 
-export default function BrandingSection({
-  formData,
-  updateFormData,
-}: BrandingSectionProps) {
+export default function BrandingSection({ existingLogoUrl, onRemoveLogo }: BrandingSectionProps) {
+  const { control } = useFormContext(); // Use context
+
   return (
     <Card className="p-6">
       <h2 className="mb-6 text-xl font-semibold">Branding</h2>
-
       <div className="space-y-4">
-        {/* Logo Upload */}
-        <div className="space-y-2">
-          <Label>Logo Perusahaan</Label>
-          <Button variant="outline" className="w-full justify-start gap-2">
-            <Upload className="h-4 w-4" />
-            Upload Logo Perusahaan
-          </Button>
-        </div>
-
-        {/* Color Pickers */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Primary Color */}
-          <div className="space-y-2">
-            <Label>Warna Primer</Label>
-            <div className="flex gap-2">
-              <div className="h-10 w-10 rounded-lg bg-gray-300" />
-              <Input
-                type="text"
-                value={formData.primaryColor}
-                onChange={(e) =>
-                  updateFormData({ primaryColor: e.target.value })
-                }
-                placeholder="#qw123d"
-              />
-            </div>
-          </div>
-
-          {/* Secondary Color */}
-          <div className="space-y-2">
-            <Label>Warna Sekunder</Label>
-            <div className="flex gap-2">
-              <div className="h-10 w-10 rounded-lg bg-purple-600" />
-              <Input
-                type="text"
-                value={formData.secondaryColor}
-                onChange={(e) =>
-                  updateFormData({ secondaryColor: e.target.value })
-                }
-                placeholder="#6E3DB7"
-              />
-            </div>
-          </div>
-        </div>
+        <FormField
+          control={control}
+          name="logo"
+          render={({ field: { value, onChange } }) => (
+            <FormItem>
+              <FormLabel>Logo Perusahaan</FormLabel>
+              <FormControl>
+                <FileUploader
+                  value={value ? [value] : null}
+                  onValueChange={(files) => onChange(files ? files[0] : null)}
+                  existingFileUrl={existingLogoUrl}
+                  onRemoveExisting={onRemoveLogo}
+                  dropzoneOptions={{
+                    accept: {
+                      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'],
+                    },
+                    multiple: false,
+                  }}
+                  texts={{
+                    title: 'Drag & drop logo here, or click to select file',
+                    fileTypes: 'JPG, PNG, GIF, WEBP, SVG up to 5MB',
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </Card>
   );

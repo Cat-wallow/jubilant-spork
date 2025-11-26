@@ -1,16 +1,16 @@
 'use client';
 
-import { useAuth } from 'contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import UnauthorizedPage from 'components/auth/UnauthorizedPage';
+import UnauthorizedPage from '@/components/auth/UnauthorizedPage';
 
 interface RBACProps {
   /**
-   * The permission string required to render the children.
+   * The permission string or an array of permission strings required to render the children.
    * If not provided, the component will only check for authentication.
    */
-  requiredPermission?: string;
+  requiredPermission?: string | string[];
   /**
    * The role(s) required to render the children.
    * Can be a single role string or an array of roles.
@@ -45,7 +45,9 @@ const RBAC: React.FC<RBACProps> = ({
 
   // Check permission
   const hasPermission = requiredPermission
-    ? permissions.includes(requiredPermission)
+    ? Array.isArray(requiredPermission)
+      ? requiredPermission.some((perm) => permissions.includes(perm))
+      : permissions.includes(requiredPermission)
     : true;
 
   // Check role
@@ -72,14 +74,7 @@ const RBAC: React.FC<RBACProps> = ({
     if (!hasAccess && redirect && !unauthorizedPage) {
       router.back();
     }
-  }, [
-    isLoading,
-    isAuthenticated,
-    hasAccess,
-    redirect,
-    unauthorizedPage,
-    router,
-  ]);
+  }, [isLoading, isAuthenticated, hasAccess, redirect, unauthorizedPage, router]);
 
   // While loading authentication state, don't render anything to prevent flashes
   if (isLoading) {

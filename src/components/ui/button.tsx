@@ -1,21 +1,20 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from 'src/lib/utils';
+import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-[#0088FF] text-white shadow hover:bg-[#0088FF]/90',
-        destructive:
-          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-        outline:
-          'border border-[#D9D9D9] bg-white shadow-sm hover:bg-[#F4F7FE] hover:text-accent-foreground',
-        secondary:
-          'bg-[#F4F7FE] text-[#2B3674] shadow-sm hover:bg-[#F4F7FE]/80',
-        ghost: 'hover:bg-[#F4F7FE] hover:text-accent-foreground',
+        default: 'bg-primary  text-primary-foreground hover:bg-[#241963]',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border border-input bg-transparent hover:bg-muted ',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        third: 'bg-card border border-input hover:bg-muted ',
+        ghost: 'hover:bg-accent  hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        transparent: 'bg-transparent ',
       },
       size: {
         default: 'h-12 px-6 py-3',
@@ -40,11 +39,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, ...props }, ref) => {
     return (
-      <button
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
+      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
     );
   },
 );

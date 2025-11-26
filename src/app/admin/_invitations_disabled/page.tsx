@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useInvitations, useInvitationCounts, useVerifyInvitationToken } from 'hooks/useInvitations';
+import {
+  useInvitations,
+  useInvitationCounts,
+  useVerifyInvitationToken,
+} from '@/hooks/useInvitations';
 import InvitationCard from './components/InvitationCard';
 import InvitationTabs from './components/InvitationTabs';
-import { InvitationStatus } from 'types/invitation';
+import { InvitationStatus } from '@/types/invitation';
 
 export default function InvitationsPage() {
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams?.get('token');
-  
+
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -39,7 +43,7 @@ export default function InvitationsPage() {
     return (
       <div className="mt-3 flex h-full w-full items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-brand-500 mx-auto"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-brand-500"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading invitations...</p>
         </div>
       </div>
@@ -50,7 +54,7 @@ export default function InvitationsPage() {
     return (
       <div className="mt-3 flex h-full w-full items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">Failed to load invitations</p>
+          <p className="mb-4 text-red-500">Failed to load invitations</p>
           <button
             onClick={() => refetch()}
             className="rounded-lg bg-brand-500 px-4 py-2 text-white hover:bg-brand-600"
@@ -70,9 +74,7 @@ export default function InvitationsPage() {
     <div className="mt-3 h-full w-full">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-navy-700 dark:text-white">
-          
-        </h1>
+        <h1 className="text-3xl font-bold text-navy-700 dark:text-white"></h1>
         <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
           Kelola undangan untuk bergabung dengan tenant
         </p>
@@ -80,30 +82,31 @@ export default function InvitationsPage() {
 
       {/* Token Verification Alert */}
       {tokenFromUrl && tokenVerification && (
-        <div className={`mb-6 rounded-lg p-4 ${
-          tokenVerification.valid 
-            ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800' 
-            : 'bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800'
-        }`}>
-          <p className={`text-sm ${
-            tokenVerification.valid 
-              ? 'text-green-800 dark:text-green-200' 
-              : 'text-red-800 dark:text-red-200'
-          }`}>
-            {tokenVerification.valid 
-              ? '✅ Undangan valid! Silakan terima atau tolak undangan di bawah.' 
-              : `❌ ${tokenVerification.message || 'Token undangan tidak valid atau sudah kadaluarsa.'}`
-            }
+        <div
+          className={`mb-6 rounded-lg p-4 ${
+            tokenVerification.valid
+              ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+              : 'border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+          }`}
+        >
+          <p
+            className={`text-sm ${
+              tokenVerification.valid
+                ? 'text-green-800 dark:text-green-200'
+                : 'text-red-800 dark:text-red-200'
+            }`}
+          >
+            {tokenVerification.valid
+              ? '✅ Undangan valid! Silakan terima atau tolak undangan di bawah.'
+              : `❌ ${
+                  tokenVerification.message || 'Token undangan tidak valid atau sudah kadaluarsa.'
+                }`}
           </p>
         </div>
       )}
 
       {/* Tabs */}
-      <InvitationTabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        counts={tabCounts}
-      />
+      <InvitationTabs activeTab={activeTab} onTabChange={setActiveTab} counts={tabCounts} />
 
       {/* Invitations List */}
       <div className="mt-6">
@@ -128,10 +131,9 @@ export default function InvitationsPage() {
               Tidak ada undangan
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {activeTab === 'all' 
-                ? 'Anda belum memiliki undangan' 
-                : `Tidak ada undangan dengan status "${activeTab}"`
-              }
+              {activeTab === 'all'
+                ? 'Anda belum memiliki undangan'
+                : `Tidak ada undangan dengan status "${activeTab}"`}
             </p>
           </div>
         ) : (
@@ -151,20 +153,21 @@ export default function InvitationsPage() {
       {pagination && pagination.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, pagination.total)} of {pagination.total} invitations
+            Showing {(page - 1) * limit + 1} to {Math.min(page * limit, pagination.total)} of{' '}
+            {pagination.total} invitations
           </p>
           <div className="flex gap-2">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               Previous
             </button>
             <button
-              onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page === pagination.totalPages}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               Next
             </button>

@@ -1,11 +1,6 @@
 'use client';
 import NextLink, { LinkProps as NextLinkProps } from 'next/link';
-import {
-  CSSProperties,
-  ComponentProps,
-  PropsWithChildren,
-  useMemo,
-} from 'react';
+import { CSSProperties, ComponentProps, PropsWithChildren, useMemo } from 'react';
 
 export type NavLinkProps = NextLinkProps &
   PropsWithChildren & {

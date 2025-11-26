@@ -4,10 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forgotPassword } from '../../../lib/api';
-import {
-  ForgotPasswordValidator,
-  ForgotPasswordFormInputs,
-} from 'validators/auth.validator';
+import { ForgotPasswordValidator, ForgotPasswordFormInputs } from '@/validators/auth.validator';
 import {
   Form,
   FormControl,
@@ -15,10 +12,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from 'components/ui/form';
-import { Input } from 'components/ui/input';
-import { Button } from 'components/ui/button';
-import { Card } from 'components/ui/card';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -42,8 +39,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-white px-4 py-8 dark:bg-navy-900">
-      <Card className="w-full max-w-[450px] space-y-[30px] rounded-[20px] p-8 sm:p-[50px]">
+    <div className="flex min-h-screen w-full items-center justify-center bg-background px-4 py-8 dark:bg-navy-900">
+      <Card className="w-full max-w-[450px] space-y-[30px] rounded-[20px] p-8 shadow-xl sm:p-[50px]">
         {/* Lock Icon */}
         <div className="flex justify-center">
           <svg
@@ -67,17 +64,13 @@ export default function ForgotPasswordPage() {
             Lupa kata sandi?
           </h1>
           <p className="text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
-            Masukkan alamat email dan kami akan kirimkan link untuk mereset kata
-            sandi
+            Masukkan alamat email dan kami akan kirimkan link untuk mereset kata sandi
           </p>
         </div>
 
         {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
@@ -112,17 +105,16 @@ export default function ForgotPasswordPage() {
               disabled={form.formState.isSubmitting}
               className="h-[54px] w-full rounded-2xl text-sm font-bold leading-[100%] tracking-[-0.28px]"
             >
-              {form.formState.isSubmitting
-                ? 'Mengirim...'
-                : 'Kirim tautan reset'}
+              {form.formState.isSubmitting ? 'Mengirim...' : 'Kirim tautan reset'}
             </Button>
           </form>
         </Form>
 
         {/* Back to Login */}
-        <button
+        <Button
+          variant="link"
           onClick={() => router.push('/auth/sign-in')}
-          className="flex items-center justify-center gap-1 text-sm font-semibold leading-[22px] text-navy-700 transition-colors hover:text-brand-500 dark:text-gray-300 dark:hover:text-brand-400"
+          className="flex w-full items-center justify-center gap-1 text-center text-sm leading-[22px] text-navy-700 transition-colors hover:text-brand-500 hover:no-underline dark:text-gray-300 dark:hover:text-brand-400"
         >
           <svg
             className="h-4 w-4"
@@ -138,7 +130,7 @@ export default function ForgotPasswordPage() {
             />
           </svg>
           Kembali ke halaman masuk
-        </button>
+        </Button>
       </Card>
 
       {/* Footer */}
