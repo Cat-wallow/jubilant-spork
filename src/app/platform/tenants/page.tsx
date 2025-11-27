@@ -94,17 +94,6 @@ function TenantsPageContent() {
     manualFiltering: true,
   });
 
-  // Stats are mocked for now, as the API does not provide them yet.
-  const stats = {
-    totalClients: 29,
-    pkpClients: 25,
-    nonPkpClients: 2,
-    activeClients: 10,
-    totalProjects: 10,
-    complianceRate: 80,
-    complianceChange: 23,
-  };
-
   return (
     <div className="w-full space-y-6">
       {/* Header */}

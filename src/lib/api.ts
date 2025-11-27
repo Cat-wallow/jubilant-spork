@@ -14,7 +14,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
-    if (token) {
+    // URLs that should not receive the Authorization header
+    const skipAuthUrls = ['auth/login', 'auth/refresh-token'];
+    const shouldSkipAuth = skipAuthUrls.some((url) => config.url?.includes(url));
+
+    if (token && !shouldSkipAuth) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
@@ -28,7 +32,7 @@ let failedQueue: {
   reject: (reason?: any) => void;
 }[] = [];
 
-const processQueue = (error: any, token = null) => {
+const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -55,7 +59,7 @@ api.interceptors.response.use(
         })
           .then((token) => {
             originalRequest.headers['Authorization'] = 'Bearer ' + token;
-            return axios(originalRequest);
+            return api(originalRequest); // Use the 'api' instance for retries
           })
           .catch((err) => {
             return Promise.reject(err);
@@ -68,16 +72,11 @@ api.interceptors.response.use(
       const refreshToken = getRefreshToken();
       if (!refreshToken) {
         isRefreshing = false;
-        // No refresh token available, truly unauthenticated
         clearTokens();
         if (typeof window !== 'undefined') {
           window.location.href = '/auth/sign-in';
         }
-        toast.error(
-          error.response?.data?.message ||
-            error.message ||
-            'Sesi Anda telah berakhir. Silakan login kembali.',
-        );
+        toast.error('Sesi Anda telah berakhir. Silakan login kembali.');
         return Promise.reject(error);
       }
 
@@ -88,16 +87,17 @@ api.interceptors.response.use(
 
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = data.data;
 
-        // Check if the old refresh token was in localStorage to decide new storage
         const rememberMe =
           typeof window !== 'undefined' && !!window.localStorage.getItem('refreshToken');
         setTokens(newAccessToken, newRefreshToken, rememberMe);
 
+        api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        
         processQueue(null, newAccessToken);
 
         return api(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         processQueue(refreshError, null);
         clearTokens();
         if (typeof window !== 'undefined') {
@@ -105,7 +105,6 @@ api.interceptors.response.use(
         }
         toast.error(
           refreshError.response?.data?.message ||
-            refreshError.message ||
             'Gagal memperbarui sesi. Silakan login kembali.',
         );
         return Promise.reject(refreshError);
@@ -114,15 +113,12 @@ api.interceptors.response.use(
       }
     }
 
-    // For any other error, display a generic error toast if a specific message is not provided
-    if (error.response?.data?.message) {
+    // For other errors, you might want to handle them differently
+    // or just reject them.
+    if (error.response?.data?.message && error.response?.status !== 401) {
       toast.error(error.response.data.message);
-    } else if (error.message) {
-      toast.error(error.message);
-    } else {
-      toast.error('Terjadi kesalahan tidak terduga.');
     }
-
+    
     return Promise.reject(error);
   },
 );

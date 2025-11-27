@@ -47,29 +47,6 @@ export const metricsData = [
     bgColor: 'bg-green-50',
     iconColor: 'text-green-600',
   },
-  {
-    icon: '💾',
-    label: 'Storage Used',
-    value: '45.5',
-    unit: 'GB',
-    bgColor: 'bg-purple-50',
-    iconColor: 'text-purple-600',
-    progress: 45.5,
-  },
-  {
-    icon: '⚠️',
-    label: 'Errors (30d)',
-    value: '0',
-    bgColor: 'bg-yellow-50',
-    iconColor: 'text-yellow-600',
-  },
-  {
-    icon: '✓',
-    label: 'Uptime SLA',
-    value: '99.9%',
-    bgColor: 'bg-indigo-50',
-    iconColor: 'text-indigo-600',
-  },
 ];
 
 export const usageTrendData = [
@@ -221,5 +198,110 @@ export const projectsData = [
       date: '2025-09-20',
     },
     progress: 38.5,
+  },
+];
+
+export const systemsBillingData = {
+  currentPlan: 'Pro',
+  billingCycle: 'Monthly',
+  amount: 'Rp 2.500.000',
+  nextBillingDate: '15/4/2024',
+  paymentMethod: 'Bank Transfer',
+};
+
+export const systemsAuditTrailData = [
+  {
+    action: 'TENANT_CREATED',
+    performedBy: 'Platform Admin',
+    timestamp: '15/1/2024, 17.00.00',
+    severity: 'medium',
+  },
+  {
+    action: 'PLAN_CHANGED',
+    performedBy: 'Platform Admin',
+    timestamp: '15/2/2024, 21.30.00',
+    severity: 'medium',
+  },
+];
+
+export const systemsUsageData = {
+  users: {
+    active: 10,
+    limit: 25,
+    percentage: 40,
+  },
+  apiCalls: {
+    thisMonth: 8540,
+    limit: 50000,
+    percentage: 17.08,
+  },
+  storage: {
+    used: '45.5 GB',
+    limit: '100 GB',
+    percentage: 45.5,
+  },
+};
+
+export const systemsBrandingData = {
+  companyName: 'PT Konsultan Pajak Maju',
+  tagline: 'Solusi Pajak Terpercaya',
+  primaryColor: '#2563eb',
+  logo: null,
+};
+
+export const systemsIntegrationsData = [
+  {
+    name: 'Accurate Online',
+    category: 'ERP',
+    description: 'Sistem akuntansi terintegrasi untuk sinkronisasi data keuangan',
+    lastSync: '10/3/2024, 13.00.00',
+    status: 'connected',
+  },
+  {
+    name: 'ZAHIR Accounting',
+    category: 'Accounting',
+    description: 'Software akuntansi untuk manajemen laporan keuangan',
+    lastSync: '10/3/2024, 11.30.00',
+    status: 'connected',
+  },
+  {
+    name: 'Google Drive',
+    category: 'Storage',
+    description: 'Cloud storage untuk backup dokumen',
+    lastSync: null,
+    status: 'disconnected',
+  },
+];
+
+export const systemsAvailableIntegrationsData = [
+  {
+    name: 'SAP Business One',
+    category: 'ERP',
+    description: 'Enterprise resource planning integration',
+  },
+  {
+    name: 'Oracle NetSuite',
+    category: 'ERP',
+    description: 'Cloud-based business management suite',
+  },
+  {
+    name: 'Microsoft Dynamics',
+    category: 'CRM',
+    description: 'Customer relationship management',
+  },
+  {
+    name: 'Slack',
+    category: 'Communication',
+    description: 'Team collaboration and messaging',
+  },
+  {
+    name: 'Dropbox',
+    category: 'Storage',
+    description: 'Cloud file storage and sharing',
+  },
+  {
+    name: 'OneDrive',
+    category: 'Storage',
+    description: 'Microsoft cloud storage solution',
   },
 ];
