@@ -51,6 +51,7 @@ function EditTenantPageContent() {
 	const queryClient = useQueryClient();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [shouldRemoveLogo, setShouldRemoveLogo] = useState(false); // New state for logo removal
 
 	const { data: tenantData, isLoading: isLoadingTenant } =
 		useTenantById(tenantId);
@@ -73,6 +74,7 @@ function EditTenantPageContent() {
 				// PIC Data is not directly set here as it will be in a read-only section
 				// We'll need to fetch and display it separately in the PICSection
 			});
+			setShouldRemoveLogo(false); // Reset on new tenantData fetch
 		}
 	}, [tenantData, form]);
 
@@ -103,7 +105,12 @@ function EditTenantPageContent() {
 
 	const onSubmit = async (values: EditTenantFormValues) => {
 		setIsSubmitting(true);
-		let logoUrl: string | undefined = (tenantData as any)?.logo_url;
+		let logoUrl: string | undefined | null = tenantData?.logo_url;
+
+		// If user explicitly removed the logo and no new logo is selected
+		if (shouldRemoveLogo && !values.logo) {
+			logoUrl = null;
+		}
 
 		if (values.logo) {
 			toast.info("Mengunggah logo baru...");
@@ -122,7 +129,7 @@ function EditTenantPageContent() {
 		const tenantPayload: UpdateTenantPayload = {
 			name: values.tenantName,
 			slug: values.slugUrl,
-			logo_url: logoUrl,
+			logo_url: logoUrl, // Use the determined logoUrl
 			settings: {
 				companyName: values.companyName || undefined,
 				timezone: values.timezone,
@@ -191,7 +198,13 @@ function EditTenantPageContent() {
 						<div className="lg:col-span-2">
 							<BasicInfoSection />
 						</div>
-						<BrandingSection />
+						<BrandingSection
+              existingLogoUrl={tenantData?.logo_url}
+              onRemoveLogo={() => {
+                setShouldRemoveLogo(true);
+                form.setValue('logo', null); // Clear the form's file input
+              }}
+            />
 					</div>
 
 					<div className="grid gap-6 lg:grid-cols-3">

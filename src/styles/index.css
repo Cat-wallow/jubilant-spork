@@ -55,11 +55,11 @@
     --background: 222, 83.33%, 97.65%;
     --foreground: 0 0% 3.6%;
 
-    --card: 255 255 255; /* #FFF */
-    --card-foreground: 43 54 116; /* #2B3674 */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.6%;
 
-    --popover: 255 255 255; /* #FFF */
-    --popover-foreground: 43 54 116; /* #2B3674 */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.6%;
 
     --muted: 222, 83.33%, 97.65%, 1;
     --muted-foreground: 0 0% 45.1%;
@@ -67,8 +67,8 @@
     --accent: 248, 56%, 34%;
     --accent-foreground: 210 40% 98%;
 
-    --muted: 244 247 254; /* #F4F7FE */
-    --muted-foreground: 163 174 208; /* #A3AED0 */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
@@ -90,8 +90,8 @@
     --card: 227.06, 60%, 16.67%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 27 37 75; /* #1B254B */
-    --popover-foreground: 255 255 255; /* #FFF */
+    --popover: 217.2 32.6% 17.5%;
+    --popover-foreground: 210 40% 98%;
 
     --muted: 227.5, 47.06%, 20%;
     --muted-foreground: 217.9 32.6% 55.7%;
@@ -99,8 +99,8 @@
     --accent: 244.92, 50.83%, 52.94%;
     --accent-foreground: 210 40% 98%;
 
-    --muted: 27 37 75; /* #1B254B */
-    --muted-foreground: 163 174 208; /* #A3AED0 */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
@@ -109,24 +109,8 @@
     --primary: 244.92, 50.83%, 52.94%;
     --primary-foreground: 210 40% 98%;
 
-    --border: 45 57 107; /* #2D396B */
-    --input: 45 57 107; /* #2D396B */
-    --ring: 51 38 135; /* #332687 */
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    font-family: 'DM Sans', sans-serif !important;
-    font-feature-settings: 'kern' !important;
-    -webkit-font-smoothing: antialiased;
-    letter-spacing: -0.2px;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 217.2 32.6% 17.5%;
   }
 }
 

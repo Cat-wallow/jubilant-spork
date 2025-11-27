@@ -29,6 +29,7 @@ export default function BrandingSection({ existingLogoUrl, onRemoveLogo }: Brand
               <FormLabel>Logo Perusahaan</FormLabel>
               <FormControl>
                 <FileUploader
+                  aspectRatio={1}
                   value={value ? [value] : null}
                   onValueChange={(files) => onChange(files ? files[0] : null)}
                   existingFileUrl={existingLogoUrl}
@@ -42,6 +43,7 @@ export default function BrandingSection({ existingLogoUrl, onRemoveLogo }: Brand
                   texts={{
                     title: 'Drag & drop logo here, or click to select file',
                     fileTypes: 'JPG, PNG, GIF, WEBP, SVG up to 5MB',
+                    aspectRatioError: 'Logo must be square',
                   }}
                 />
               </FormControl>

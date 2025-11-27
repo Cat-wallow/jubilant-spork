@@ -2,101 +2,142 @@
 
 import { useCallback, useState, useEffect } from 'react';
 import { useDropzone, DropzoneOptions, FileRejection } from 'react-dropzone';
-import { Upload, File as FileIcon, X, CheckCircle, Image as ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
-
-// Define the props for the component
 interface FileUploaderProps {
   value: File[] | null;
   onValueChange: (files: File[] | null) => void;
   dropzoneOptions?: DropzoneOptions;
-  customValidator?: (file: File) => Promise<{ code: string; message: string } | null>;
   className?: string;
   disabled?: boolean;
   texts?: {
     title?: string;
     subtitle?: string;
     fileTypes?: string;
+    aspectRatioError?: string;
   };
   existingFileUrl?: string | null;
   onRemoveExisting?: () => void;
+  aspectRatio?: number; // e.g., 1 for 1:1, 16/9 for 16:9
 }
 
 export function FileUploader({
   value,
   onValueChange,
   dropzoneOptions,
-  customValidator,
   className,
   disabled,
   texts = {},
   existingFileUrl,
   onRemoveExisting,
+  aspectRatio,
 }: FileUploaderProps) {
   const [internalErrors, setInternalErrors] = useState<FileRejection[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const handleRemoveExisting = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    if(onRemoveExisting) {
-      onRemoveExisting();
+  const hasNewFile = value && value.length > 0;
+  const hasExistingFile = !!existingFileUrl;
+
+  // Effect to create or revoke preview URL for new files
+  useEffect(() => {
+    if (hasNewFile) {
+      const objectUrl = URL.createObjectURL(value[0]);
+      setPreviewUrl(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    } else if (hasExistingFile) {
+      setPreviewUrl(existingFileUrl);
+    } else {
+      setPreviewUrl(null);
     }
-  };
-
+  }, [value, existingFileUrl, hasNewFile, hasExistingFile]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      setInternalErrors([]); // Clear previous errors
-      
-      if (fileRejections.length > 0) {
-        setInternalErrors(fileRejections);
-        onValueChange(null);
-        return;
-      }
+      const allErrors: FileRejection[] = [...fileRejections];
+      let validFiles: File[] = [];
 
-      if (acceptedFiles.length > 0) {
-        if (customValidator) {
-          const validationResults = await Promise.all(acceptedFiles.map(customValidator));
-          const validationErrors = validationResults
-            .map((error, index) => (error ? { file: acceptedFiles[index], errors: [error] } : null))
-            .filter((e): e is FileRejection => e !== null);
+      if (aspectRatio && acceptedFiles.length > 0) {
+        for (const file of acceptedFiles) {
+          const error = await new Promise<{ code: string; message: string } | null>(
+            (resolve) => {
+              if (!file.type.startsWith('image/')) {
+                // This check is secondary; dropzone's `accept` option is primary
+                resolve(null);
+                return;
+              }
+              const objectUrl = URL.createObjectURL(file);
+              const img = new window.Image();
+              img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+                const actualRatio = img.width / img.height;
+                if (Math.abs(actualRatio - aspectRatio) > 0.01) {
+                  resolve({
+                    code: 'invalid-aspect-ratio',
+                    message:
+                      texts.aspectRatioError ||
+                      `Image aspect ratio must be ~${aspectRatio.toFixed(2)}`,
+                  });
+                } else {
+                  resolve(null);
+                }
+              };
+              img.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                resolve({
+                  code: 'image-load-error',
+                  message: 'Could not load image to validate.',
+                });
+              };
+              img.src = objectUrl;
+            },
+          );
 
-          if (validationErrors.length > 0) {
-            setInternalErrors(validationErrors);
-            onValueChange(null);
-            return;
+          if (error) {
+            allErrors.push({ file, errors: [error] });
+          } else {
+            validFiles.push(file);
           }
         }
-        onValueChange(acceptedFiles);
+      } else {
+        validFiles = acceptedFiles;
+      }
+
+      setInternalErrors(allErrors);
+
+      if (allErrors.length > 0) {
+        onValueChange(null);
+      } else {
+        onValueChange(validFiles);
       }
     },
-    [customValidator, onValueChange],
+    [aspectRatio, onValueChange, texts.aspectRatioError],
   );
+
+  const handleRemove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (hasNewFile) {
+      onValueChange(null);
+    } else if (hasExistingFile && onRemoveExisting) {
+      onRemoveExisting();
+    }
+    setPreviewUrl(null);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     ...dropzoneOptions,
     onDrop,
-    disabled,
+    disabled: !!previewUrl || disabled, // Disable dropzone when a file is being previewed
   });
 
-  // Synchronize react-hook-form's value with the component's display
   useEffect(() => {
-    if (value === null || (Array.isArray(value) && value.length === 0)) {
-      // If form value is cleared externally, clear errors too
+    if (value === null) {
       setInternalErrors([]);
     }
   }, [value]);
-
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  };
 
   const {
     title = 'Click to upload or drag and drop',
@@ -104,74 +145,56 @@ export function FileUploader({
     fileTypes = 'Any file',
   } = texts;
 
-  const hasNewFile = value && value.length > 0;
-  const showExistingFile = existingFileUrl && !hasNewFile;
-
-
   return (
     <div className="w-full">
       <div
         {...getRootProps()}
         className={cn(
-          'relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-colors',
-          isDragActive ? 'border-primary bg-accent' : 'border-border hover:border-primary/50',
+          'relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors',
+          isDragActive && !previewUrl ? 'border-primary bg-accent' : 'border-border',
           disabled && 'cursor-not-allowed opacity-50',
-          (hasNewFile || showExistingFile) && 'p-4', // Reduce padding when showing a file
+          !previewUrl && 'hover:border-primary/50',
+          previewUrl && 'border-solid p-0', // Adjust padding and border when showing preview
           className,
         )}
       >
         <input {...getInputProps()} />
 
-        {hasNewFile ? (
-          <div className="space-y-2 text-center">
-            <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-            {value.map((file) => (
-              <div key={file.name}>
-                <p className="font-medium">{file.name}</p>
-                <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="link"
-              size="sm"
-              className="text-destructive"
-              onClick={(e) => {
-                e.stopPropagation(); // prevent dropzone from opening
-                onValueChange(null);
-              }}
-              disabled={disabled}
-            >
-              Ganti file
-            </Button>
+        {previewUrl ? (
+          <div className="relative h-48 w-full">
+            <Image
+              src={previewUrl}
+              alt="Preview"
+              layout="fill"
+              objectFit="contain"
+              className="rounded-lg"
+            />
           </div>
-        ) : showExistingFile ? (
-             <div className="space-y-2 text-center">
-                <ImageIcon className="mx-auto h-12 w-12 text-gray-500" />
-                 <p className="font-medium">Logo saat ini:</p>
-                 <Image src={existingFileUrl} alt="Existing Logo" width={64} height={64} className="mx-auto rounded-md" />
-                 <Button
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    className="text-destructive"
-                    onClick={handleRemoveExisting}
-                    disabled={disabled}
-                >
-                    Hapus Logo
-                </Button>
-             </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 p-4">
             <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
             <div className="text-sm">
               <span className="font-semibold text-primary">{title}</span>
-              {subtitle && <span className="text-muted-foreground"> {subtitle}</span>}
+              {subtitle && (
+                <span className="text-muted-foreground"> {subtitle}</span>
+              )}
             </div>
             <p className="text-xs text-muted-foreground">{fileTypes}</p>
           </div>
         )}
       </div>
+
+      {previewUrl && !disabled && (
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="mt-2 text-destructive"
+          onClick={handleRemove}
+        >
+          Hapus
+        </Button>
+      )}
 
       {internalErrors.length > 0 && (
         <div className="mt-2 text-sm text-destructive">

@@ -47,29 +47,6 @@ export const metricsData = [
     bgColor: 'bg-green-50',
     iconColor: 'text-green-600',
   },
-  {
-    icon: '💾',
-    label: 'Storage Used',
-    value: '45.5',
-    unit: 'GB',
-    bgColor: 'bg-purple-50',
-    iconColor: 'text-purple-600',
-    progress: 45.5,
-  },
-  {
-    icon: '⚠️',
-    label: 'Errors (30d)',
-    value: '0',
-    bgColor: 'bg-yellow-50',
-    iconColor: 'text-yellow-600',
-  },
-  {
-    icon: '✓',
-    label: 'Uptime SLA',
-    value: '99.9%',
-    bgColor: 'bg-indigo-50',
-    iconColor: 'text-indigo-600',
-  },
 ];
 
 export const usageTrendData = [

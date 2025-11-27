@@ -9,6 +9,32 @@ export interface Tenant {
   storage_quota_gb: number;
   created_at: string;
   updated_at: string;
+  logo_url?: string;
+  settings: {
+    companyName?: string;
+    tagline?: string;
+    timezone?: string;
+    language?: string;
+    currency?: string;
+  };
+  pic: {
+    name: string;
+    email: string;
+  } | null;
+  stats: {
+    users: {
+      current: number;
+      total: number;
+    };
+    projects: {
+      current: number;
+      total: number;
+    };
+    storage: {
+      usedGb: number;
+      totalGb: number;
+    };
+  };
 }
 
 export interface PaginatedTenantsResponse {

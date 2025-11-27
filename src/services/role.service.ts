@@ -10,7 +10,7 @@ export interface Role {
 export const getTenantAssignableRoles = async (): Promise<Role[]> => {
   const response = await api.get('/api/v1/roles', {
     params: {
-      minLevel: 70,
+      permission: 'tenant:manage'
     },
   });
   return response.data.data;

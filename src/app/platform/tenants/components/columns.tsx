@@ -5,6 +5,7 @@ import { Tenant } from '@/types/tenant';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/DataTableColumnHeader';
 import { TenantActionsMenu } from './TenantActionsMenu';
+import Link from 'next/link';
 
 export const columns: ColumnDef<Tenant>[] = [
   {
@@ -29,6 +30,13 @@ export const columns: ColumnDef<Tenant>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tenant" />,
+    cell: ({ row }) => {
+      const name = row.getValue('name') as string;
+      const id = row.original.id as string;
+      return (
+        <Link className='capitalize' href={`/platform/tenants/${id}`} >{name}</Link>
+      );
+    }
   },
   {
     accessorKey: 'status',
