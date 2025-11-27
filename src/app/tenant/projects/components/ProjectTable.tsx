@@ -329,8 +329,7 @@ export default function ProjectTable({
                 </TableCell>
               </TableRow>
             ))}
-          </TableRow>
-          <TableBody>
+          </TableBody>
         </Table>
 
         {/* Pagination */}
