@@ -31,6 +31,7 @@ export interface ClientDetail extends Client {
   employee_count?: number;
   basic_capital?: number;
   paid_capital?: number;
+  industry?: string;
   business_type?: string;
   industry_sector?: string;
   service_package?: string;

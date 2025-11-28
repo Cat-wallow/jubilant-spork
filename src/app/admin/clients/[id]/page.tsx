@@ -3,6 +3,8 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient, useDeleteClient } from '@/hooks/useClients';
+import { useClientContacts } from '@/hooks/useClientContacts';
+import { useClientBranches } from '@/hooks/useClientBranches';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,6 +40,14 @@ export default function ClientDetailPage() {
   const deleteClientMutation = useDeleteClient();
 
   const { data: client, isLoading, error } = useClient(tenant.id, id);
+  const {
+    data: contacts,
+    isLoading: isContactsLoading,
+  } = useClientContacts(tenant.id, id);
+  const {
+    data: branches,
+    isLoading: isBranchesLoading,
+  } = useClientBranches(tenant.id, id);
 
   if (isLoading) {
     return <div className="p-6 space-y-6">
@@ -371,20 +381,534 @@ export default function ClientDetailPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="identity">
-            <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
-                Detail Identitas Perusahaan akan ditampilkan di sini
-            </div>
+        <TabsContent value="identity" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Informasi Dasar
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Nama Perusahaan</p>
+                  <p className="font-medium">{client.name}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Nama Legal</p>
+                  <p className="font-medium">{client.legal_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Nama Merek (Brand)</p>
+                  <p className="font-medium">{client.brand_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Kode Klien</p>
+                  <p className="font-medium">{client.code || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Tipe Entitas</p>
+                  <p className="font-medium capitalize">{client.type || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Website</p>
+                  <p className="font-medium text-blue-600 hover:underline">
+                    {client.website ? (
+                      <a href={client.website} target="_blank" rel="noopener noreferrer">
+                        {client.website}
+                      </a>
+                    ) : (
+                      '-'
+                    )}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Alamat & Kontak
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Alamat Lengkap</p>
+                  <p className="font-medium">{client.address || '-'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-muted-foreground mb-1">Kota / Kabupaten</p>
+                    <p className="font-medium">{client.city || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Provinsi</p>
+                    <p className="font-medium">{client.province || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Negara</p>
+                    <p className="font-medium">{client.country || 'Indonesia'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Kode Pos</p>
+                    <p className="font-medium">{client.postal_code || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Email Resmi</p>
+                    <p className="font-medium">{client.email || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Telepon Resmi</p>
+                    <p className="font-medium">{client.phone || '-'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Legalitas & Pendirian
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">NPWP</p>
+                  <p className="font-medium">{client.npwp || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">NIK</p>
+                  <p className="font-medium">{client.nik || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">NIB</p>
+                  <p className="font-medium">{client.nib || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Nomor Akta Pendirian</p>
+                  <p className="font-medium">{client.deed_number || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Tanggal Berdiri</p>
+                  <p className="font-medium">{formatDate(client.establishment_date)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Nama Notaris</p>
+                  <p className="font-medium">{client.notary_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Lokasi Notaris</p>
+                  <p className="font-medium">{client.notary_location || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Kontak Notaris</p>
+                  <p className="font-medium">{client.notary_contact || '-'}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Modal & SDM
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Modal Dasar</p>
+                  <p className="font-medium">
+                    {client.basic_capital != null
+                      ? new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                          maximumFractionDigits: 0,
+                        }).format(Number(client.basic_capital))
+                      : 'Rp 0'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Modal Disetor</p>
+                  <p className="font-medium">
+                    {client.paid_capital != null
+                      ? new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                          maximumFractionDigits: 0,
+                        }).format(Number(client.paid_capital))
+                      : 'Rp 0'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Revenue Tahunan</p>
+                  <p className="font-medium">
+                    {client.annual_revenue != null
+                      ? new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                          maximumFractionDigits: 0,
+                        }).format(Number(client.annual_revenue))
+                      : 'Rp 0'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Jumlah Karyawan</p>
+                  <p className="font-medium">{client.employee_count ?? 0} Orang</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
-        <TabsContent value="classification">
-            <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
-                Detail Klasifikasi Usaha & Pajak akan ditampilkan di sini
-            </div>
+        <TabsContent value="classification" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Klasifikasi Usaha */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Klasifikasi Usaha
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Jenis Usaha</p>
+                  <p className="font-medium capitalize">{client.business_type || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Sektor Industri</p>
+                  <p className="font-medium capitalize">{client.industry_sector || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Paket Layanan</p>
+                  <p className="font-medium capitalize">{client.service_package || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Skala Bisnis</p>
+                  <p className="font-medium capitalize">{client.business_scale || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Revenue Tahunan</p>
+                  <p className="font-medium">
+                    {client.annual_revenue != null
+                      ? new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                          maximumFractionDigits: 0,
+                        }).format(Number(client.annual_revenue))
+                      : 'Rp 0'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Jumlah Karyawan</p>
+                  <p className="font-medium">{client.employee_count ?? 0} Orang</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Identitas Pajak & PKP */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Identitas Pajak & PKP
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-muted-foreground mb-1">Status PKP</p>
+                    <p className="font-medium">
+                      {client.pkp_status ? 'PKP' : 'Non PKP'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Tipe Wajib Pajak</p>
+                    <p className="font-medium capitalize">{client.taxpayer_type || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">KPP Terdaftar</p>
+                    <p className="font-medium">{client.kpp_office || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">PIC AR Kantor Pajak</p>
+                    <p className="font-medium">{client.pic_pkp_name || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Kontak PIC AR</p>
+                    <p className="font-medium">{client.pic_pkp_contact || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground mb-1">Email PIC AR</p>
+                    <p className="font-medium">{client.pic_pkp_email || '-'}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-muted-foreground mb-2">Jenis Pajak Aktif</p>
+                  <div className="flex flex-wrap gap-2">
+                    {client.applicable_taxes?.length ? (
+                      client.applicable_taxes.map((tax) => (
+                        <Badge
+                          key={tax}
+                          variant="secondary"
+                          className="bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                        >
+                          {tax}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-muted-foreground italic">
+                        Tidak ada pajak aktif
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
-        <TabsContent value="contacts">
-            <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
-                Kontak & Cabang akan ditampilkan di sini
-            </div>
+        <TabsContent value="contacts" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Person In Charge (PIC) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Person In Charge (PIC)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {isContactsLoading ? (
+                  <p className="text-muted-foreground italic">Memuat kontak...</p>
+                ) : contacts && contacts.length ? (
+                  (() => {
+                    const primary = contacts.find((c) => c.is_primary);
+                    if (!primary) {
+                      return (
+                        <p className="text-muted-foreground italic">
+                          Belum ada PIC utama yang ditandai.
+                        </p>
+                      );
+                    }
+                    return (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-muted-foreground mb-1">Nama PIC</p>
+                          <p className="font-medium">{primary.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">Jabatan</p>
+                          <p className="font-medium">{primary.position || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">Email</p>
+                          <p className="font-medium">{primary.email || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">Telepon</p>
+                          <p className="font-medium">{primary.phone || '-'}</p>
+                        </div>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <p className="text-muted-foreground italic">Belum ada data kontak.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Kontak Billing */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Kontak Billing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {isContactsLoading ? (
+                  <p className="text-muted-foreground italic">Memuat kontak...</p>
+                ) : contacts && contacts.length ? (
+                  (() => {
+                    const billing = contacts.find((c) => c.is_billing_contact);
+                    if (!billing) {
+                      return (
+                        <p className="text-muted-foreground italic">
+                          Belum ada kontak billing yang ditandai.
+                        </p>
+                      );
+                    }
+                    return (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-muted-foreground mb-1">Nama Kontak Billing</p>
+                          <p className="font-medium">{billing.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">Jabatan</p>
+                          <p className="font-medium">{billing.position || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">Email</p>
+                          <p className="font-medium">{billing.email || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">Telepon</p>
+                          <p className="font-medium">{billing.phone || '-'}</p>
+                        </div>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <p className="text-muted-foreground italic">Belum ada data kontak.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Kontak Lainnya */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Kontak Lainnya
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                {isContactsLoading ? (
+                  <p className="text-muted-foreground italic">Memuat kontak...</p>
+                ) : contacts && contacts.length ? (
+                  (() => {
+                    const others = contacts.filter(
+                      (c) => !c.is_primary && !c.is_billing_contact,
+                    );
+                    if (!others.length) {
+                      return (
+                        <p className="text-muted-foreground italic">
+                          Tidak ada kontak lain selain PIC dan Billing.
+                        </p>
+                      );
+                    }
+                    return (
+                      <div className="space-y-2">
+                        {others.map((c) => (
+                          <div
+                            key={c.id}
+                            className="flex flex-col md:flex-row md:items-center md:justify-between border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900/40"
+                          >
+                            <div className="space-y-1">
+                              <p className="font-medium">
+                                {c.name}{' '}
+                                {c.is_authorized_signer && (
+                                  <span className="ml-2 text-xs rounded-full bg-green-100 text-green-700 px-2 py-0.5 dark:bg-green-900/40 dark:text-green-300">
+                                    Penandatangan Berwenang
+                                  </span>
+                                )}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {c.position || 'Jabatan tidak diisi'}
+                              </p>
+                            </div>
+                            <div className="mt-2 md:mt-0 text-xs text-muted-foreground space-y-1 md:text-right">
+                              <p>
+                                <span className="font-medium">Email: </span>
+                                {c.email || '-'}
+                              </p>
+                              <p>
+                                <span className="font-medium">Telepon: </span>
+                                {c.phone || '-'}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <p className="text-muted-foreground italic">Belum ada data kontak.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Kantor Cabang */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Kantor Cabang
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {isBranchesLoading ? (
+                  <p className="text-muted-foreground italic">Memuat kantor cabang...</p>
+                ) : branches && branches.length ? (
+                  <div className="space-y-3">
+                    {branches.map((branch, index) => (
+                      <div
+                        key={branch.id}
+                        className="border rounded-md px-4 py-3 bg-slate-50 dark:bg-slate-900/40"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-semibold">Cabang {index + 1}</p>
+                          {branch.is_hq && (
+                            <span className="text-xs rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 dark:bg-blue-900/40 dark:text-blue-200">
+                              Kantor Pusat
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-muted-foreground mb-1">Pemegang Saham</p>
+                            <p className="font-medium">{branch.shareholder || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Jabatan/Struktur</p>
+                            <p className="font-medium">{branch.position || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Negara</p>
+                            <p className="font-medium">{branch.country || 'Indonesia'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Provinsi</p>
+                            <p className="font-medium">{branch.province || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Kota</p>
+                            <p className="font-medium">{branch.city || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Telepon</p>
+                            <p className="font-medium">{branch.phone || '-'}</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <p className="text-muted-foreground mb-1">Alamat</p>
+                            <p className="font-medium">{branch.address || '-'}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-muted-foreground mb-1">Nama PIC</p>
+                            <p className="font-medium">{branch.pic_name || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Jabatan PIC</p>
+                            <p className="font-medium">{branch.pic_position || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Email PIC</p>
+                            <p className="font-medium">{branch.pic_email || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Telepon PIC</p>
+                            <p className="font-medium">{branch.pic_phone || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground italic">
+                    Belum ada kantor cabang yang terdaftar.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
         <TabsContent value="accounting">
             <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">

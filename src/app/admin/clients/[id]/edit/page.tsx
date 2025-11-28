@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient, useUpdateClient, useDeleteClient } from '@/hooks/useClients';
 import { useClientContacts, useUpsertClientContact } from '@/hooks/useClientContacts';
+import { useClientBranches, useUpsertClientBranch, useDeleteClientBranch } from '@/hooks/useClientBranches';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Trash2, Save, ArrowLeft } from 'lucide-react';
+import { Trash2, Save, ArrowLeft, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 // Zod Schema (Simplified version of CreateClientModalUpdated)
@@ -63,6 +64,22 @@ const clientFormSchema = z.object({
 
 type ClientFormData = z.infer<typeof clientFormSchema>;
 
+type BranchForm = {
+  id?: string;
+  shareholder: string;
+  position: string;
+  country: string;
+  province: string;
+  city: string;
+  phone: string;
+  address: string;
+  is_hq: boolean;
+  pic_name: string;
+  pic_position: string;
+  pic_email: string;
+  pic_phone: string;
+};
+
 export default function EditClientPage() {
   const params = useParams();
   const router = useRouter();
@@ -74,6 +91,9 @@ export default function EditClientPage() {
   const { data: client, isLoading } = useClient(tenant.id, id);
   const { data: contacts } = useClientContacts(tenant.id, id);
   const upsertContactMutation = useUpsertClientContact();
+  const { data: branches } = useClientBranches(tenant.id, id);
+  const upsertBranchMutation = useUpsertClientBranch();
+  const deleteBranchMutation = useDeleteClientBranch();
   
   const [activeTab, setActiveTab] = useState('identity');
 
@@ -92,6 +112,9 @@ export default function EditClientPage() {
     email: '',
     phone: '',
   });
+
+  const [branchesState, setBranchesState] = useState<BranchForm[]>([]);
+  const [deletedBranchIds, setDeletedBranchIds] = useState<string[]>([]);
 
   const {
     register,
@@ -141,6 +164,29 @@ export default function EditClientPage() {
     }
   }, [contacts]);
 
+  // Sync existing branches into local editable state
+  useEffect(() => {
+    if (!branches) return;
+
+    setBranchesState(
+      branches.map((b) => ({
+        id: b.id,
+        shareholder: b.shareholder || '',
+        position: b.position || '',
+        country: b.country || 'Indonesia',
+        province: b.province || '',
+        city: b.city || '',
+        phone: b.phone || '',
+        address: b.address || '',
+        is_hq: !!b.is_hq,
+        pic_name: b.pic_name || '',
+        pic_position: b.pic_position || '',
+        pic_email: b.pic_email || '',
+        pic_phone: b.pic_phone || '',
+      })),
+    );
+  }, [branches]);
+
   // Populate form when data loads
   useEffect(() => {
     if (client) {
@@ -184,6 +230,57 @@ export default function EditClientPage() {
     }
   }, [client, reset]);
 
+  const handleAddBranch = () => {
+    setBranchesState((prev) => [
+      ...prev,
+      {
+        shareholder: '',
+        position: '',
+        country: 'Indonesia',
+        province: '',
+        city: '',
+        phone: '',
+        address: '',
+        is_hq: false,
+        pic_name: '',
+        pic_position: '',
+        pic_email: '',
+        pic_phone: '',
+      },
+    ]);
+  };
+
+  const handleBranchChange = (
+    index: number,
+    field: keyof BranchForm,
+    value: string | boolean,
+  ) => {
+    setBranchesState((prev) =>
+      prev.map((branch, i) =>
+        i === index
+          ? {
+              ...branch,
+              [field]: value,
+            }
+          : branch,
+      ),
+    );
+  };
+
+  const handleRemoveBranch = (index: number) => {
+    setBranchesState((prev) => {
+      const toRemove = prev[index];
+      if (toRemove?.id) {
+        setDeletedBranchIds((ids) =>
+          ids.includes(toRemove.id as string)
+            ? ids
+            : [...ids, toRemove.id as string],
+        );
+      }
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   const onSubmit = async (data: any) => {
     console.log('Submitting form data:', data); // DEBUG LOG
     try {
@@ -194,11 +291,11 @@ export default function EditClientPage() {
       });
       console.log('Update successful, server response:', result); // DEBUG LOG
       
-      // Upsert PIC & Billing contacts
-      const contactPromises: Promise<any>[] = [];
+      // Upsert PIC & Billing contacts + cabang
+      const mutationPromises: Promise<any>[] = [];
 
       if (picContact.name || picContact.email || picContact.phone) {
-        contactPromises.push(
+        mutationPromises.push(
           upsertContactMutation.mutateAsync({
             tenantId: tenant.id,
             clientId: id,
@@ -217,7 +314,7 @@ export default function EditClientPage() {
       }
 
       if (billingContact.name || billingContact.email || billingContact.phone) {
-        contactPromises.push(
+        mutationPromises.push(
           upsertContactMutation.mutateAsync({
             tenantId: tenant.id,
             clientId: id,
@@ -234,8 +331,46 @@ export default function EditClientPage() {
         );
       }
 
-      if (contactPromises.length) {
-        await Promise.all(contactPromises);
+      // Upsert branches (create/update)
+      for (const branch of branchesState) {
+        const payload = {
+          shareholder: branch.shareholder || null,
+          position: branch.position || null,
+          country: branch.country || 'Indonesia',
+          province: branch.province || null,
+          city: branch.city || null,
+          phone: branch.phone || null,
+          address: branch.address || null,
+          is_hq: branch.is_hq ?? false,
+          pic_name: branch.pic_name || null,
+          pic_position: branch.pic_position || null,
+          pic_email: branch.pic_email || null,
+          pic_phone: branch.pic_phone || null,
+        };
+
+        mutationPromises.push(
+          upsertBranchMutation.mutateAsync({
+            tenantId: tenant.id,
+            clientId: id,
+            branchId: branch.id,
+            data: payload,
+          }),
+        );
+      }
+
+      // Delete removed branches
+      for (const branchId of deletedBranchIds) {
+        mutationPromises.push(
+          deleteBranchMutation.mutateAsync({
+            tenantId: tenant.id,
+            clientId: id,
+            branchId,
+          }),
+        );
+      }
+
+      if (mutationPromises.length) {
+        await Promise.all(mutationPromises);
       }
 
       router.push(`/admin/clients/${id}`);
@@ -827,12 +962,180 @@ export default function EditClientPage() {
                 <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
                   Kantor Cabang
                 </CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddBranch}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Tambah Cabang
+                </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 text-sm text-muted-foreground bg-slate-50 dark:bg-slate-900 rounded-lg border border-dashed">
-                  Form detail Kantor Cabang akan diimplementasikan pada tahap berikutnya. Saat ini,
-                  penyimpanan data kontak utama dan kontak billing sudah terhubung ke backend.
-                </div>
+                {branchesState.length === 0 ? (
+                  <div className="p-4 text-sm text-muted-foreground bg-slate-50 dark:bg-slate-900 rounded-lg border border-dashed">
+                    Belum ada kantor cabang yang terdaftar. Tambahkan cabang baru dengan tombol "Tambah Cabang".
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {branchesState.map((branch, index) => (
+                      <div
+                        key={branch.id || index}
+                        className="border rounded-lg p-4 space-y-4 bg-slate-50 dark:bg-slate-900/40"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-semibold">Cabang {index + 1}</p>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`branch-${index}-is_hq`}
+                                checked={branch.is_hq}
+                                onCheckedChange={(checked) =>
+                                  handleBranchChange(index, 'is_hq', !!checked)
+                                }
+                              />
+                              <Label
+                                htmlFor={`branch-${index}-is_hq`}
+                                className="text-xs"
+                              >
+                                Kantor Pusat
+                              </Label>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                              onClick={() => handleRemoveBranch(index)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Hapus
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Pemegang Saham</Label>
+                            <Input
+                              placeholder="PT Investindo Jaya"
+                              value={branch.shareholder}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'shareholder', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Jabatan/Struktur</Label>
+                            <Input
+                              placeholder="Branch Manager"
+                              value={branch.position}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'position', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Negara</Label>
+                            <Input
+                              placeholder="Indonesia"
+                              value={branch.country}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'country', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Provinsi</Label>
+                            <Input
+                              placeholder="Jawa Barat"
+                              value={branch.province}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'province', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Kota</Label>
+                            <Input
+                              placeholder="Bandung"
+                              value={branch.city}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'city', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Telepon</Label>
+                            <Input
+                              placeholder="022-1234567"
+                              value={branch.phone}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'phone', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2 md:col-span-2">
+                            <Label>Alamat</Label>
+                            <Textarea
+                              placeholder="Jl. Sudirman No. 123"
+                              value={branch.address}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'address', e.target.value)
+                              }
+                              className="h-20"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t mt-2">
+                          <div className="space-y-2">
+                            <Label>Nama PIC</Label>
+                            <Input
+                              placeholder="Dedi Kurniawan"
+                              value={branch.pic_name}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'pic_name', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Jabatan PIC</Label>
+                            <Input
+                              placeholder="Supervisor"
+                              value={branch.pic_position}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'pic_position', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Email PIC</Label>
+                            <Input
+                              type="email"
+                              placeholder="dedi@branch.com"
+                              value={branch.pic_email}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'pic_email', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Telepon PIC</Label>
+                            <Input
+                              placeholder="08123456789"
+                              value={branch.pic_phone}
+                              onChange={(e) =>
+                                handleBranchChange(index, 'pic_phone', e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

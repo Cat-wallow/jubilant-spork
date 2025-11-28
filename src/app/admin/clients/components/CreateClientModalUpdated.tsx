@@ -92,7 +92,7 @@ const clientFormSchema = z.object({
     applicable_taxes: z.array(z.string()).default([]),
     pic_pkp_name: z.string().optional(),
     pic_pkp_contact: z.string().optional(),
-    pic_pkp_email: z.string().email('Email tidak valid').optional(),
+    pic_pkp_email: z.string().email('Email tidak valid').optional().or(z.literal('')),
     
     // Tax Documents
     has_registered_letter: z.boolean().default(false),
@@ -125,7 +125,7 @@ const clientFormSchema = z.object({
     phone: z.string().optional(),
     pic_name: z.string().optional(),
     pic_position: z.string().optional(),
-    pic_email: z.string().email('Email tidak valid').optional(),
+    pic_email: z.string().email('Email tidak valid').optional().or(z.literal('')),
     pic_phone: z.string().optional(),
     address: z.string().optional(),
     is_hq: z.boolean().default(false),
