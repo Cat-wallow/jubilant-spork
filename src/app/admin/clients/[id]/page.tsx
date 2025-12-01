@@ -93,18 +93,19 @@ export default function ClientDetailPage() {
     });
   };
 
-  // Mock Projects Data (Sesuai Screenshot)
+  // Mock Projects Data - dengan Form 1.0 sebagai milestone pertama
   const projects = [
     {
       id: 'PRJ-25-SIP002',
       client_name: 'PT. SUKSES INDO PRAMATA',
       team_lead: 'Budi Dharma',
       milestones: [
-        { name: 'KK1', status: 'done', label: 'Done' },
-        { name: 'KK2', status: 'done', label: 'Done' },
-        { name: 'KK3', status: 'in_progress', label: 'In Progress' },
-        { name: 'KK4', status: 'not_started', label: 'Not started' },
-        { name: 'KK5', status: 'not_started', label: 'Not started' },
+        { name: 'Form 1.0', status: 'done', label: 'Done' },
+        { name: 'KK 1.0', status: 'done', label: 'Done' },
+        { name: 'KK 2.0', status: 'done', label: 'Done' },
+        { name: 'KK 3.0', status: 'in_progress', label: 'In Progress' },
+        { name: 'KK 4.0', status: 'not_started', label: 'Not started' },
+        { name: 'KK 5.0', status: 'not_started', label: 'Not started' },
       ],
       next_deadline: 'KK 3.0 Completion (2025-09-20)',
       progress: 38.5,
@@ -114,14 +115,15 @@ export default function ClientDetailPage() {
       client_name: 'PT. SUKSES INDO PRAMATA',
       team_lead: 'Budi Dharma',
       milestones: [
-        { name: 'KK1', status: 'done', label: 'Done' },
-        { name: 'KK2', status: 'done', label: 'Done' },
-        { name: 'KK3', status: 'in_progress', label: 'In Progress' },
-        { name: 'KK4', status: 'not_started', label: 'Not started' },
-        { name: 'KK5', status: 'not_started', label: 'Not started' },
+        { name: 'Form 1.0', status: 'in_progress', label: 'In Progress' },
+        { name: 'KK 1.0', status: 'not_started', label: 'Not started' },
+        { name: 'KK 2.0', status: 'not_started', label: 'Not started' },
+        { name: 'KK 3.0', status: 'not_started', label: 'Not started' },
+        { name: 'KK 4.0', status: 'not_started', label: 'Not started' },
+        { name: 'KK 5.0', status: 'not_started', label: 'Not started' },
       ],
-      next_deadline: 'KK 3.0 Completion (2025-09-20)',
-      progress: 38.5,
+      next_deadline: 'Form 1.0 Completion (2025-10-15)',
+      progress: 10,
     },
   ];
 
