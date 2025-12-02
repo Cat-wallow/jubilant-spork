@@ -912,10 +912,79 @@ export default function ClientDetailPage() {
             </Card>
           </div>
         </TabsContent>
-        <TabsContent value="accounting">
-            <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
-                Preferensi Akuntansi akan ditampilkan di sini
-            </div>
+        <TabsContent value="accounting" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Chart of Accounts Card */}
+            <Card className="hover:shadow-md transition-shadow cursor-pointer group">
+              <Link href={`/admin/clients/${id}/accounts`}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                      <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                      Aktif
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <h3 className="font-semibold text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    Chart of Accounts
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Kelola daftar akun untuk klien ini
+                  </p>
+                  <div className="mt-4 flex items-center text-sm text-blue-600 dark:text-blue-400 font-medium">
+                    Kelola Akun
+                    <ArrowLeft className="h-4 w-4 ml-1 rotate-180 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </CardContent>
+              </Link>
+            </Card>
+
+            {/* Placeholder for future features */}
+            <Card className="opacity-60">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                    <Activity className="h-5 w-5 text-slate-500" />
+                  </div>
+                  <Badge variant="secondary" className="bg-slate-100 text-slate-500 dark:bg-slate-800">
+                    Coming Soon
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <h3 className="font-semibold text-lg text-slate-500">
+                  Periode Akuntansi
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Pengaturan periode fiskal dan pelaporan
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="opacity-60">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                    <Globe className="h-5 w-5 text-slate-500" />
+                  </div>
+                  <Badge variant="secondary" className="bg-slate-100 text-slate-500 dark:bg-slate-800">
+                    Coming Soon
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <h3 className="font-semibold text-lg text-slate-500">
+                  Mata Uang
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Pengaturan mata uang dan kurs
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
         <TabsContent value="documents">
             <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">

@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClient, useUpdateClient, useDeleteClient } from '@/hooks/useClients';
 import { useClientContacts, useUpsertClientContact } from '@/hooks/useClientContacts';
 import { useClientBranches, useUpsertClientBranch, useDeleteClientBranch } from '@/hooks/useClientBranches';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trash2, Save, ArrowLeft, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 // Zod Schema (Simplified version of CreateClientModalUpdated)
 const clientFormSchema = z.object({
@@ -84,6 +85,7 @@ export default function EditClientPage() {
   const params = useParams();
   const router = useRouter();
   const { tenant } = useAuth();
+  const { toast } = useToast();
   const id = params.id as string;
   
   const updateClientMutation = useUpdateClient();
@@ -373,12 +375,37 @@ export default function EditClientPage() {
         await Promise.all(mutationPromises);
       }
 
+      toast({
+        title: 'Berhasil',
+        description: 'Data klien berhasil diperbarui',
+      });
+      
       router.push(`/admin/clients/${id}`);
     } catch (error) {
       console.error('Failed to update client:', error);
       const anyErr = error as any;
+      const errorMessage = anyErr?.response?.data?.message || anyErr?.message || 'Terjadi kesalahan saat menyimpan data';
       console.error('Error details:', anyErr?.response?.data || anyErr?.message); // DEBUG LOG
+      
+      toast({
+        title: 'Gagal menyimpan',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     }
+  };
+
+  const onValidationError = (validationErrors: FieldErrors<ClientFormData>) => {
+    console.log('Validation errors:', validationErrors);
+    const errorFields = Object.keys(validationErrors);
+
+    if (!errorFields.length) return;
+
+    toast({
+      title: 'Form tidak lengkap',
+      description: `Mohon lengkapi field berikut: ${errorFields.join(', ')}`,
+      variant: 'destructive',
+    });
   };
 
   const handleDelete = () => {
@@ -429,8 +456,9 @@ export default function EditClientPage() {
               Hapus
             </Button>
             <Button 
+              type="submit"
+              form="edit-client-form"
               className="bg-blue-600 hover:bg-blue-700 dark:text-white"
-              onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
             >
               <Save className="mr-2 h-4 w-4" />
@@ -463,7 +491,7 @@ export default function EditClientPage() {
           </TabsTrigger>
         </TabsList>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form id="edit-client-form" onSubmit={handleSubmit(onSubmit, onValidationError)}>
           <TabsContent value="identity" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Informasi Dasar */}
@@ -475,8 +503,13 @@ export default function EditClientPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Nama *</Label>
-                      <Input id="name" {...register('name')} placeholder="Nama klien/wajib pajak" />
-                      {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+                      <Input 
+                        id="name" 
+                        {...register('name')} 
+                        placeholder="Nama klien/wajib pajak" 
+                        className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                      />
+                      {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="brand_name">Nama Merek</Label>
@@ -500,8 +533,13 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Telepon *</Label>
-                      <Input id="phone" {...register('phone')} placeholder="08123456789" />
-                      {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
+                      <Input 
+                        id="phone" 
+                        {...register('phone')} 
+                        placeholder="08123456789" 
+                        className={errors.phone ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                      />
+                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                     </div>
                   </div>
 
@@ -520,8 +558,13 @@ export default function EditClientPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="address">Alamat Lengkap *</Label>
-                    <Textarea id="address" {...register('address')} placeholder="Jl. Contoh, No 321" className="h-24" />
-                    {errors.address && <p className="text-red-500 text-xs">{errors.address.message}</p>}
+                    <Textarea 
+                      id="address" 
+                      {...register('address')} 
+                      placeholder="Jl. Contoh, No 321" 
+                      className={`h-24 ${errors.address ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                    />
+                    {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">

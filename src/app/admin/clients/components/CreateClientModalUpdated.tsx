@@ -112,6 +112,7 @@ const clientFormSchema = z.object({
     position: z.string().min(1, 'Posisi wajib diisi'),
     email: z.string().email('Email tidak valid'),
     phone: z.string().min(1, 'Telepon wajib diisi'),
+    is_primary: z.boolean().default(false),
     is_billing_contact: z.boolean().default(false),
   })).default([]),
   
@@ -253,9 +254,11 @@ export function CreateClientModalUpdated({
   // Helper functions for dynamic arrays
   const addContact = () => {
     const currentContacts = watchedValues.contacts || [];
+    // First contact is automatically primary
+    const isPrimary = currentContacts.length === 0;
     setValue('contacts', [
       ...currentContacts,
-      { name: '', position: '', email: '', phone: '', is_billing_contact: false }
+      { name: '', position: '', email: '', phone: '', is_primary: isPrimary, is_billing_contact: false }
     ]);
   };
 
@@ -950,11 +953,31 @@ export function CreateClientModalUpdated({
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      {...register(`contacts.${index}.is_billing_contact`)}
-                    />
-                    <Label>Jadikan sebagai kontak billing</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`contacts.${index}.is_primary`}
+                        checked={watchedValues.contacts?.[index]?.is_primary || false}
+                        onCheckedChange={(checked) => {
+                          // Uncheck all other contacts first
+                          if (checked) {
+                            watchedValues.contacts?.forEach((_, i) => {
+                              if (i !== index) setValue(`contacts.${i}.is_primary`, false);
+                            });
+                          }
+                          setValue(`contacts.${index}.is_primary`, checked as boolean);
+                        }}
+                      />
+                      <Label htmlFor={`contacts.${index}.is_primary`}>Kontak Utama (PIC)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`contacts.${index}.is_billing_contact`}
+                        checked={watchedValues.contacts?.[index]?.is_billing_contact || false}
+                        onCheckedChange={(checked) => setValue(`contacts.${index}.is_billing_contact`, checked as boolean)}
+                      />
+                      <Label htmlFor={`contacts.${index}.is_billing_contact`}>Kontak Billing</Label>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1044,9 +1067,19 @@ export function CreateClientModalUpdated({
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        {...register(`branches.${index}.is_hq`)}
+                        id={`branches.${index}.is_hq`}
+                        checked={watchedValues.branches?.[index]?.is_hq || false}
+                        onCheckedChange={(checked) => {
+                          // Uncheck all other branches first
+                          if (checked) {
+                            watchedValues.branches?.forEach((_, i) => {
+                              if (i !== index) setValue(`branches.${i}.is_hq`, false);
+                            });
+                          }
+                          setValue(`branches.${index}.is_hq`, checked as boolean);
+                        }}
                       />
-                      <Label>Kantor Pusat</Label>
+                      <Label htmlFor={`branches.${index}.is_hq`}>Kantor Pusat</Label>
                     </div>
                   </div>
 
