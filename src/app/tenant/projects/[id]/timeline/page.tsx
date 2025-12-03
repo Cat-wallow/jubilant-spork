@@ -37,7 +37,7 @@ export default function TimelinePage() {
 			<div className="flex items-center justify-center gap-2.5">
 				<div className="flex flex-1 flex-col gap-[5px]">
 					<p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">
-						Project > Add Project
+						Project &gt; Add Project
 					</p>
 					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight text-[#0B1437]">
 						Konsultasi Pajak PT Maju Bersama
