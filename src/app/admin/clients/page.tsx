@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClients, useCreateClient, useDeleteClient } from '@/hooks/useClients';
+import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary } from '@/hooks/useClients';
 import { useAuth } from '@/contexts/AuthContext';
 import { SummaryCards } from './components/SummaryCards';
 import { AdvancedFilters } from './components/AdvancedFilters';
@@ -210,6 +210,8 @@ export default function ClientsPage() {
     limit: pagination.pageSize,
   });
 
+  const { data: complianceSummary } = useTenantComplianceSummary(tenant.id);
+
   const columns = useMemo<ColumnDef<Client>[]>(
     () => [
       {
@@ -368,7 +370,7 @@ export default function ClientsPage() {
     totalClients: data?.pagination?.total || 0,
     activeClients: clients.filter((c) => c.status === 'active').length,
     totalProjects: clients.reduce((sum, c) => sum + (c.active_projects || 0), 0),
-    complianceRate: 85, // Mock data
+    complianceRate: complianceSummary?.compliance_rate ?? 0,
   };
 
   const table = useReactTable({

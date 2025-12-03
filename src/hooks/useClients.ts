@@ -50,6 +50,19 @@ export interface ClientDetail extends Client {
   website?: string;
 }
 
+export interface TenantComplianceSummary {
+  tenant_id: string;
+  total_clients: number;
+  evaluated_clients: number;
+  average_score: number;
+  compliance_rate: number;
+  by_status: {
+    ready: number;
+    warning: number;
+    not_ready: number;
+  };
+}
+
 interface ClientsResponse {
   items: Client[];
   pagination: {
@@ -82,6 +95,25 @@ export const useClient = (tenantId: string, id: string) => {
       return data;
     },
     enabled: !!tenantId && !!id,
+  });
+};
+
+export const useTenantComplianceSummary = (tenantId: string) => {
+  return useQuery<TenantComplianceSummary>({
+    queryKey: ['clients-compliance', tenantId],
+    queryFn: async () => {
+      const { data } = await api.get<TenantComplianceSummary>(
+        '/client-wp/api/clients/compliance-summary',
+        {
+          headers: {
+            'X-Tenant-Id': tenantId,
+          },
+        },
+      );
+      return data;
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -140,6 +172,7 @@ export const useCreateClient = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['clients', variables.tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['clients-compliance', variables.tenantId] });
     },
   });
 };
@@ -179,6 +212,7 @@ export const useUpdateClient = () => {
       console.log('Mutation successful for client:', variables.id); // DEBUG LOG
       queryClient.invalidateQueries({ queryKey: ['clients', variables.tenantId] });
       queryClient.invalidateQueries({ queryKey: ['client', variables.tenantId, variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['clients-compliance', variables.tenantId] });
     },
     onError: (error) => {
       console.error('Mutation error:', error); // DEBUG LOG
