@@ -1,3 +1,4 @@
+const routes = [
 	{
 		name: "Dasbor",
 		layout: "/admin",
