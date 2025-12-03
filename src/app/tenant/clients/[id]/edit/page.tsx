@@ -22,6 +22,7 @@ import Link from 'next/link';
 
 // Zod Schema (Simplified version of CreateClientModalUpdated)
 const clientFormSchema = z.object({
+  code: z.string().min(1, 'Kode klien wajib diisi'), // Added code field
   name: z.string().min(1, 'Nama perusahaan wajib diisi'),
   brand_name: z.string().optional(),
   type: z.string().min(1, 'Tipe klien wajib diisi'),
@@ -33,7 +34,7 @@ const clientFormSchema = z.object({
   province: z.string().optional(),
   city: z.string().optional(),
   postal_code: z.string().optional(),
-  
+
   // Corporate Info
   nik: z.string().optional(),
   npwp: z.string().optional(),
@@ -44,21 +45,24 @@ const clientFormSchema = z.object({
   notary_contact: z.string().optional(),
   establishment_date: z.string().optional(),
   employee_count: z.number().optional(),
-  basic_capital: z.number().optional(),
-  paid_capital: z.number().optional(),
-  
+  basic_capital: z.number().optional(), // Ensure type is number
+  paid_capital: z.number().optional(), // Ensure type is number
+
   // Classification
   business_scale: z.string().optional(),
-  industry: z.string().optional(),
+  business_type: z.string().optional(), // Renamed from industry to business_type
   industry_sector: z.string().optional(),
-  annual_revenue: z.number().optional(),
+  annual_revenue: z.number().optional(), // Ensure type is number
   service_package: z.string().optional(),
-  
+
   // Tax Identity
   taxpayer_type: z.string().optional(),
   kpp_office: z.string().optional(),
   pkp_status: z.boolean().optional(),
   applicable_taxes: z.array(z.string()).optional(),
+  pic_pkp_name: z.string().optional(), // Added PKP contact fields
+  pic_pkp_contact: z.string().optional(),
+  pic_pkp_email: z.string().email('Email PIC PKP tidak valid').optional().or(z.literal('')),
 });
 
 type ClientFormData = z.infer<typeof clientFormSchema>;
@@ -68,13 +72,13 @@ export default function EditClientPage() {
   const router = useRouter();
   const { tenant } = useAuth();
   const id = params.id as string;
-  
+
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
   const { data: client, isLoading } = useClient(tenant.id, id);
   const { data: contacts } = useClientContacts(tenant.id, id);
   const upsertContactMutation = useUpsertClientContact();
-  
+
   const [activeTab, setActiveTab] = useState('identity');
 
   const [picContact, setPicContact] = useState({
@@ -104,9 +108,13 @@ export default function EditClientPage() {
   } = useForm({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
+      code: '', // Added default value
       country: 'Indonesia',
       applicable_taxes: [],
       pkp_status: false,
+      pic_pkp_name: '', // Added default value
+      pic_pkp_contact: '', // Added default value
+      pic_pkp_email: '', // Added default value
     },
   });
 
@@ -145,6 +153,7 @@ export default function EditClientPage() {
   useEffect(() => {
     if (client) {
       reset({
+        code: client.code || '', // Populate code
         name: client.name || '',
         brand_name: client.brand_name || '',
         type: client.type || 'corporate',
@@ -165,21 +174,24 @@ export default function EditClientPage() {
         notary_contact: client.notary_contact || '',
         establishment_date: client.establishment_date ? new Date(client.establishment_date).toISOString().split('T')[0] : '',
         employee_count: client.employee_count || 0,
-        basic_capital: client.basic_capital || 0,
-        paid_capital: client.paid_capital || 0,
-        
+        basic_capital: Number(client.basic_capital) || 0, // Convert to number
+        paid_capital: Number(client.paid_capital) || 0, // Convert to number
+
         // Classification
         business_scale: client.business_scale || '',
-        industry: client.industry || '',
+        business_type: client.business_type || '', // Populate business_type
         industry_sector: client.industry_sector || '',
-        annual_revenue: client.annual_revenue || 0,
+        annual_revenue: Number(client.annual_revenue) || 0, // Convert to number
         service_package: client.service_package || '',
-        
+
         // Tax
         taxpayer_type: client.taxpayer_type || '',
         kpp_office: client.kpp_office || '',
         pkp_status: client.pkp_status || false,
         applicable_taxes: client.applicable_taxes || [],
+        pic_pkp_name: client.pic_pkp_name || '', // Populate PKP contact fields
+        pic_pkp_contact: client.pic_pkp_contact || '',
+        pic_pkp_email: client.pic_pkp_email || '',
       });
     }
   }, [client, reset]);
@@ -193,7 +205,7 @@ export default function EditClientPage() {
         data,
       });
       console.log('Update successful, server response:', result); // DEBUG LOG
-      
+
       // Upsert PIC & Billing contacts
       const contactPromises: Promise<any>[] = [];
 
@@ -238,7 +250,7 @@ export default function EditClientPage() {
         await Promise.all(contactPromises);
       }
 
-      router.push(`/admin/clients/${id}`);
+      router.push(`/clients/${id}`);
     } catch (error) {
       console.error('Failed to update client:', error);
       const anyErr = error as any;
@@ -252,7 +264,7 @@ export default function EditClientPage() {
         { tenantId: tenant.id, id },
         {
           onSuccess: () => {
-            router.push('/admin/clients');
+            router.push('/clients');
           },
         }
       );
@@ -274,18 +286,18 @@ export default function EditClientPage() {
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/admin/clients" className="hover:text-primary">Client</Link>
+          <Link href="/clients" className="hover:text-primary">Client</Link>
           <span>/</span>
-          <Link href={`/admin/clients/${id}`} className="hover:text-primary">Detail Client</Link>
+          <Link href={`/clients/${id}`} className="hover:text-primary">Detail Client</Link>
           <span>/</span>
           <span>Edit Client</span>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Edit Data Klien</h1>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               type="button"
               className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400"
               onClick={handleDelete}
@@ -293,7 +305,7 @@ export default function EditClientPage() {
               <Trash2 className="mr-2 h-4 w-4" />
               Hapus
             </Button>
-            <Button 
+            <Button
               className="bg-blue-600 hover:bg-blue-700 dark:text-white"
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
@@ -459,10 +471,10 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="employee_count">Jumlah Karyawan</Label>
-                      <Input 
-                        type="number" 
-                        id="employee_count" 
-                        {...register('employee_count', { valueAsNumber: true })} 
+                      <Input
+                        type="number"
+                        id="employee_count"
+                        {...register('employee_count', { valueAsNumber: true })}
                         placeholder="0"
                       />
                     </div>
@@ -471,19 +483,19 @@ export default function EditClientPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="basic_capital">Modal Dasar (Rp)</Label>
-                      <Input 
-                        type="number" 
-                        id="basic_capital" 
-                        {...register('basic_capital', { valueAsNumber: true })} 
+                      <Input
+                        type="number"
+                        id="basic_capital"
+                        {...register('basic_capital', { valueAsNumber: true })}
                         placeholder="0"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="paid_capital">Modal Disetor (Rp)</Label>
-                      <Input 
-                        type="number" 
-                        id="paid_capital" 
-                        {...register('paid_capital', { valueAsNumber: true })} 
+                      <Input
+                        type="number"
+                        id="paid_capital"
+                        {...register('paid_capital', { valueAsNumber: true })}
                         placeholder="0"
                       />
                     </div>
@@ -538,9 +550,9 @@ export default function EditClientPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="annual_revenue">Revenue Tahunan (Rp)</Label>
-                    <Input 
-                      id="annual_revenue" 
-                      {...register('annual_revenue', { valueAsNumber: true })} 
+                    <Input
+                      id="annual_revenue"
+                      {...register('annual_revenue', { valueAsNumber: true })}
                       placeholder="0"
                     />
                   </div>
@@ -571,8 +583,8 @@ export default function EditClientPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Status PKP</Label>
-                    <Select 
-                      onValueChange={(val) => setValue('pkp_status', val === 'true')} 
+                    <Select
+                      onValueChange={(val) => setValue('pkp_status', val === 'true')}
                       defaultValue={client?.pkp_status ? 'true' : 'false'}
                     >
                       <SelectTrigger>
@@ -613,8 +625,8 @@ export default function EditClientPage() {
                   <Label>Jenis Pajak yang Berlaku</Label>
                   <div className="grid grid-cols-3 gap-4">
                     {['PPh 21', 'PPh 22', 'PPh 23', 'PPh 4 ayat 2', 'PPh 15', 'PPN', 'PBB', 'Lainnya'].map((tax) => (
-                      <div 
-                        key={tax} 
+                      <div
+                        key={tax}
                         className="flex items-center space-x-2"
                         onClick={() => console.log('Div clicked for tax:', tax)} // DEBUG LOG
                       >

@@ -16,7 +16,7 @@ export const useRoles = () => {
   return useQuery<Role[]>({
     queryKey: ['roles'],
     queryFn: async () => {
-      const response = await api.get<RolesResponse>('/api/v1/roles');
+      const response = await api.get<RolesResponse>('user/roles');
       return response.data.data;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes

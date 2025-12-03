@@ -10,7 +10,7 @@ import InviteUserModal from "./InviteUserModal";
 import ImportUsersModal from "./ImportUsersModal";
 import { columns } from "./columns";
 
-export default function UserTable( {tenantid}: {tenantid: string}) {
+export default function UserTable( {tenantid}: {tenantid?: string}) {
 const [showInviteModal, setShowInviteModal] = useState(false);
 const [showImportModal, setShowImportModal] = useState(false);
 const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });

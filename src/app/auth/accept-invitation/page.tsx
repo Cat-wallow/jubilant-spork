@@ -31,7 +31,7 @@ export default function AcceptInvitationPage() {
       setStatus('loading');
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/invitations/accept-by-token`,
+        `${process.env.NEXT_PUBLIC_API_URL}/invitations/accept-by-token`,
         {
           method: 'POST',
           headers: {

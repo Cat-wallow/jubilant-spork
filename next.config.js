@@ -20,6 +20,10 @@ const nextConfig = {
     // Make ENV
     unoptimized: true,
   },
+  experimental: {
+    serverActions: false
+  },
+
 };
 
 module.exports = nextConfig;

@@ -26,7 +26,7 @@ export const useClientContacts = (tenantId: string, clientId: string) => {
     queryKey: ['clientContacts', tenantId, clientId],
     queryFn: async () => {
       const { data } = await api.get<ContactsApiResponse>(
-        `/client-wp/api/clients/${clientId}/contacts`,
+        `/client/${clientId}/contacts`,
         {
           headers: {
             'X-Tenant-Id': tenantId,
@@ -67,7 +67,7 @@ export const useUpsertClientContact = () => {
 
       if (contactId) {
         const response = await api.put(
-          `/client-wp/api/clients/${clientId}/contacts/${contactId}`,
+          `/client/${clientId}/contacts/${contactId}`,
           data,
           { headers },
         );
@@ -75,7 +75,7 @@ export const useUpsertClientContact = () => {
       }
 
       const response = await api.post(
-        `/client-wp/api/clients/${clientId}/contacts`,
+        `/client/${clientId}/contacts`,
         data,
         { headers },
       );

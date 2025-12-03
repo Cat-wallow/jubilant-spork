@@ -1,173 +1,400 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Card, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useFormContext, Controller } from "react-hook-form";
+import { ProjectFormValues } from "@/validators/project.schema";
+import { useEffect, useState, useMemo } from "react";
+import api from "@/lib/api";
+import { MODULES } from "./DetailProjectTab";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTenantUsers } from "@/hooks/useTenant"; // New import for fetching tenant users
+import { useQueries } from "@tanstack/react-query"; // New import for fetching multiple queries
+import { User } from "@/types/users";
+
+// Helper to get color style based on module code (mimicking original)
+const getModuleStyle = (code: string) => {
+	if (["Form 1.0", "KK 2.0", "KK 4.0"].includes(code)) {
+		return { bg: "bg-[#F4F7FE]", textColor: "text-[#332687]" };
+	}
+	return { bg: "bg-[rgba(255,204,0,0.1)]", textColor: "" };
+};
+
+// Helper function for permission prefix, memoized to prevent re-creation
+const cleanCode = (code: string) => {
+	const parts = code.split("_");
+	return parts[0].toLowerCase() + parts[1].split(".")[0];
+};
+
+// Helper to sanitize scope key for form field names (replace dots and spaces)
+export const sanitizeScopeKey = (scope: string) => {
+	return scope.replace(/[\s.]/g, "_");
+};
 
 export default function ProjectSettingsTab() {
-  const modules = [
-    { code: 'Form 1.0', bg: 'bg-[#F4F7FE]', textColor: 'text-[#332687]' },
-    { code: 'KK 1.0', bg: 'bg-[rgba(255,204,0,0.1)]', textColor: 'text-[#404040]' },
-    { code: 'KK 2.0', bg: 'bg-[#F4F7FE]', textColor: 'text-[#332687]' },
-    { code: 'KK 3.0', bg: 'bg-[rgba(255,204,0,0.1)]', textColor: 'text-[#404040]' },
-    { code: 'KK 4.0', bg: 'bg-[#F4F7FE]', textColor: 'text-[#332687]' },
-    { code: 'KK 5.0', bg: 'bg-[rgba(255,204,0,0.1)]', textColor: 'text-[#404040]' },
-  ];
+	const {
+		control,
+		watch,
+		register,
+		formState: { errors },
+	} = useFormContext<ProjectFormValues>();
+	const selectedScopes = watch("scopes") || [];
 
-  return (
-    <div className="flex items-start gap-[30px] self-stretch">
-      {/* Left Column - Team Assignment */}
-      <Card className="flex-1 self-stretch p-5">
-        <div className="mb-5 flex flex-col gap-0 self-stretch">
-          <CardTitle>Team Assignment</CardTitle>
-          <CardDescription className="line-clamp-1 overflow-hidden text-ellipsis">
-            Pilih modul yang akan dikerjakan dalam project ini
-          </CardDescription>
-        </div>
+	const { tenant } = useAuth();
+	const [bastTemplates, setBastTemplates] = useState<any[]>([]);
+	const [invoiceTemplates, setInvoiceTemplates] = useState<any[]>([]);
+	// Removed moduleUsers and pmoUsers local states as they will be managed by react-query hooks
 
-        <div className="flex flex-col gap-2.5">
-          {modules.map((module, index) => (
-            <div key={index} className="flex h-[163px] flex-col gap-2.5">
-              <div
-                className={`inline-flex items-center justify-center gap-2.5 self-start rounded-[5px] border border-[rgba(145,158,171,0.2)] px-2.5 py-2.5 ${module.bg}`}
-              >
-                <span className={`font-inter text-xs font-normal leading-normal ${module.textColor}`}>
-                  {module.code}
-                </span>
-              </div>
+	// Fetch Templates (keeping as is, no specific hook requested)
+	useEffect(() => {
+		if (tenant?.id) {
+			api
+				.get("/tenant/report-templates", {
+					headers: { "X-Tenant-Id": tenant.id },
+				})
+				.then((res) => {
+					const templates = res.data.data || [];
+					setBastTemplates(
+						templates.filter((t: any) => t.report_type === "BAST"),
+					);
+					setInvoiceTemplates(
+						templates.filter((t: any) => t.report_type === "INVOICE"),
+					);
+				})
+				.catch((err) => console.error("Failed to fetch templates", err));
+		}
+	}, [tenant?.id]); // Added tenant dependency
 
-              <div className="flex flex-col gap-0">
-                <Select>
-                  <SelectTrigger className="h-[54px] rounded-lg border-[rgba(145,158,171,0.2)]">
-                    <SelectValue placeholder="Pilih Team Leader" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Team Leader 1</SelectItem>
-                    <SelectItem value="2">Team Leader 2</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+	// Fetch PMO users for escalation using useTenantUsers hook
+	const { data: pmoUsersData, isLoading: isLoadingPmoUsers } = useTenantUsers({
+		tenantId: tenant?.id || "",
+		permission: "project:manage", // Assuming 'project:manage' permission for PMO users
+		enabled: !!tenant?.id, // Only enable if tenantId is available
+		limit: 100, // Reasonable limit for PMO users
+	});
 
-              <div className="flex flex-col gap-0">
-                <Select>
-                  <SelectTrigger className="h-[54px] rounded-lg border-[rgba(145,158,171,0.2)]">
-                    <SelectValue placeholder="Pilih Team Member" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Team Member 1</SelectItem>
-                    <SelectItem value="2">Team Member 2</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+	const pmoUsers = useMemo(() => pmoUsersData?.items || [], [pmoUsersData]);
 
-      {/* Right Column */}
-      <div className="flex w-[600px] flex-col justify-center gap-[30px]">
-        {/* SLA & Reminders */}
-        <Card className="p-5">
-          <div className="mb-5 flex flex-col gap-0 self-stretch">
-            <CardTitle>SLA & Reminders</CardTitle>
-            <CardDescription className="line-clamp-1 overflow-hidden text-ellipsis">
-              Atur kebijakan deadline dan eskalasi
-            </CardDescription>
-          </div>
+	// Fetch users for selected scopes using useQueries
+	const moduleUserQueries = useQueries({
+		queries: selectedScopes.map((scope) => {
+			const permPrefix = cleanCode(scope);
+			return {
+				queryKey: ["moduleUsers", tenant?.id, scope], // Unique query key for each scope
+				queryFn: async () => {
+					const [resLeader, resMember] = await Promise.all([
+						api.get(`/tenant/user?permission=${permPrefix}:approve`, {
+							headers: { "X-Tenant-Id": tenant?.id },
+						}),
+						api.get(`/tenant/user?permission=${permPrefix}:manage`, {
+							headers: { "X-Tenant-Id": tenant?.id },
+						}),
+					]);
+					return {
+						leaders: resLeader.data.data || [],
+						members: resMember.data.data || [],
+					};
+				},
+				enabled: !!tenant?.id, // Only enable if tenantId is available
+				staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+			};
+		}),
+	});
 
-          <div className="flex flex-col gap-0 self-stretch">
-            <Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#3F3F3F]">
-              Due Policy *
-            </Label>
-            <Select>
-              <SelectTrigger className="h-[54px] rounded-lg border-[rgba(145,158,171,0.2)]">
-                <SelectValue placeholder="H+3 (3 hari setelah deadline)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">H+3 (3 hari setelah deadline)</SelectItem>
-                <SelectItem value="2">H+5 (5 hari setelah deadline)</SelectItem>
-                <SelectItem value="3">H+7 (7 hari setelah deadline)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+	// Transform the results from useQueries into the moduleUsers format
+	const moduleUsers = useMemo(() => {
+		return selectedScopes.reduce(
+			(acc, scope, index) => {
+				const queryResult = moduleUserQueries[index];
+				if (queryResult && queryResult.isSuccess) {
+					acc[scope] = {
+						leaders: queryResult.data.leaders,
+						members: queryResult.data.members,
+					};
+				} else if (queryResult && queryResult.isFetching) {
+					// Optionally handle loading state per scope
+					acc[scope] = { leaders: [], members: [] };
+				}
+				return acc;
+			},
+			{} as Record<string, { leaders: any[]; members: any[] }>,
+		);
+	}, [selectedScopes, moduleUserQueries]); // Dependencies for useMemo
 
-          <div className="mt-5 flex flex-col gap-2.5 py-[5px]">
-            <Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#3F3F3F]">
-              Escalation Recipients
-            </Label>
+	return (
+		<div className="flex items-start gap-[30px] self-stretch">
+			{/* Left Column - Team Assignment */}
+			<Card className="flex-1 self-stretch p-5">
+				<div className="mb-5 flex flex-col gap-0 self-stretch">
+					<CardTitle>Team Assignment</CardTitle>
+					<CardDescription className="line-clamp-1 overflow-hidden text-ellipsis text-primary">
+						Assign Team Leader and Member for selected modules
+					</CardDescription>
+				</div>
 
-            <div className="flex items-center gap-2">
-              <Checkbox />
-              <span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
-                PMO 1
-              </span>
-            </div>
+				<div className="flex flex-col gap-2.5">
+					{selectedScopes.length === 0 && (
+						<p className="text-center text-sm text-primary mt-5 ">
+							Belum ada modul di scope of work yang dipilih
+						</p>
+					)}
 
-            <div className="flex items-center gap-2">
-              <Checkbox />
-              <span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
-                PMO 2
-              </span>
-            </div>
+					{selectedScopes.map((scope, index) => {
+						const style = getModuleStyle(scope);
+						// const users = moduleUsers[scope] || { leaders: [], members: [] }; // Now moduleUsers is a useMemo result
+						const leaderField = watch(
+							`team_assignments.${sanitizeScopeKey(scope)}.leader_id`,
+						);
+						const memberField = watch(
+							`team_assignments.${sanitizeScopeKey(scope)}.member_id`,
+						);
 
-            <div className="flex items-center gap-2">
-              <Checkbox />
-              <span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
-                PMO 3
-              </span>
-            </div>
-          </div>
-        </Card>
+						const filteredLeaders =
+							moduleUsers[scope]?.leaders.filter(
+								(u: any) => u.id !== memberField,
+							) || [];
 
-        {/* Deliverables */}
-        <Card className="p-5">
-          <div className="mb-5 flex flex-col gap-0 self-stretch">
-            <CardTitle>Deliverables</CardTitle>
-            <CardDescription className="line-clamp-1 overflow-hidden text-ellipsis">
-              Template BAST & Invoice yang akan digunakan
-            </CardDescription>
-          </div>
+						const filteredMembers =
+							moduleUsers[scope]?.members.filter(
+								(u: User) => u.id !== leaderField,
+							) || [];
 
-          <div className="flex flex-col gap-5 self-stretch">
-            <div className="flex flex-col gap-0">
-              <Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#3F3F3F]">
-                BAST Template
-              </Label>
-              <Select>
-                <SelectTrigger className="h-[54px] rounded-lg border-[rgba(145,158,171,0.2)]">
-                  <SelectValue placeholder="Pilih template BAST" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Template BAST 1</SelectItem>
-                  <SelectItem value="2">Template BAST 2</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+						return (
+							<div
+								key={scope}
+								className="flex h-[163px] flex-col gap-2.5 border-b pb-2 last:border-0"
+							>
+								<div
+									className={`inline-flex items-center justify-center gap-2.5 self-start rounded-[5px] border  px-2.5 py-2.5 ${style.bg}`}
+								>
+									<span
+										className={`font-inter text-xs font-normal leading-normal ${style.textColor}`}
+									>
+										{scope}
+									</span>
+								</div>
 
-            <div className="flex flex-col gap-0">
-              <Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#3F3F3F]">
-                Invoice Template
-              </Label>
-              <Select>
-                <SelectTrigger className="h-[54px] rounded-lg border-[rgba(145,158,171,0.2)]">
-                  <SelectValue placeholder="Pilih template Invoice" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Template Invoice 1</SelectItem>
-                  <SelectItem value="2">Template Invoice 2</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
+								<div className="flex flex-col gap-0">
+									<Controller
+										control={control}
+										name={`team_assignments.${sanitizeScopeKey(scope)}.leader_id`}
+										render={({ field }) => (
+											<Select
+												onValueChange={field.onChange}
+												value={field.value}
+											>
+												<SelectTrigger
+													className={
+														errors.team_assignments?.[sanitizeScopeKey(scope)]
+															?.leader_id
+															? "border-red-500"
+															: ""
+													}
+												>
+													<SelectValue placeholder="Pilih Team Leader" />
+												</SelectTrigger>
+												<SelectContent>
+													{filteredLeaders.map((u: any) => (
+														<SelectItem key={u.id} value={u.id}>
+															{u.username}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										)}
+									/>
+									{errors.team_assignments?.[sanitizeScopeKey(scope)]
+										?.leader_id && (
+										<span className="text-red-500 text-xs">
+											{
+												errors.team_assignments[sanitizeScopeKey(scope)]
+													?.leader_id?.message
+											}
+										</span>
+									)}
+								</div>
+
+								<div className="flex flex-col gap-0">
+									<Controller
+										control={control}
+										name={`team_assignments.${sanitizeScopeKey(scope)}.member_id`}
+										render={({ field }) => (
+											<Select
+												onValueChange={field.onChange}
+												value={field.value}
+											>
+												<SelectTrigger
+													className={
+														errors.team_assignments?.[sanitizeScopeKey(scope)]
+															?.member_id
+															? "border-red-500"
+															: ""
+													}
+												>
+													<SelectValue placeholder="Pilih Team Member" />
+												</SelectTrigger>
+												<SelectContent>
+													{filteredMembers.map((u: any) => (
+														<SelectItem key={u.id} value={u.id}>
+															{u.username}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										)}
+									/>
+									{errors.team_assignments?.[sanitizeScopeKey(scope)]
+										?.member_id && (
+										<span className="text-red-500 text-xs">
+											{
+												errors.team_assignments[sanitizeScopeKey(scope)]
+													?.member_id?.message
+											}
+										</span>
+									)}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</Card>
+
+			{/* Right Column */}
+			<div className="flex w-[600px] flex-col justify-center gap-[30px]">
+				{/* SLA & Reminders */}
+				<Card className="p-5">
+					<div className="mb-5 flex flex-col gap-0 self-stretch">
+						<CardTitle>SLA & Reminders</CardTitle>
+						<CardDescription className="line-clamp-1 overflow-hidden text-ellipsis">
+							Atur kebijakan deadline dan eskalasi
+						</CardDescription>
+					</div>
+
+					<div className="flex flex-col gap-0 self-stretch">
+						<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+							Due Policy (Hari) *
+						</Label>
+						<Input
+							type="number"
+							placeholder="3"
+							{...register("due_policy_days")}
+						/>
+						{errors.due_policy_days && (
+							<span className="text-red-500 text-xs">
+								{errors.due_policy_days.message}
+							</span>
+						)}
+					</div>
+
+					<div className="mt-5 flex flex-col gap-2.5 py-[5px]">
+						<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+							Escalation Recipients
+						</Label>
+						<div className="flex flex-col gap-2">
+							{pmoUsers.map(
+								(
+									user: any, // Cast to any temporarily for u.name
+								) => (
+									<div key={user.id} className="flex items-center gap-2">
+										<Controller
+											control={control}
+											name="escalation_user_ids"
+											render={({ field }) => {
+												const isChecked = field.value?.includes(user.id);
+												return (
+													<Checkbox
+														checked={isChecked}
+														onCheckedChange={(checked) => {
+															const current = field.value || [];
+															const updated = checked
+																? [...current, user.id]
+																: current.filter((val) => val !== user.id);
+															field.onChange(updated);
+														}}
+													/>
+												);
+											}}
+										/>
+										<span className="font-inter text-sm font-medium leading-[14px]">
+											{user.username ||
+												`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+										</span>
+									</div>
+								),
+							)}
+						</div>
+					</div>
+				</Card>
+
+				{/* Deliverables */}
+				<Card className="p-5">
+					<div className="mb-5 flex flex-col gap-0 self-stretch">
+						<CardTitle>Deliverables</CardTitle>
+						<CardDescription className="line-clamp-1 overflow-hidden text-ellipsis">
+							Template BAST & Invoice yang akan digunakan
+						</CardDescription>
+					</div>
+
+					<div className="flex flex-col gap-5 self-stretch">
+						<div className="flex flex-col gap-0">
+							<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+								BAST Template
+							</Label>
+							<Controller
+								control={control}
+								name="bast_template_id"
+								render={({ field }) => (
+									<Select onValueChange={field.onChange} value={field.value}>
+										<SelectTrigger>
+											<SelectValue placeholder="Pilih template BAST" />
+										</SelectTrigger>
+										<SelectContent>
+											{bastTemplates.map((t: any) => (
+												<SelectItem key={t.id} value={t.id}>
+													{t.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								)}
+							/>
+						</div>
+
+						<div className="flex flex-col gap-0">
+							<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+								Invoice Template
+							</Label>
+							<Controller
+								control={control}
+								name="invoice_template_id"
+								render={({ field }) => (
+									<Select onValueChange={field.onChange} value={field.value}>
+										<SelectTrigger>
+											<SelectValue placeholder="Pilih template Invoice" />
+										</SelectTrigger>
+										<SelectContent>
+											{invoiceTemplates.map((t: any) => (
+												<SelectItem key={t.id} value={t.id}>
+													{t.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								)}
+							/>
+						</div>
+					</div>
+				</Card>
+			</div>
+		</div>
+	);
 }

@@ -9,12 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
-import { 
-  ArrowLeft, 
-  Trash2, 
-  Edit, 
-  Building2, 
-  FileText, 
+import {
+  ArrowLeft,
+  Trash2,
+  Edit,
+  Building2,
+  FileText,
   Activity,
   Calendar,
   Mail,
@@ -66,7 +66,7 @@ export default function ClientDetailPage() {
         { tenantId: tenant.id, id },
         {
           onSuccess: () => {
-            router.push('/admin/clients');
+            router.push('/clients');
           },
         }
       );
@@ -120,27 +120,27 @@ export default function ClientDetailPage() {
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/admin/clients" className="hover:text-primary">Client</Link>
+          <Link href="/clients" className="hover:text-primary">Client</Link>
           <span>/</span>
           <span>Edit Client</span>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Detail Klien</h1>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:hover:bg-red-950/50 dark:text-red-400"
               onClick={handleDelete}
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Hapus
             </Button>
-            <Button 
+            <Button
               className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
               asChild
             >
-              <Link href={`/admin/clients/${id}/edit`}>
+              <Link href={`/clients/${id}/edit`}>
                 Edit Data Klien
               </Link>
             </Button>
@@ -328,7 +328,7 @@ export default function ClientDetailPage() {
                     {/* Milestones */}
                     <div className="flex flex-wrap gap-2">
                       {project.milestones.map((ms) => (
-                        <Badge 
+                        <Badge
                           key={ms.name}
                           variant="secondary"
                           className={`
@@ -349,7 +349,7 @@ export default function ClientDetailPage() {
                         <Calendar className="h-4 w-4" />
                         Next: {project.next_deadline}
                       </div>
-                      
+
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>Progress</span>

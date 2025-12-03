@@ -1,9 +1,9 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { setTenantIdHeader } from '@/lib/api';
 import {
   ILoginRequest,
   ILoginResponse,
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   } = useQuery<ILoginResponse>({
     queryKey: ['session'],
     queryFn: getMe,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: false, // Let axios interceptor handle retries (refresh token)
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     enabled: typeof window !== 'undefined' && !isOnAuthPage,
@@ -116,6 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
     onSuccess: () => {
       clearTokens();
+      setTenantIdHeader(null); // Clear tenant ID header on logout
       queryClient.clear(); // Clear all queries
       router.push('/auth/sign-in');
     },
@@ -129,6 +130,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const sessionData = sessionResponse?.data;
   const isAuthenticated = !!sessionData && !isError;
+
+  useEffect(() => {
+    if (sessionData?.tenant?.id) {
+      setTenantIdHeader(sessionData.tenant.id);
+    } else {
+      setTenantIdHeader(null);
+    }
+  }, [sessionData?.tenant?.id]); // Watch for changes in tenant ID
 
   return (
     <AuthContext.Provider

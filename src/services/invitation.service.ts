@@ -14,7 +14,7 @@ import {
 
 /**
  * Get user's invitations
- * GET /api/v1/users/me/invitations
+ * GET /users/me/invitations
  */
 export const getMyInvitations = async (
   params?: ListInvitationsParams,
@@ -22,7 +22,7 @@ export const getMyInvitations = async (
   const { data } = await api.get<{
     success: boolean;
     data: InvitationListResponse;
-  }>('/users/me/invitations', { params });
+  }>('/user/me/invitations', { params });
   return data.data;
 };
 

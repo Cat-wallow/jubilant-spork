@@ -1,75 +1,152 @@
-'use client';
+"use client";
 
-import RBAC from '@/components/rbac/RBAC';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import ProjectStats from './components/ProjectStats';
-import ProjectTable from './components/ProjectTable';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import RBAC from "@/components/rbac/RBAC";
+import { getProjects } from "@/services/project.service";
+import { useQuery } from "@tanstack/react-query";
+import {
+	ColumnFiltersState,
+	getCoreRowModel,
+	SortingState,
+	useReactTable,
+	VisibilityState,
+} from "@tanstack/react-table";
+import { useState } from "react";
+import ProjectStats from "./components/ProjectStats";
+import { DataTableToolbar } from "./components/data-table-toolbar";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./components/columns";
+import { useDebounce } from "use-debounce";
 
 function ProjectsPageContent() {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+	// Table state
+	const [pagination, setPagination] = useState({
+		pageIndex: 0,
+		pageSize: 10,
+	});
+	const [sorting, setSorting] = useState<SortingState>([]);
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+	const [rowSelection, setRowSelection] = useState({});
 
-  return (
-    <div className="w-full space-y-[30px]">
-      {/* Header */}
-      <div className="flex flex-col gap-[5px]">
-        <p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">Project</p>
-        <h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-[-0.68px] text-[#0B1437]">
-          Daftar Project
-        </h1>
-      </div>
+	const [searchQuery, setSearchQuery] = useState("");
+	const [statusFilter, setStatusFilter] = useState("all");
+	const [planFilter, setPlanFilter] = useState("all"); // planFilter here maps to 'scope' in service
+	const debouncedSearch = useDebounce(searchQuery, 400);
 
-      {/* Stats */}
-      <ProjectStats />
+	const { data, isLoading, isError } = useQuery({
+		queryKey: [
+			"projects",
+			pagination.pageIndex,
+			pagination.pageSize,
+			sorting,
+			debouncedSearch,
+			statusFilter,
+			planFilter,
+		],
+		queryFn: () => {
+			const sortDescriptor = sorting.length > 0 ? sorting[0] : undefined;
+			const sort = sortDescriptor
+				? {
+						column: sortDescriptor.id,
+						direction: sortDescriptor.desc ? "desc" : "asc",
+					}
+				: undefined;
 
-      {/* Main Content Card */}
-      <div className="rounded-[20px] bg-white p-[30px]">
-        {/* Title and Add Button */}
-        <div className="mb-[50px] flex items-start justify-between">
-          <div className="flex flex-col gap-[20px]">
-            <div>
-              <h2 className="font-dm text-2xl font-bold leading-8 text-[#2B3674]">
-                Semua Project
-              </h2>
-              <p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
-                Kelola projectdi dalam sistem
-              </p>
-            </div>
-          </div>
-          <Button
-            onClick={() => router.push('/tenant/projects/new')}
-            className="flex h-12 items-center gap-1 rounded-[10px] bg-[#08F] px-3 hover:bg-[#08F]/90"
-          >
-            <Plus className="h-6 w-6" />
-            <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
-              Tambah Project
-            </span>
-          </Button>
-        </div>
+			return getProjects(
+				pagination.pageIndex + 1,
+				pagination.pageSize,
+				searchQuery,
+				statusFilter,
+				planFilter,
+				sort as any,
+			);
+		},
+		keepPreviousData: true,
+		staleTime: 5 * 60 * 1000, // 5 minutes
+	});
 
-        {/* Table */}
-        <ProjectTable
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          typeFilter={typeFilter}
-          setTypeFilter={setTypeFilter}
-        />
-      </div>
-    </div>
-  );
+	const projects = data?.data?.projects || [];
+	const totalProjects = data?.data?.total || 0;
+	const pageCount = Math.ceil(totalProjects / pagination.pageSize);
+
+	const table = useReactTable({
+		data: projects,
+		columns: columns,
+		pageCount,
+		state: {
+			pagination,
+			sorting,
+			columnFilters,
+			columnVisibility,
+			rowSelection,
+		},
+		onPaginationChange: setPagination,
+		onSortingChange: setSorting,
+		onColumnFiltersChange: setColumnFilters,
+		onColumnVisibilityChange: setColumnVisibility,
+		onRowSelectionChange: setRowSelection,
+		getCoreRowModel: getCoreRowModel(),
+		manualPagination: true,
+		manualSorting: true,
+		manualFiltering: true,
+	});
+
+	return (
+		<div className="w-full space-y-6">
+			{/* Header */}
+			<div className="flex flex-col gap-[5px]">
+				<h1 className="text-3xl font-bold tracking-tight text-primary">
+					Daftar Project
+				</h1>
+			</div>
+
+			{/* Stats */}
+			<ProjectStats />
+
+			{/* Main Content Card */}
+			<div className="rounded-lg border bg-card p-6">
+				{/* Title and Add Button */}
+				<div className="mb-6 flex items-start justify-between">
+					<div className="flex flex-col gap-1">
+						<h2 className="text-2xl font-bold">Semua Project</h2>
+						<p className="text-sm text-muted-foreground">
+							Kelola project di dalam sistem
+						</p>
+					</div>
+				</div>
+
+				{/* Filters and Toolbar */}
+				<DataTableToolbar
+					table={table}
+					searchQuery={searchQuery}
+					setSearchQuery={setSearchQuery}
+					statusFilter={statusFilter}
+					setStatusFilter={setStatusFilter}
+					planFilter={planFilter}
+					setPlanFilter={setPlanFilter}
+				/>
+
+				{/* Table */}
+				<div className="mt-6">
+					<DataTable
+						table={table}
+						columns={columns}
+						isLoading={isLoading}
+						isError={isError}
+					/>
+				</div>
+			</div>
+		</div>
+	);
 }
 
 export default function ProjectsPage() {
-  return (
-    <RBAC requiredPermission="project:manage" unauthorizedPage={true}>
-      <ProjectsPageContent />
-    </RBAC>
-  );
+	return (
+		<RBAC
+			requiredPermission={["project:manage", "project:read"]}
+			unauthorizedPage={true}
+		>
+			<ProjectsPageContent />
+		</RBAC>
+	);
 }

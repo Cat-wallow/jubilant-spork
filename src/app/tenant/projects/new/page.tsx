@@ -1,82 +1,168 @@
-'use client';
+"use client";
 
-import RBAC from '@/components/rbac/RBAC';
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import DetailProjectTab from './components/DetailProjectTab';
-import ProjectSettingsTab from './components/ProjectSettingsTab';
+import RBAC from "@/components/rbac/RBAC";
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import DetailProjectTab from "./components/DetailProjectTab";
+import ProjectSettingsTab from "./components/ProjectSettingsTab";
+import Switch from "@/components/switch";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { projectSchema, ProjectFormValues } from "@/validators/project.schema";
+import api from "@/lib/api";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 function NewProjectPageContent() {
-  const [published, setPublished] = useState(false);
+	const [published, setPublished] = useState(false);
+	const router = useRouter();
+	const queryClient = useQueryClient();
 
-  return (
-    <div className="w-full space-y-[30px]">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2.5 self-stretch">
-        <div className="flex flex-1 flex-col gap-[5px]">
-          <p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">
-            Project {'>'} Add Project
-          </p>
-          <h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-[-0.68px] text-[#0B1437]">
-            Tambah Project Baru
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
-            Publish
-          </span>
-          <button
-            onClick={() => setPublished(!published)}
-            className="relative h-6 w-11 rounded-full bg-[#E2E8F0] transition-colors"
-          >
-            <div
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${published ? 'translate-x-5' : 'translate-x-0.5'}`}
-            />
-          </button>
-        </div>
-        <Button className="flex h-12 items-center gap-1 rounded-[10px] bg-[#08F] px-3 hover:bg-[#08F]/90">
-          <Plus className="h-6 w-6" />
-          <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
-            Buat Project
-          </span>
-        </Button>
-      </div>
+	const methods = useForm<ProjectFormValues>({
+		resolver: zodResolver(projectSchema),
+		defaultValues: {
+			scopes: [],
+			escalation_user_ids: [],
+			team_assignments: {},
+			due_policy_days: 3, // Default H+3
+		},
+	});
 
-      {/* Tabs */}
-      <Tabs defaultValue="detail" className="w-full">
-        <TabsList className="mb-[30px] h-[42px] w-full justify-start gap-5 rounded-[5px] bg-[#F4F7FE] p-[5px]">
-          <TabsTrigger
-            value="detail"
-            className="flex-1 rounded-[5px] px-[15px] py-[3px] font-public-sans text-sm font-semibold leading-[22px] data-[state=active]:bg-white data-[state=active]:text-[#757575] data-[state=inactive]:text-[#757575]"
-          >
-            Detail Project
-          </TabsTrigger>
-          <TabsTrigger
-            value="settings"
-            className="flex-1 rounded-[5px] px-[15px] py-[3px] font-public-sans text-sm font-semibold leading-[22px] data-[state=active]:bg-white data-[state=active]:text-[#757575] data-[state=inactive]:text-[#757575]"
-          >
-            Project Settings
-          </TabsTrigger>
-        </TabsList>
+	const onSubmit = async (data: ProjectFormValues) => {
+		try {
+			// Transform frontend data to backend DTO
+			const selectedSanitizedScopes = data.scopes.map((scope) =>
+				scope.replace(/[\s.]/g, "_"),
+			);
 
-        <TabsContent value="detail" className="mt-0">
-          <DetailProjectTab />
-        </TabsContent>
+			// Filter team assignments to keep only those that match selected sanitized scopes
+			const validAssignments = Object.entries(data.team_assignments).filter(
+				([key]) => selectedSanitizedScopes.includes(key),
+			);
 
-        <TabsContent value="settings" className="mt-0">
-          <ProjectSettingsTab />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
+			const members = validAssignments.flatMap(
+				([sanitizedScopeKey, assignment]) => {
+					// Find original scope name from data.scopes that matches this sanitized key
+					const originalScope = data.scopes.find(
+						(scope) => scope.replace(/[\s.]/g, "_") === sanitizedScopeKey,
+					);
+
+					if (!originalScope) return [];
+
+					return [
+						{
+							user_id: assignment.leader_id,
+							role: "Team Leader",
+							scope: originalScope,
+						},
+						{
+							user_id: assignment.member_id,
+							role: "Team Member",
+							scope: originalScope,
+						},
+					];
+				},
+			);
+
+			const payload = {
+				...data,
+				members,
+				code: data.contract_code,
+				type: "tax_consulting", // Default project type for now, replace with actual selection from UI if implemented
+			};
+
+			// Remove frontend-only fields
+			// @ts-ignore
+			delete payload.team_assignments;
+
+			await api.post("/project", payload);
+
+			toast.success("Berhasil", {
+				description: "Project berhasil dibuat.",
+			});
+			queryClient.invalidateQueries({ queryKey: ["projects"] });
+
+			router.push("/tenant/projects");
+		} catch (error: any) {
+			console.error(error);
+			toast.error("Gagal", {
+				description: "Project gagal dibuat.",
+			});
+		}
+	};
+
+	const onError = (errors: any) => {
+		console.error("Form validation errors:", errors);
+		toast.error("Gagal", {
+			description: "Mohon periksa kembali formulir Anda.",
+		});
+	};
+
+	return (
+		<FormProvider {...methods}>
+			<form
+				onSubmit={methods.handleSubmit(onSubmit, onError)}
+				className="w-full space-y-4"
+			>
+				{/* Header */}
+				<div className="flex items-center justify-between gap-2.5 self-stretch">
+					<div className="flex flex-1 flex-col gap-[5px]">
+						<h1 className="font-dm text-3xl font-bold leading-[42px] tracking-[-0.68px]">
+							Tambah Project Baru
+						</h1>
+					</div>
+					<div className="flex items-center gap-4">
+						<span className="font-inter text-sm font-medium leading-[14px] ">
+							Publish
+						</span>
+						<Switch
+							checked={published}
+							onChange={(e: any) => setPublished(e.target.checked)}
+						/>
+					</div>
+					<Button
+						type="submit"
+						className="flex"
+						disabled={methods.formState.isSubmitting}
+					>
+						<Plus className="h-6 w-6" />
+						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
+							{methods.formState.isSubmitting ? "Menyimpan..." : "Buat Project"}
+						</span>
+					</Button>
+				</div>
+
+				{/* Tabs */}
+				<Tabs defaultValue="detail" className="w-full">
+					<TabsList className="mb-4 bg-card flex w-full">
+						<TabsTrigger value="detail" className="flex-1">
+							Detail Project
+						</TabsTrigger>
+						<TabsTrigger value="settings" className="flex-1">
+							Project Settings
+						</TabsTrigger>
+					</TabsList>
+
+					<TabsContent value="detail" className="mt-0">
+						<DetailProjectTab />
+					</TabsContent>
+
+					<TabsContent value="settings" className="mt-0">
+						<ProjectSettingsTab />
+					</TabsContent>
+				</Tabs>
+			</form>
+		</FormProvider>
+	);
 }
 
 export default function NewProjectPage() {
-  return (
-    <RBAC requiredPermission="project:manage" unauthorizedPage={true}>
-      <NewProjectPageContent />
-    </RBAC>
-  );
+	return (
+		<RBAC requiredPermission="project:manage" unauthorizedPage={true}>
+			<NewProjectPageContent />
+		</RBAC>
+	);
 }
