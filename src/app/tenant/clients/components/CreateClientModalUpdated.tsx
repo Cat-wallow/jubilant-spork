@@ -24,12 +24,12 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Building2, 
-  FileText, 
-  MapPin, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  FileText,
+  MapPin,
   User,
   Calculator,
   Phone,
@@ -72,7 +72,7 @@ const clientFormSchema = z.object({
     service_package: z.string().default('basic'),
     business_scale: z.string().optional(),
     annual_revenue: z.number().min(0).default(0),
-    
+
     // Address
     address: z.string().min(1, 'Alamat wajib diisi'),
     country: z.string().default('Indonesia'),
@@ -83,17 +83,15 @@ const clientFormSchema = z.object({
     email: z.string().email('Email tidak valid'),
     website: z.string().optional(),
   }),
-  
+
   // Tax Information
   taxInfo: z.object({
     pkp_status: z.boolean().default(false),
     taxpayer_type: z.string().optional(),
     kpp_office: z.string().optional(),
     applicable_taxes: z.array(z.string()).default([]),
-    pic_pkp_name: z.string().optional(),
-    pic_pkp_contact: z.string().optional(),
-    pic_pkp_email: z.string().email('Email tidak valid').optional(),
-    
+    pic_pkp_email: z.string().email('Email tidak valid').optional().or(z.literal('')),
+
     // Tax Documents
     has_registered_letter: z.boolean().default(false),
     registered_letter_description: z.string().optional(),
@@ -105,16 +103,15 @@ const clientFormSchema = z.object({
     pkp_confirmation_date: z.string().optional(),
     has_other_letter: z.boolean().default(false),
   }),
-  
+
   // Contacts
   contacts: z.array(z.object({
     name: z.string().min(1, 'Nama kontak wajib diisi'),
     position: z.string().min(1, 'Posisi wajib diisi'),
-    email: z.string().email('Email tidak valid'),
-    phone: z.string().min(1, 'Telepon wajib diisi'),
+    is_primary: z.boolean().default(false),
     is_billing_contact: z.boolean().default(false),
   })).default([]),
-  
+
   // Branch Offices
   branches: z.array(z.object({
     shareholder: z.string().optional(),
@@ -123,14 +120,12 @@ const clientFormSchema = z.object({
     province: z.string().optional(),
     city: z.string().optional(),
     phone: z.string().optional(),
-    pic_name: z.string().optional(),
-    pic_position: z.string().optional(),
-    pic_email: z.string().email('Email tidak valid').optional(),
+    pic_email: z.string().email('Email tidak valid').optional().or(z.literal('')),
     pic_phone: z.string().optional(),
     address: z.string().optional(),
     is_hq: z.boolean().default(false),
   })).default([]),
-  
+
   // Accounting Preferences
   preferences: z.object({
     use_default_coa: z.boolean().default(true),
@@ -142,14 +137,14 @@ const clientFormSchema = z.object({
     prefix: z.string().optional(),
     suffix: z.string().optional(),
   }).optional(),
-  
+
   // Custom COA
   customCoa: z.array(z.object({
     account_number: z.string().min(1, 'Nomor akun wajib diisi'),
     account_name: z.string().min(1, 'Nama akun wajib diisi'),
     description: z.string().optional(),
   })).default([]),
-  
+
   // Legal Documents
   legalDocuments: z.array(z.object({
     document_type: z.string().min(1, 'Tipe dokumen wajib diisi'),
@@ -170,14 +165,14 @@ interface CreateClientModalUpdatedProps {
   onSubmit: (data: any) => Promise<void>;
 }
 
-export function CreateClientModalUpdated({ 
-  open, 
-  onOpenChange, 
-  onSubmit 
+export function CreateClientModalUpdated({
+  open,
+  onOpenChange,
+  onSubmit
 }: CreateClientModalUpdatedProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -251,11 +246,11 @@ export function CreateClientModalUpdated({
   ];
 
   // Helper functions for dynamic arrays
-  const addContact = () => {
-    const currentContacts = watchedValues.contacts || [];
+    // First contact is automatically primary
+    const isPrimary = currentContacts.length === 0;
     setValue('contacts', [
       ...currentContacts,
-      { name: '', position: '', email: '', phone: '', is_billing_contact: false }
+      { name: '', position: '', email: '', phone: '', is_primary: isPrimary, is_billing_contact: false }
     ]);
   };
 
@@ -268,19 +263,19 @@ export function CreateClientModalUpdated({
     const currentBranches = watchedValues.branches || [];
     setValue('branches', [
       ...currentBranches,
-      { 
-        shareholder: '', 
-        position: '', 
-        country: 'Indonesia', 
-        province: '', 
-        city: '', 
-        phone: '', 
-        pic_name: '', 
-        pic_position: '', 
-        pic_email: '', 
-        pic_phone: '', 
-        address: '', 
-        is_hq: false 
+      {
+        shareholder: '',
+        position: '',
+        country: 'Indonesia',
+        province: '',
+        city: '',
+        phone: '',
+        pic_name: '',
+        pic_position: '',
+        pic_email: '',
+        pic_phone: '',
+        address: '',
+        is_hq: false
       }
     ]);
   };
@@ -334,16 +329,16 @@ export function CreateClientModalUpdated({
       const transformedData = {
         // Basic fields (flatten for backend)
         ...data.basicInfo,
-        
+
         // Tax fields (flatten for backend)
         ...data.taxInfo,
-        
+
         // Nested arrays for related tables
         contacts: data.contacts,
         branches: data.branches,
         preferences: data.preferences,
         customCoa: data.customCoa,
-        
+
         // Tax documents (transform from taxInfo)
         taxDocuments: [
           ...(data.taxInfo.has_registered_letter ? [{
@@ -359,7 +354,7 @@ export function CreateClientModalUpdated({
             description: data.taxInfo.pkp_confirmation_description,
           }] : []),
         ],
-        
+
         // Legal documents
         legalDocuments: data.legalDocuments,
       };
@@ -948,13 +943,31 @@ export function CreateClientModalUpdated({
                         placeholder="08123456789"
                       />
                     </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      {...register(`contacts.${index}.is_billing_contact`)}
-                    />
-                    <Label>Jadikan sebagai kontak billing</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`contacts.${index}.is_primary`}
+                        checked={watchedValues.contacts?.[index]?.is_primary || false}
+                        onCheckedChange={(checked) => {
+                          // Uncheck all other contacts first
+                          if (checked) {
+                            watchedValues.contacts?.forEach((_, i) => {
+                              if (i !== index) setValue(`contacts.${i}.is_primary`, false);
+                            });
+                          }
+                          setValue(`contacts.${index}.is_primary`, checked as boolean);
+                        }}
+                      />
+                      <Label htmlFor={`contacts.${index}.is_primary`}>Kontak Utama (PIC)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`contacts.${index}.is_billing_contact`}
+                        checked={watchedValues.contacts?.[index]?.is_billing_contact || false}
+                        onCheckedChange={(checked) => setValue(`contacts.${index}.is_billing_contact`, checked as boolean)}
+                      />
+                      <Label htmlFor={`contacts.${index}.is_billing_contact`}>Kontak Billing</Label>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1042,11 +1055,19 @@ export function CreateClientModalUpdated({
                         placeholder="022-1234567"
                       />
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        {...register(`branches.${index}.is_hq`)}
+                        id={`branches.${index}.is_hq`}
+                        checked={watchedValues.branches?.[index]?.is_hq || false}
+                        onCheckedChange={(checked) => {
+                          // Uncheck all other branches first
+                          if (checked) {
+                            watchedValues.branches?.forEach((_, i) => {
+                              if (i !== index) setValue(`branches.${i}.is_hq`, false);
+                            });
+                          }
+                          setValue(`branches.${index}.is_hq`, checked as boolean);
+                        }}
                       />
-                      <Label>Kantor Pusat</Label>
+                      <Label htmlFor={`branches.${index}.is_hq`}>Kantor Pusat</Label>
                     </div>
                   </div>
 
@@ -1095,7 +1116,7 @@ export function CreateClientModalUpdated({
           <div className="space-y-6">
             <div className="space-y-4">
               <Label>Preferensi Akuntansi</Label>
-              
+
               <div className="flex items-center space-x-2">
                 <Checkbox
                   {...register('preferences.use_default_coa')}
@@ -1139,7 +1160,7 @@ export function CreateClientModalUpdated({
 
             <div className="space-y-4">
               <Label>Penomoran Voucher</Label>
-              
+
               <div className="flex items-center space-x-2">
                 <Checkbox
                   {...register('preferences.use_tenant_voucher_numbering')}

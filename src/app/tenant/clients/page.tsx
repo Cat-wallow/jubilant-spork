@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClients, useCreateClient, useDeleteClient } from '@/hooks/useClients';
+import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary } from '@/hooks/useClients';
 import { useAuth } from '@/contexts/AuthContext';
 import { SummaryCards } from './components/SummaryCards';
 import { AdvancedFilters } from './components/AdvancedFilters';
@@ -47,6 +47,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Client } from '@/hooks/useClients';
+import { useToast } from '@/hooks/use-toast';
 
 // const columns: ColumnDef<Client>[] = [
 //   {
@@ -188,6 +189,7 @@ import { Client } from '@/hooks/useClients';
 export default function ClientsPage() {
   const { tenant } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const createClientMutation = useCreateClient();
   const deleteClientMutation = useDeleteClient();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
@@ -207,6 +209,8 @@ export default function ClientsPage() {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
   });
+
+  const { data: complianceSummary } = useTenantComplianceSummary(tenant.id);
 
   const columns = useMemo<ColumnDef<Client>[]>(
     () => [
@@ -366,7 +370,7 @@ export default function ClientsPage() {
     totalClients: data?.pagination?.total || 0,
     activeClients: clients.filter((c) => c.status === 'active').length,
     totalProjects: clients.reduce((sum, c) => sum + (c.active_projects || 0), 0),
-    complianceRate: 85, // Mock data
+    complianceRate: complianceSummary?.compliance_rate ?? 0,
   };
 
   const table = useReactTable({
@@ -485,10 +489,19 @@ export default function ClientsPage() {
               tenantId: tenant.id,
               data,
             });
+            toast({
+              title: 'Berhasil',
+              description: 'Klien baru berhasil ditambahkan',
+            });
             setShowCreateModal(false);
-          } catch (error) {
+          } catch (error: any) {
             console.error('Failed to create client:', error);
-            // TODO: Show error toast
+            const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat membuat klien';
+            toast({
+              title: 'Gagal membuat klien',
+              description: errorMessage,
+              variant: 'destructive',
+            });
           }
         }}
       />
