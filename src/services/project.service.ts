@@ -52,6 +52,7 @@ export const getProjects = async (
   status?: string,
   scope?: string,
   sort?: SortDescriptor,
+  tenantId?: string // Optional tenantId parameter
 ): Promise<PaginatedProjectsResponse> => {
   const params = new URLSearchParams();
   params.append('page', page.toString());
@@ -63,8 +64,14 @@ export const getProjects = async (
     params.append('sortBy', sort.column as string);
     params.append('sortOrder', sort.direction);
   }
+  // If tenantId is provided, send it as a query param or header. 
+  // The backend likely expects it in the header 'X-Tenant-Id' or similar if acting as admin.
+  // However, the previous backend logic extracts it from 'X-Tenant-Id' header or user role.
+  // For a platform admin viewing a specific tenant, we usually pass the target tenant ID in the header.
+  
+  const config = tenantId ? { headers: { 'X-Tenant-Id': tenantId } } : {};
 
-  const response = await api.get<PaginatedProjectsResponse>(`/project?${params.toString()}`);
+  const response = await api.get<PaginatedProjectsResponse>(`/project?${params.toString()}`, config);
   return response.data;
 };
 

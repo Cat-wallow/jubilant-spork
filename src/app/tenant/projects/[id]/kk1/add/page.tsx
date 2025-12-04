@@ -31,6 +31,7 @@ import {
 	Check,
 	AlertTriangle,
 	Eye,
+	FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -323,11 +324,7 @@ function TabelBarangJasa({ items }: { items: typeof dummyItems }) {
 								className="h-[45px] w-[100px] rounded-lg border-none bg-[rgba(145,158,171,0.08)]"
 								readOnly
 							/>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-[45px] w-[50px]"
-							>
+							<Button variant="ghost" size="icon" className="h-[45px] w-[50px]">
 								<Trash2 className="h-5 w-5 text-[#BF6A02]" />
 							</Button>
 						</div>
@@ -676,27 +673,42 @@ function SimulasiVoucher() {
 							<TableHead className="text-[#0A0A0A]">Account No</TableHead>
 							<TableHead className="text-[#0A0A0A]">Account Name</TableHead>
 							<TableHead className="text-right text-[#0A0A0A]">Debit</TableHead>
-							<TableHead className="text-right text-[#0A0A0A]">Credit</TableHead>
+							<TableHead className="text-right text-[#0A0A0A]">
+								Credit
+							</TableHead>
 							<TableHead className="text-[#0A0A0A]">Description</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{voucherLines.map((line) => (
-							<TableRow key={line.line} className="border-b border-[rgba(0,0,0,0.10)]">
+							<TableRow
+								key={line.line}
+								className="border-b border-[rgba(0,0,0,0.10)]"
+							>
 								<TableCell className="text-center">{line.line}</TableCell>
 								<TableCell className="font-mono">{line.accountNo}</TableCell>
 								<TableCell>{line.accountName}</TableCell>
-								<TableCell className="text-right font-mono">{line.debit}</TableCell>
-								<TableCell className="text-right font-mono">{line.credit}</TableCell>
-								<TableCell className="text-[#717182]">{line.description}</TableCell>
+								<TableCell className="text-right font-mono">
+									{line.debit}
+								</TableCell>
+								<TableCell className="text-right font-mono">
+									{line.credit}
+								</TableCell>
+								<TableCell className="text-[#717182]">
+									{line.description}
+								</TableCell>
 							</TableRow>
 						))}
 						<TableRow className="bg-[rgba(236,236,240,0.20)]">
 							<TableCell colSpan={3} className="text-right font-medium">
 								TOTAL
 							</TableCell>
-							<TableCell className="text-right font-mono font-medium">0</TableCell>
-							<TableCell className="text-right font-mono font-medium">0</TableCell>
+							<TableCell className="text-right font-mono font-medium">
+								0
+							</TableCell>
+							<TableCell className="text-right font-mono font-medium">
+								0
+							</TableCell>
 							<TableCell>
 								<Badge className="border-none bg-[#DCFCE7] text-[#016630]">
 									<Check className="mr-1 h-3 w-3" />
@@ -749,13 +761,13 @@ export default function KK1AddPage() {
 						onClick={() => setIsPublished(!isPublished)}
 						className={cn(
 							"relative h-6 w-11 rounded-full transition-colors",
-							isPublished ? "bg-[#08F]" : "bg-[#E2E8F0]"
+							isPublished ? "bg-[#08F]" : "bg-[#E2E8F0]",
 						)}
 					>
 						<div
 							className={cn(
 								"absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-								isPublished ? "left-5" : "left-0.5"
+								isPublished ? "left-5" : "left-0.5",
 							)}
 						/>
 					</button>

@@ -59,6 +59,7 @@ function ProjectsPageContent() {
 				statusFilter,
 				planFilter,
 				sort as any,
+                undefined // tenantId not needed for tenant view
 			);
 		},
 		keepPreviousData: true,

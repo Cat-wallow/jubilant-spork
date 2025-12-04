@@ -20,9 +20,9 @@ const subMenuItems: SubMenuItem[] = [
 	{ name: "Semua KK 5.0", path: "kk-5" },
 ];
 
-export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
+export const SidebarLinks = (props: { routes: RoutesType[]; isCollapsed?: boolean }): JSX.Element => {
 	const pathname = usePathname();
-	const { routes } = props;
+	const { routes, isCollapsed } = props;
 	const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(
 		{},
 	);
@@ -35,6 +35,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
 	);
 
 	const toggleMenu = (routePath: string) => {
+		if (isCollapsed) return; // Disable toggle when collapsed
 		setExpandedMenus((prev) => ({
 			...prev,
 			[routePath]: !prev[routePath],
@@ -53,8 +54,8 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
 		isExpanded: boolean;
 		hasCollapse: boolean;
 	}) => (
-		<div className="group relative flex w-full items-center gap-[73px] hover:cursor-pointer">
-			<div className="flex flex-1 items-center gap-[15px]">
+		<div className={`group relative flex w-full items-center ${isCollapsed ? "justify-center" : "gap-[73px]"} hover:cursor-pointer`}>
+			<div className={`flex flex-1 items-center ${isCollapsed ? "justify-center" : "gap-[15px]"}`}>
 				<span
 					className={`flex h-6 w-6 items-center justify-center ${
 						isActive || isExpanded
@@ -64,22 +65,24 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
 				>
 					{route.icon ? route.icon : <DashIcon />}
 				</span>
-				<p
-					className={`text-nowrap font-dm text-base leading-[30px] tracking-[-0.32px] ${
-						isActive || isExpanded
-							? "font-bold text-brand-500 dark:text-white"
-							: "font-normal text-gray-600 group-hover:text-brand-500 dark:text-gray-400 dark:group-hover:text-white"
-					}`}
-				>
-					{route.name}
-				</p>
+				{!isCollapsed && (
+					<p
+						className={`text-nowrap font-dm text-base leading-[30px] tracking-[-0.32px] ${
+							isActive || isExpanded
+								? "font-bold text-brand-500 dark:text-white"
+								: "font-normal text-gray-600 group-hover:text-brand-500 dark:text-gray-400 dark:group-hover:text-white"
+						}`}
+					>
+						{route.name}
+					</p>
+				)}
 			</div>
 
-			{isActive && !isExpanded && (
+			{!isCollapsed && isActive && !isExpanded && (
 				<div className="h-9 w-1 flex-shrink-0 rounded-[25px] bg-brand-500 dark:bg-brand-400" />
 			)}
 
-			{hasCollapse && (
+			{!isCollapsed && hasCollapse && (
 				<svg
 					className={`h-6 w-3 flex-shrink-0 transition-transform ${
 						isExpanded ? "rotate-180" : ""
@@ -133,7 +136,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
 									/>
 								</div>
 
-								{isExpanded && (
+								{isExpanded && !isCollapsed && (
 									<div className="ml-[20px] mt-2 flex w-[247px] flex-col">
 										{subMenuItems.map((item, subIndex) => (
 											<NavLink

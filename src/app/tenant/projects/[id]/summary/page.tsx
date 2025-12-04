@@ -21,7 +21,6 @@ const projectData = {
 	id: "1",
 	name: "Konsultasi Pajak PT Maju Bersama",
 	code: "PRJ-2025-02-001",
-	breadcrumb: "Project > Add Project",
 	client: "PT Maju Mundur Bersama",
 	startDate: "2024-02-20",
 	deadline: "2024-02-22",
@@ -199,20 +198,20 @@ export default function ProjectSummaryPage() {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[30px] bg-[#F4F7FE] p-[30px]">
+		<div className="flex w-full flex-col gap-[30px]  p-[30px]">
 			{/* Header */}
 			<div className="flex items-center justify-center gap-2.5">
 				<div className="flex flex-1 flex-col gap-[5px]">
 					<p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">
 						{projectData.breadcrumb}
 					</p>
-					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight text-[#0B1437]">
+					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight ">
 						{projectData.name}
 					</h1>
 				</div>
 				<div className="flex items-center gap-2">
 					<span className="text-sm font-medium text-[#404040]">Publish</span>
-					<div className="h-6 w-11 rounded-[50px] bg-[#E2E8F0] relative">
+					<div className="h-6 w-11 rounded-[50px] relative">
 						<div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white" />
 					</div>
 				</div>
@@ -228,7 +227,7 @@ export default function ProjectSummaryPage() {
 							"flex flex-1 items-center justify-center gap-2.5 rounded-[5px] px-[15px] py-[3px] transition-colors",
 							currentTab === tab.path
 								? "bg-white"
-								: "bg-transparent hover:bg-white/50"
+								: "bg-transparent hover:bg-white/50",
 						)}
 					>
 						<span className="font-public-sans text-sm font-semibold leading-[22px] text-[#757575]">
@@ -472,7 +471,7 @@ export default function ProjectSummaryPage() {
 													? "bg-[#14AE5C]"
 													: module.status === "On Progress"
 														? "bg-[#08F]"
-														: "bg-[#D9D9D9]"
+														: "bg-[#D9D9D9]",
 											)}
 										>
 											{module.status === "Completed" && (
@@ -505,7 +504,7 @@ export default function ProjectSummaryPage() {
 															? "bg-[#CFF7D3] text-[#404040]"
 															: module.status === "On Progress"
 																? "bg-[#F4F7FE] text-[#404040]"
-																: "bg-white text-[#404040]"
+																: "bg-white text-[#404040]",
 													)}
 												>
 													{module.status}
@@ -626,7 +625,7 @@ export default function ProjectSummaryPage() {
 									"rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2.5 py-[5px] text-xs",
 									projectData.topIssues[0].severity === "Medium"
 										? "bg-[#FFE8A3] text-[#BF6A02]"
-										: ""
+										: "",
 								)}
 							>
 								{projectData.topIssues[0].severity}
@@ -644,7 +643,7 @@ export default function ProjectSummaryPage() {
 											? "bg-[#FFFBEB]"
 											: issue.severity === "High"
 												? "bg-[#FEE9E7]"
-												: "bg-white"
+												: "bg-white",
 									)}
 								>
 									<AlertTriangle className="h-[30px] w-[30px] text-[#900B09]" />
@@ -663,7 +662,7 @@ export default function ProjectSummaryPage() {
 												? "bg-[#FFE8A3] text-[#BF6A02]"
 												: issue.severity === "High"
 													? "bg-[#FDD3D0] text-[#BF6A02]"
-													: "bg-white text-[#404040]"
+													: "bg-white text-[#404040]",
 										)}
 									>
 										{issue.severity}
@@ -742,7 +741,7 @@ export default function ProjectSummaryPage() {
 												"rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2.5 py-[5px] text-xs",
 												issue.severity === "Medium"
 													? "bg-[#FFE8A3] text-[#BF6A02]"
-													: "bg-[#FDD3D0] text-[#BF6A02]"
+													: "bg-[#FDD3D0] text-[#BF6A02]",
 											)}
 										>
 											{issue.severity}

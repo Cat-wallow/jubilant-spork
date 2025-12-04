@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from "@/components/ui/DataTableColumnHeader";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Project } from "@/services/project.service";
 import type { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 
 export const columns: ColumnDef<Project>[] = [
 	{
@@ -36,10 +37,13 @@ export const columns: ColumnDef<Project>[] = [
 			const name = row.getValue("name") as string;
 			const code = row.original.code;
 			return (
-				<div className="flex flex-col ">
+				<Link
+					href={`/tenant/projects/${row.original.id}`}
+					className="flex flex-col"
+				>
 					<span className="text-primary uppercase font-bold">{name}</span>
 					<span className="text-primary uppercase">{code}</span>
-				</div>
+				</Link>
 			);
 		},
 	},
