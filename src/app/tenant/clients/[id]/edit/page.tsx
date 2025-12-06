@@ -16,9 +16,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Trash2, Save, ArrowLeft, Plus } from 'lucide-react';
+import { Trash2, Save, ArrowLeft, Plus, Eye, Upload, FileText, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
@@ -65,6 +68,16 @@ const clientFormSchema = z.object({
   pic_pkp_name: z.string().optional(), // Added PKP contact fields
   pic_pkp_contact: z.string().optional(),
   pic_pkp_email: z.string().email('Email PIC PKP tidak valid').optional().or(z.literal('')),
+
+  // Accounting Preferences
+  use_default_coa: z.boolean().optional(),
+  coa_template: z.string().optional(),
+  use_tenant_voucher_numbering: z.boolean().optional(),
+  voucher_format: z.string().optional(),
+  reset_frequency: z.string().optional(),
+  padding_number: z.number().optional(),
+  voucher_prefix: z.string().optional(),
+  voucher_suffix: z.string().optional(),
 });
 
 type ClientFormData = z.infer<typeof clientFormSchema>;
@@ -121,6 +134,27 @@ export default function EditClientPage() {
 
   const [branchesState, setBranchesState] = useState<BranchForm[]>([]);
   const [deletedBranchIds, setDeletedBranchIds] = useState<string[]>([]);
+
+  // Legal Documents State
+  const [legalDocuments, setLegalDocuments] = useState<{
+    id?: string;
+    document_type: string;
+    document_name: string;
+    expiry_date?: string;
+    file_size?: string;
+    upload_date?: string;
+    is_required: boolean;
+  }[]>([
+    { document_type: 'akta_pendirian', document_name: '', is_required: true },
+    { document_type: 'nib', document_name: '', is_required: true },
+    { document_type: 'npwp', document_name: '', is_required: true },
+  ]);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [newDocument, setNewDocument] = useState({
+    document_type: '',
+    expiry_date: '',
+    file: null as File | null,
+  });
 
   const {
     register,
@@ -221,13 +255,13 @@ export default function EditClientPage() {
         notary_location: client.notary_location || '',
         notary_contact: client.notary_contact || '',
         establishment_date: client.establishment_date ? new Date(client.establishment_date).toISOString().split('T')[0] : '',
-        employee_count: client.employee_count || 0,
+        employee_count: Number(client.employee_count) || 0, // Convert to number
         basic_capital: Number(client.basic_capital) || 0, // Convert to number
         paid_capital: Number(client.paid_capital) || 0, // Convert to number
 
         // Classification
         business_scale: client.business_scale || '',
-        business_type: client.business_type || '', // Populate business_type
+        business_type: client.business_type || '',
         industry_sector: client.industry_sector || '',
         annual_revenue: Number(client.annual_revenue) || 0, // Convert to number
         service_package: client.service_package || '',
@@ -237,9 +271,19 @@ export default function EditClientPage() {
         kpp_office: client.kpp_office || '',
         pkp_status: client.pkp_status || false,
         applicable_taxes: client.applicable_taxes || [],
-        pic_pkp_name: client.pic_pkp_name || '', // Populate PKP contact fields
+        pic_pkp_name: client.pic_pkp_name || '',
         pic_pkp_contact: client.pic_pkp_contact || '',
         pic_pkp_email: client.pic_pkp_email || '',
+
+        // Accounting Preferences
+        use_default_coa: client.use_default_coa ?? true,
+        coa_template: client.coa_template || '',
+        use_tenant_voucher_numbering: client.use_tenant_voucher_numbering ?? true,
+        voucher_format: client.voucher_format || '',
+        reset_frequency: client.reset_frequency || 'monthly',
+        padding_number: client.padding_number || 4,
+        voucher_prefix: client.voucher_prefix || '',
+        voucher_suffix: client.voucher_suffix || '',
       });
     }
   }, [client, reset]);
@@ -304,15 +348,9 @@ export default function EditClientPage() {
         data,
       });
       console.log('Update successful, server response:', result); // DEBUG LOG
-<<<<<<< HEAD:src/app/tenant/clients/[id]/edit/page.tsx
 
-      // Upsert PIC & Billing contacts
-      const contactPromises: Promise<any>[] = [];
-=======
-      
       // Upsert PIC & Billing contacts + cabang
       const mutationPromises: Promise<any>[] = [];
->>>>>>> 9580b8adfe2e529119fdc07e13a66194e5d1341d:src/app/admin/clients/[id]/edit/page.tsx
 
       if (picContact.name || picContact.email || picContact.phone) {
         mutationPromises.push(
@@ -378,9 +416,6 @@ export default function EditClientPage() {
         );
       }
 
-<<<<<<< HEAD:src/app/tenant/clients/[id]/edit/page.tsx
-      router.push(`/clients/${id}`);
-=======
       // Delete removed branches
       for (const branchId of deletedBranchIds) {
         mutationPromises.push(
@@ -401,8 +436,7 @@ export default function EditClientPage() {
         description: 'Data klien berhasil diperbarui',
       });
       
-      router.push(`/admin/clients/${id}`);
->>>>>>> 9580b8adfe2e529119fdc07e13a66194e5d1341d:src/app/admin/clients/[id]/edit/page.tsx
+      router.push(`/clients/${id}`);
     } catch (error) {
       console.error('Failed to update client:', error);
       const anyErr = error as any;
@@ -477,13 +511,9 @@ export default function EditClientPage() {
               <Trash2 className="mr-2 h-4 w-4" />
               Hapus
             </Button>
-<<<<<<< HEAD:src/app/tenant/clients/[id]/edit/page.tsx
-            <Button
-=======
             <Button 
               type="submit"
               form="edit-client-form"
->>>>>>> 9580b8adfe2e529119fdc07e13a66194e5d1341d:src/app/admin/clients/[id]/edit/page.tsx
               className="bg-blue-600 hover:bg-blue-700 dark:text-white"
               disabled={isSubmitting}
             >
@@ -515,10 +545,22 @@ export default function EditClientPage() {
           >
             Kontak & Cabang
           </TabsTrigger>
+          <TabsTrigger
+            value="preferences"
+            className="px-0 py-3 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 dark:data-[state=active]:border-blue-400 data-[state=active]:bg-transparent font-medium text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            Preferensi Akuntansi
+          </TabsTrigger>
+          <TabsTrigger
+            value="documents"
+            className="px-0 py-3 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 dark:data-[state=active]:border-blue-400 data-[state=active]:bg-transparent font-medium text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            Dokumen Legal
+          </TabsTrigger>
         </TabsList>
 
         <form id="edit-client-form" onSubmit={handleSubmit(onSubmit, onValidationError)}>
-          <TabsContent value="identity" className="space-y-6">
+          <TabsContent value="identity" className="space-y-6" forceMount style={{ display: activeTab === 'identity' ? 'block' : 'none' }}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Informasi Dasar */}
               <Card>
@@ -697,7 +739,7 @@ export default function EditClientPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="classification" className="space-y-6">
+          <TabsContent value="classification" className="space-y-6" forceMount style={{ display: activeTab === 'classification' ? 'block' : 'none' }}>
             {/* Informasi Bisnis */}
             <Card>
               <CardHeader>
@@ -706,8 +748,8 @@ export default function EditClientPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="industry">Jenis Usaha *</Label>
-                    <Input id="industry" {...register('industry')} placeholder="Konstruksi" />
+                    <Label htmlFor="business_type">Jenis Usaha *</Label>
+                    <Input id="business_type" {...register('business_type')} placeholder="Konstruksi" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="business_scale">Skala Bisnis *</Label>
@@ -911,7 +953,7 @@ export default function EditClientPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="contacts" className="space-y-6">
+          <TabsContent value="contacts" className="space-y-6" forceMount style={{ display: activeTab === 'contacts' ? 'block' : 'none' }}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -1208,8 +1250,390 @@ export default function EditClientPage() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="preferences" className="space-y-6" forceMount style={{ display: activeTab === 'preferences' ? 'block' : 'none' }}>
+            {/* Template COA */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Template COA (Chart of Account)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Gunakan Template Default */}
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                  <div>
+                    <p className="font-medium">Gunakan Template Default</p>
+                    <p className="text-sm text-muted-foreground">
+                      Otomatis menggunakan template berdasarkan jenis usaha: {watch('business_type') || 'Trading'}
+                    </p>
+                    {watch('use_default_coa') && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="px-3 py-1 bg-white dark:bg-slate-800 border rounded-md text-sm">
+                          Trading COA Template
+                        </span>
+                        <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
+                          <Eye className="h-4 w-4 mr-1" />
+                          Preview
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <Switch
+                    checked={watch('use_default_coa') ?? true}
+                    onCheckedChange={(checked) => setValue('use_default_coa', checked)}
+                  />
+                </div>
+
+                {/* Pilih Template COA */}
+                {!watch('use_default_coa') && (
+                  <div className="space-y-2">
+                    <Label>Pilih Template COA *</Label>
+                    <Select 
+                      value={watch('coa_template') || ''} 
+                      onValueChange={(val) => setValue('coa_template', val)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih template COA..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="trading">Trading COA Template</SelectItem>
+                        <SelectItem value="manufacturing">Manufacturing COA Template</SelectItem>
+                        <SelectItem value="services">Services COA Template</SelectItem>
+                        <SelectItem value="construction">Construction COA Template</SelectItem>
+                        <SelectItem value="retail">Retail COA Template</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Kebijakan Penomoran Voucher */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Kebijakan Penomoran Voucher
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Gunakan kebijakan dari tenant */}
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                  <div>
+                    <p className="font-medium">Gunakan kebijakan penomoran dari tenant</p>
+                    <p className="text-sm text-muted-foreground">
+                      Mengikuti format penomoran yang ditetapkan
+                    </p>
+                  </div>
+                  <Switch
+                    checked={watch('use_tenant_voucher_numbering') ?? true}
+                    onCheckedChange={(checked) => setValue('use_tenant_voucher_numbering', checked)}
+                  />
+                </div>
+
+                {/* Custom Voucher Settings */}
+                {!watch('use_tenant_voucher_numbering') && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Format Voucher *</Label>
+                        <Input
+                          {...register('voucher_format')}
+                          placeholder="JB YYY-MM-###"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Frekuensi Reset</Label>
+                        <Select 
+                          value={watch('reset_frequency') || 'monthly'} 
+                          onValueChange={(val) => setValue('reset_frequency', val)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Bulanan" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">Harian</SelectItem>
+                            <SelectItem value="weekly">Mingguan</SelectItem>
+                            <SelectItem value="monthly">Bulanan</SelectItem>
+                            <SelectItem value="yearly">Tahunan</SelectItem>
+                            <SelectItem value="never">Tidak Pernah</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Padding Angka</Label>
+                        <Input
+                          type="number"
+                          {...register('padding_number', { valueAsNumber: true })}
+                          placeholder="4"
+                          min={1}
+                          max={10}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Prefix</Label>
+                        <Input
+                          {...register('voucher_prefix')}
+                          placeholder="JV"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Suffix</Label>
+                        <Input
+                          {...register('voucher_suffix')}
+                          placeholder="Optional"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Preview Nomor */}
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Preview Nomor:</p>
+                      <p className="font-mono text-blue-600 dark:text-blue-400">
+                        {watch('voucher_prefix') || 'JV'}-{new Date().getFullYear().toString().slice(-2)}{(new Date().getMonth() + 1).toString().padStart(2, '0')}-{'1'.padStart(watch('padding_number') || 4, '0')}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="documents" className="space-y-6" forceMount style={{ display: activeTab === 'documents' ? 'block' : 'none' }}>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Upload Dokumen Legal
+                </CardTitle>
+                <Button 
+                  type="button" 
+                  onClick={() => setIsDocumentModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Tambah Dokumen
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {legalDocuments.map((doc, index) => {
+                  const docTypeLabels: Record<string, string> = {
+                    akta_pendirian: 'Akta Pendirian',
+                    nib: 'NIB',
+                    npwp: 'NPWP',
+                    siup: 'SIUP',
+                    tdp: 'TDP',
+                    pkp: 'Pernyataan PKP',
+                    ktp_direktur: 'KTP Direktur',
+                    sk_kemenkumham: 'SK Kemenkumham',
+                  };
+                  
+                  return (
+                    <div key={index} className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-blue-900 dark:text-blue-100">
+                            {docTypeLabels[doc.document_type] || doc.document_type}
+                          </span>
+                          {doc.is_required && (
+                            <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 text-xs">
+                              Wajib
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {doc.document_name && (
+                            <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
+                              <Eye className="h-4 w-4 mr-1" />
+                              Preview
+                            </Button>
+                          )}
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setLegalDocuments(prev => prev.filter((_, i) => i !== index));
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {doc.document_name ? (
+                        <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg border">
+                          <p className="font-medium text-blue-900 dark:text-blue-100">{doc.document_name}</p>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            {doc.expiry_date && (
+                              <span>Masa berlaku sampai: {new Date(doc.expiry_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                            )}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {doc.file_size && <span>{doc.file_size}</span>}
+                            {doc.upload_date && <span> • Diupload {new Date(doc.upload_date).toLocaleDateString('id-ID')}</span>}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-3 p-4 border-2 border-dashed rounded-lg text-center text-muted-foreground">
+                          <Upload className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">Belum ada dokumen diupload</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {legalDocuments.length === 0 && (
+                  <div className="p-8 text-center text-muted-foreground border-2 border-dashed rounded-lg">
+                    <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                    <p>Belum ada dokumen yang ditambahkan</p>
+                    <p className="text-sm mt-1">Klik "Tambah Dokumen" untuk menambahkan dokumen legal</p>
+                  </div>
+                )}
+
+                <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+                  <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <p>
+                    Dokumen yang diupload akan disimpan dengan enkripsi dan hanya dapat diakses oleh tim yang berwenang. 
+                    Pastikan dokumen yang diupload sudah benar dan masih berlaku.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </form>
       </Tabs>
+
+      {/* Modal Upload Dokumen */}
+      <Dialog open={isDocumentModalOpen} onOpenChange={setIsDocumentModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-blue-900 dark:text-blue-100">Upload Dokumen Legal</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Jenis Dokumen</Label>
+              <Select 
+                value={newDocument.document_type} 
+                onValueChange={(val) => setNewDocument(prev => ({ ...prev, document_type: val }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih jenis dokumen..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="akta_pendirian">Akta Pendirian</SelectItem>
+                  <SelectItem value="akta_perubahan">Akta Perubahan</SelectItem>
+                  <SelectItem value="nib">NIB (Nomor Induk Berusaha)</SelectItem>
+                  <SelectItem value="npwp">NPWP</SelectItem>
+                  <SelectItem value="siup">SIUP</SelectItem>
+                  <SelectItem value="tdp">TDP</SelectItem>
+                  <SelectItem value="pkp">Pernyataan PKP</SelectItem>
+                  <SelectItem value="ktp_direktur">KTP Direktur</SelectItem>
+                  <SelectItem value="sk_kemenkumham">SK Kemenkumham</SelectItem>
+                  <SelectItem value="surat_domisili">Surat Domisili</SelectItem>
+                  <SelectItem value="lainnya">Lainnya</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Masa Berlaku Hingga (opsional)</Label>
+              <Input 
+                type="date" 
+                value={newDocument.expiry_date}
+                onChange={(e) => setNewDocument(prev => ({ ...prev, expiry_date: e.target.value }))}
+                placeholder="dd/mm/yyyy"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>File Dokumen</Label>
+              <div className="border-2 border-dashed rounded-lg p-4">
+                <input
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setNewDocument(prev => ({ ...prev, file }));
+                  }}
+                  className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300"
+                />
+              </div>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Info className="h-3 w-3" />
+                <span>Format yang didukung: JPG, PNG, PDF</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setIsDocumentModalOpen(false);
+                setNewDocument({ document_type: '', expiry_date: '', file: null });
+              }}
+            >
+              Batal
+            </Button>
+            <Button 
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700"
+              disabled={!newDocument.document_type || !newDocument.file}
+              onClick={() => {
+                if (newDocument.document_type && newDocument.file) {
+                  const docTypeLabels: Record<string, string> = {
+                    akta_pendirian: 'Akta Pendirian',
+                    akta_perubahan: 'Akta Perubahan',
+                    nib: 'NIB',
+                    npwp: 'NPWP',
+                    siup: 'SIUP',
+                    tdp: 'TDP',
+                    pkp: 'Pernyataan PKP',
+                    ktp_direktur: 'KTP Direktur',
+                    sk_kemenkumham: 'SK Kemenkumham',
+                    surat_domisili: 'Surat Domisili',
+                    lainnya: 'Dokumen Lainnya',
+                  };
+                  
+                  // Format file size
+                  const fileSize = newDocument.file.size;
+                  const fileSizeStr = fileSize < 1024 * 1024 
+                    ? `${(fileSize / 1024).toFixed(2)} KB` 
+                    : `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
+                  
+                  setLegalDocuments(prev => [
+                    ...prev,
+                    {
+                      document_type: newDocument.document_type,
+                      document_name: `${docTypeLabels[newDocument.document_type]} ${watch('name') || 'Klien'}`,
+                      expiry_date: newDocument.expiry_date || undefined,
+                      file_size: fileSizeStr,
+                      upload_date: new Date().toISOString(),
+                      is_required: ['akta_pendirian', 'nib', 'npwp'].includes(newDocument.document_type),
+                    }
+                  ]);
+                  
+                  setIsDocumentModalOpen(false);
+                  setNewDocument({ document_type: '', expiry_date: '', file: null });
+                  
+                  toast({
+                    title: 'Dokumen ditambahkan',
+                    description: 'Dokumen berhasil ditambahkan ke daftar',
+                  });
+                }
+              }}
+            >
+              Upload Dokumen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

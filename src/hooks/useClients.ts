@@ -48,6 +48,16 @@ export interface ClientDetail extends Client {
 	province?: string;
 	postal_code?: string;
 	website?: string;
+
+	// Accounting Preferences
+	use_default_coa?: boolean;
+	coa_template?: string;
+	use_tenant_voucher_numbering?: boolean;
+	voucher_format?: string;
+	reset_frequency?: string;
+	padding_number?: number;
+	voucher_prefix?: string;
+	voucher_suffix?: string;
 }
 
 export interface TenantComplianceSummary {

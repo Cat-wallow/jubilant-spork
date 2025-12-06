@@ -44,7 +44,9 @@ import {
   Clock,
   AlertCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ClipboardCheck,
+  TrendingUp
 } from 'lucide-react';
 
 // Complete form validation schema for all sections
@@ -101,7 +103,6 @@ const clientFormSchema = z.object({
     pkp_confirmation_description: z.string().optional(),
     pkp_confirmation_number: z.string().optional(),
     pkp_confirmation_date: z.string().optional(),
-    has_other_letter: z.boolean().default(false),
   }),
 
   // Contacts
@@ -208,7 +209,6 @@ export function CreateClientModalUpdated({
         applicable_taxes: [],
         has_registered_letter: false,
         has_pkp_confirmation: false,
-        has_other_letter: false,
       },
       contacts: [],
       branches: [],
@@ -231,6 +231,7 @@ export function CreateClientModalUpdated({
     { id: 2, title: 'Kontak & Cabang', icon: User },
     { id: 3, title: 'Preferensi Akuntansi', icon: Settings },
     { id: 4, title: 'Dokumen Legal', icon: FileText },
+    { id: 5, title: 'Review', icon: ClipboardCheck },
   ];
 
   // Tax options
@@ -1258,107 +1259,467 @@ export function CreateClientModalUpdated({
         );
 
       case 4: // Legal Documents
+        // Predefined document types
+        const documentTypes = [
+          { id: 'akta_pendirian', label: 'Akta Pendirian', format: 'PDF, JPG, PNG (Max 10MB)' },
+          { id: 'nib', label: 'NIB (Nomor Induk Berusaha)', format: 'PDF, JPG, PNG (Max 10MB)' },
+          { id: 'npwp', label: 'NPWP', format: 'PDF, JPG, PNG (Max 10MB)' },
+          { id: 'surat_pkp', label: 'Surat Pengukuhan PKP', format: 'PDF, JPG, PNG (Max 10MB)' },
+          { id: 'siup', label: 'SIUP', format: 'PDF, JPG, PNG (Max 10MB)' },
+          { id: 'izin_usaha', label: 'Izin Usaha', format: 'PDF, JPG, PNG (Max 10MB)' },
+          { id: 'dokumen_lainnya', label: 'Dokumen Lainnya', format: 'PDF, JPG, PNG (Max 10MB)' },
+        ];
+
+        // Get current documents state
+        const currentDocs = watchedValues.legalDocuments || [];
+
+        // Helper to find document by type
+        const getDocByType = (docType: string) => {
+          return currentDocs.find(d => d.document_type === docType);
+        };
+
+        // Helper to handle file upload for a specific document type
+        const handleDocUpload = (docType: string, file: File) => {
+          const existingIndex = currentDocs.findIndex(d => d.document_type === docType);
+          const fileSize = file.size < 1024 * 1024 
+            ? `${(file.size / 1024).toFixed(2)} KB` 
+            : `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+          
+          const newDoc = {
+            document_type: docType,
+            document_number: '',
+            file_url: URL.createObjectURL(file),
+            file_name: file.name,
+            status: 'uploaded',
+            upload_date: new Date().toISOString(),
+            notes: fileSize,
+          };
+
+          if (existingIndex >= 0) {
+            const updatedDocs = [...currentDocs];
+            updatedDocs[existingIndex] = newDoc;
+            setValue('legalDocuments', updatedDocs);
+          } else {
+            setValue('legalDocuments', [...currentDocs, newDoc]);
+          }
+        };
+
+        // Helper to mark document as not available
+        const markAsNotAvailable = (docType: string) => {
+          const existingIndex = currentDocs.findIndex(d => d.document_type === docType);
+          
+          const newDoc = {
+            document_type: docType,
+            document_number: '',
+            file_url: '',
+            file_name: '',
+            status: 'not_available',
+            upload_date: '',
+            notes: 'Tidak tersedia (Belum memiliki dokumen tersebut)',
+          };
+
+          if (existingIndex >= 0) {
+            const updatedDocs = [...currentDocs];
+            updatedDocs[existingIndex] = newDoc;
+            setValue('legalDocuments', updatedDocs);
+          } else {
+            setValue('legalDocuments', [...currentDocs, newDoc]);
+          }
+        };
+
+        return (
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Upload Dokumen Legal</h3>
+            </div>
+
+            <div className="space-y-3">
+              {documentTypes.map((docType) => {
+                const doc = getDocByType(docType.id);
+                const isUploaded = doc?.status === 'uploaded';
+                const isNotAvailable = doc?.status === 'not_available';
+
+                return (
+                  <div key={docType.id} className="border rounded-lg overflow-hidden">
+                    {/* Document Header */}
+                    <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900">
+                      <div>
+                        <p className="font-medium text-blue-900 dark:text-blue-100">{docType.label}</p>
+                        <p className="text-xs text-muted-foreground">Format: {docType.format}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isUploaded && (
+                          <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
+                            <Eye className="h-4 w-4 mr-1" />
+                            Preview
+                          </Button>
+                        )}
+                        {isUploaded && (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-500 hover:text-red-700"
+                            onClick={() => {
+                              setValue('legalDocuments', currentDocs.filter(d => d.document_type !== docType.id));
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {!isUploaded && !isNotAvailable && (
+                          <>
+                            <label className="cursor-pointer">
+                              <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleDocUpload(docType.id, file);
+                                }}
+                              />
+                              <span className="inline-flex items-center gap-1 px-3 py-1.5 text-sm border rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <Upload className="h-4 w-4" />
+                                Upload
+                              </span>
+                            </label>
+                            <Button 
+                              type="button" 
+                              variant="secondary" 
+                              size="sm"
+                              className="bg-slate-700 text-white hover:bg-slate-800"
+                              onClick={() => markAsNotAvailable(docType.id)}
+                            >
+                              Tidak tersedia
+                            </Button>
+                          </>
+                        )}
+                        {isNotAvailable && (
+                          <>
+                            <label className="cursor-pointer">
+                              <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleDocUpload(docType.id, file);
+                                }}
+                              />
+                              <span className="inline-flex items-center gap-1 px-3 py-1.5 text-sm border rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <Upload className="h-4 w-4" />
+                                Upload
+                              </span>
+                            </label>
+                            <Button 
+                              type="button" 
+                              variant="secondary" 
+                              size="sm"
+                              className="bg-slate-700 text-white hover:bg-slate-800"
+                              disabled
+                            >
+                              Tidak tersedia
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Document Content - Show if uploaded or not available */}
+                    {(isUploaded || isNotAvailable) && (
+                      <div className="px-4 pb-4">
+                        <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                          {isUploaded ? (
+                            <>
+                              <p className="font-medium text-blue-900 dark:text-blue-100">
+                                {doc?.file_name || `${docType.label} ${watchedValues.basicInfo?.name || ''}`}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Masa berlaku sampai: -
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {doc?.notes} • Diupload {doc?.upload_date ? new Date(doc.upload_date).toLocaleDateString('id-ID') : '-'}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              Tidak Tersedia (Belum memiliki dokumen tersebut)
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <p>
+                Dokumen yang diupload akan disimpan dengan enkripsi dan hanya dapat diakses oleh tim yang berwenang. 
+                Pastikan dokumen yang diupload sudah benar dan masih berlaku.
+              </p>
+            </div>
+          </div>
+        );
+
+      case 5: // Review
+        const basicInfo = watchedValues.basicInfo;
+        const taxInfo = watchedValues.taxInfo;
+        const contacts = watchedValues.contacts || [];
+        const legalDocs = watchedValues.legalDocuments || [];
+        const preferences = watchedValues.preferences;
+        
+        // Calculate completeness
+        const uploadedDocs = legalDocs.filter(d => d.status === 'uploaded' || d.status === 'verified').length;
+        const totalDocs = legalDocs.length;
+        const completenessPercent = totalDocs > 0 ? Math.round((uploadedDocs / totalDocs) * 100) : 100;
+        
+        // Get primary contact
+        const primaryContact = contacts.find(c => c.is_primary);
+        const billingContact = contacts.find(c => c.is_billing_contact);
+        
+        // Get applicable taxes for display
+        const activeTaxes = taxInfo?.applicable_taxes || [];
+        
+        // Get PKP effective date
+        const pkpDate = taxInfo?.pkp_confirmation_date 
+          ? new Date(taxInfo.pkp_confirmation_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })
+          : '-';
+
         return (
           <div className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Dokumen Legal</Label>
-                <Button type="button" variant="outline" size="sm" onClick={addLegalDocument}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Tambah Dokumen
-                </Button>
-              </div>
+            {/* Header Title */}
+            <div className="text-center pb-2">
+              <p className="text-sm text-muted-foreground">Ringkasan dan Validasi</p>
+            </div>
 
-              {watchedValues.legalDocuments?.map((doc, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label>Dokumen {index + 1}</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeLegalDocument(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+            {/* Summary Cards - Top Row */}
+            <div className="grid grid-cols-3 gap-4">
+              {/* Tipe Klien Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Tipe Dokumen *</Label>
-                      <Select onValueChange={(value) => setValue(`legalDocuments.${index}.document_type`, value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih tipe dokumen" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="akta_pendirian">Akta Pendirian</SelectItem>
-                          <SelectItem value="akta_perubahan">Akta Perubahan</SelectItem>
-                          <SelectItem value="siup">SIUP</SelectItem>
-                          <SelectItem value="tdp">TDP</SelectItem>
-                          <SelectItem value="npwp">NPWP</SelectItem>
-                          <SelectItem value="ktp_direktur">KTP Direktur</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Nomor Dokumen</Label>
-                      <Input
-                        {...register(`legalDocuments.${index}.document_number`)}
-                        placeholder="Nomor dokumen"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>File URL</Label>
-                      <Input
-                        {...register(`legalDocuments.${index}.file_url`)}
-                        placeholder="URL file"
-                      />
-                    </div>
-                    <div>
-                      <Label>Nama File</Label>
-                      <Input
-                        {...register(`legalDocuments.${index}.file_name`)}
-                        placeholder="nama_file.pdf"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Status</Label>
-                      <Select onValueChange={(value) => setValue(`legalDocuments.${index}.status`, value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="missing">Missing</SelectItem>
-                          <SelectItem value="uploaded">Uploaded</SelectItem>
-                          <SelectItem value="verified">Verified</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Tanggal Upload</Label>
-                      <Input
-                        type="datetime-local"
-                        {...register(`legalDocuments.${index}.upload_date`)}
-                      />
-                    </div>
-                  </div>
-
                   <div>
-                    <Label>Catatan</Label>
-                    <Textarea
-                      {...register(`legalDocuments.${index}.notes`)}
-                      placeholder="Catatan tambahan"
-                    />
+                    <p className="text-xs text-muted-foreground">Tipe Klien</p>
+                    <p className="font-semibold text-blue-900 dark:text-blue-100 capitalize">
+                      {basicInfo?.type || '-'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{basicInfo?.industry_sector || '-'}</p>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Status PKP Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                    <Calculator className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Status PKP</p>
+                    <p className="font-semibold text-blue-900 dark:text-blue-100">
+                      {taxInfo?.pkp_status ? 'PKP' : 'Non-PKP'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Efektif: {pkpDate}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Kelengkapan Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Kelengkapan</p>
+                    <p className="font-semibold text-blue-900 dark:text-blue-100">{completenessPercent}%</p>
+                    <p className="text-xs text-muted-foreground">
+                      {uploadedDocs} dokumen wajib dan {totalDocs - uploadedDocs} dokumen tambahan
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Detail Cards - Two Column Layout */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Identitas Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Identitas</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Nama:</span>
+                    <span className="font-medium text-right">{basicInfo?.name || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span className="font-medium text-right">{basicInfo?.email || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Telepon:</span>
+                    <span className="font-medium text-right">{basicInfo?.phone || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Alamat:</span>
+                    <span className="font-medium text-right truncate max-w-[200px]">{basicInfo?.address || '-'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Identitas Perpajakan Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Identitas Perpajakan</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">NIK:</span>
+                    <span className="font-medium">{basicInfo?.nik || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">NPWP:</span>
+                    <span className="font-medium">{basicInfo?.npwp || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">KPP:</span>
+                    <span className="font-medium">{taxInfo?.kpp_office || '-'}</span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Jenis Pajak:</span>
+                    <div className="flex flex-wrap gap-1 justify-end max-w-[200px]">
+                      {activeTaxes.length > 0 ? activeTaxes.map((tax) => (
+                        <Badge key={tax} variant="outline" className="text-xs">
+                          {tax}
+                        </Badge>
+                      )) : <span className="text-muted-foreground">-</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Kontak Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Kontak</h4>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">Person in Charge (PIC)</p>
+                    <div className="space-y-1 mt-1">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">PIC:</span>
+                        <span className="font-medium">{primaryContact?.name || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Email:</span>
+                        <span className="font-medium">{primaryContact?.email || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Telepon:</span>
+                        <span className="font-medium">{primaryContact?.phone || '-'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">Kontak Billing:</p>
+                    <div className="space-y-1 mt-1">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">PIC:</span>
+                        <span className="font-medium">{billingContact?.name || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Email:</span>
+                        <span className="font-medium">{billingContact?.email || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Telepon:</span>
+                        <span className="font-medium">{billingContact?.phone || '-'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Akuntansi Card */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Akuntansi</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Template COA:</span>
+                    <span className="font-medium capitalize">{preferences?.coa_template || 'Default Template'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tarif PPN Default:</span>
+                    <span className="font-medium">11%</span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Pemetaan Pajak:</span>
+                    <span className="font-medium text-green-600">{activeTaxes.length} Pemetaan pajak aktif</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1 justify-end">
+                    {activeTaxes.slice(0, 5).map((tax) => (
+                      <Badge key={tax} variant="outline" className="text-xs">
+                        {tax}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Kebijakan Penomoran:</span>
+                    <span className="font-medium">
+                      {preferences?.use_tenant_voucher_numbering ? 'Inherit dari Tenant' : 'Custom'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dokumen Legal Section */}
+            <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-3">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-100">Dokumen Legal</h4>
+              <div className="space-y-2">
+                {legalDocs.length > 0 ? legalDocs.map((doc, index) => {
+                  const docTypeLabels: Record<string, string> = {
+                    akta_pendirian: 'Akta Pendirian',
+                    akta_perubahan: 'Akta Perubahan',
+                    siup: 'SIUP',
+                    tdp: 'TDP',
+                    npwp: 'NPWP',
+                    ktp_direktur: 'KTP Direktur',
+                  };
+                  const isUploaded = doc.status === 'uploaded' || doc.status === 'verified';
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium text-blue-900 dark:text-blue-100">
+                          {docTypeLabels[doc.document_type] || doc.document_type || `Dokumen ${index + 1}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {doc.file_name ? `${doc.file_name}` : 'Belum diupload'}
+                          {doc.upload_date && ` • Diupload ${new Date(doc.upload_date).toLocaleDateString('id-ID')}`}
+                        </p>
+                      </div>
+                      <Badge 
+                        variant={isUploaded ? 'default' : 'secondary'}
+                        className={isUploaded ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : ''}
+                      >
+                        {isUploaded && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {isUploaded ? 'Uploaded' : doc.status || 'Missing'}
+                      </Badge>
+                    </div>
+                  );
+                }) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Belum ada dokumen yang ditambahkan
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -1430,18 +1791,22 @@ export function CreateClientModalUpdated({
               disabled={currentStep === 0}
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
-              Previous
+              Sebelumnya
             </Button>
 
             <div className="space-x-2">
               {currentStep < steps.length - 1 ? (
                 <Button type="button" onClick={nextStep}>
-                  Next
+                  Selanjutnya
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
-                <Button type="submit" disabled={isSubmitting || !isValid}>
-                  {isSubmitting ? 'Menyimpan...' : 'Simpan Client'}
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {isSubmitting ? 'Menyimpan...' : 'Simpan'}
                 </Button>
               )}
             </div>

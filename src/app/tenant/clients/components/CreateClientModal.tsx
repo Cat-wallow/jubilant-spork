@@ -105,7 +105,6 @@ const taxDocumentSchema = z.object({
   pkp_confirmation_description: z.string().optional(),
   pkp_confirmation_number: z.string().optional(),
   pkp_confirmation_date: z.string().optional(),
-  has_other_letter: z.boolean().optional(),
 });
 
 const picPkpSchema = z.object({
@@ -332,7 +331,6 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
       pkp_confirmation_description: '',
       pkp_confirmation_number: '',
       pkp_confirmation_date: '',
-      has_other_letter: false,
     },
   });
 
@@ -1215,18 +1213,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
               </div>
 
               {/* Tambah Surat Lainnya */}
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="has_other_letter"
-                  checked={taxDocumentForm.watch('has_other_letter') || false}
-                  onChange={(e) => taxDocumentForm.setValue('has_other_letter', e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <Label htmlFor="has_other_letter" className="font-medium">
-                  Tambah Surat Lainnya
-                </Label>
-              </div>
+              
             </div>
 
             <Separator />
@@ -2259,10 +2246,6 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                       <p>{basicInfoForm.watch('phone') || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Email</p>
-                      <p>{basicInfoForm.watch('email') || '-'}</p>
-                    </div>
-                    <div>
                       <p className="text-sm font-medium text-muted-foreground">Website</p>
                       <p>{basicInfoForm.watch('website') || '-'}</p>
                     </div>
@@ -2274,7 +2257,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                     <p className="text-sm font-medium text-muted-foreground">Alamat Lengkap</p>
                     <p>
                       {addressForm.watch('address')}, {addressForm.watch('city')},{' '}
-                      {addressForm.watch('province')} {addressForm.watch('postal_code')}
+                      {addressForm.watch('province')}
                     </p>
                   </div>
                 </div>
@@ -2377,19 +2360,17 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Bidang Usaha</p>
-                      <p>{businessInfoForm.watch('businessField') || '-'}</p>
+                      <p>{businessInfoForm.watch('business_type') || '-'}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">NPWP</p>
-                      <p>{taxIdentityForm.watch('npwpNumber') || '-'}</p>
+                      <p>{corporateForm.watch('npwp') || '-'}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Status PKP</p>
-                      <p>{taxIdentityForm.watch('isPkp') ? 'PKP' : 'Non-PKP'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">NPPKP</p>
-                      <p>{taxIdentityForm.watch('nppkpNumber') || '-'}</p>
+                      <p>
+                        {taxIdentityForm.watch('pkp_status') === 'pkp' ? 'PKP' : 'Non-PKP'}
+                      </p>
                     </div>
                   </div>
                 </div>
