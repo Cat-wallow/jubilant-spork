@@ -247,6 +247,8 @@ export function CreateClientModalUpdated({
   ];
 
   // Helper functions for dynamic arrays
+  const addContact = () => {
+    const currentContacts = watchedValues.contacts || [];
     // First contact is automatically primary
     const isPrimary = currentContacts.length === 0;
     setValue('contacts', [
@@ -944,6 +946,7 @@ export function CreateClientModalUpdated({
                         placeholder="08123456789"
                       />
                     </div>
+                  </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -1056,6 +1059,8 @@ export function CreateClientModalUpdated({
                         placeholder="022-1234567"
                       />
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
                         id={`branches.${index}.is_hq`}
                         checked={watchedValues.branches?.[index]?.is_hq || false}
                         onCheckedChange={(checked) => {

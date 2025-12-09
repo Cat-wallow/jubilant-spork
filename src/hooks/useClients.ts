@@ -97,7 +97,14 @@ export const useClient = (tenantId: string, id: string) => {
 	return useQuery<ClientDetail>({
 		queryKey: ["client", tenantId, id],
 		queryFn: async () => {
-			const { data } = await api.get<ClientDetail>(`/client/${id}`);
+			const { data } = await api.get<ClientDetail>(
+				`/client-wp/api/clients/${id}`,
+				{
+					headers: {
+						"X-Tenant-Id": tenantId,
+					},
+				},
+			);
 			return data;
 		},
 		enabled: !!tenantId && !!id,
@@ -146,7 +153,7 @@ export const useClients = (params: UseClientsParams) => {
 				total: number;
 				page: number;
 				size: number;
-			}>("/client", {
+			}>("/client-wp/api/clients", {
 				params: {
 					search,
 					status,
@@ -182,7 +189,7 @@ export const useCreateClient = () => {
 
 	return useMutation({
 		mutationFn: async ({ tenantId, data }: { tenantId: string; data: any }) => {
-			const response = await api.post("/client", data, {
+			const response = await api.post("/client-wp/api/clients", data, {
 				headers: {
 					"X-Tenant-Id": tenantId,
 				},
@@ -205,7 +212,7 @@ export const useDeleteClient = () => {
 
 	return useMutation({
 		mutationFn: async ({ tenantId, id }: { tenantId: string; id: string }) => {
-			await api.delete(`/client/${id}`, {
+			await api.delete(`/client-wp/api/clients/${id}`, {
 				headers: {
 					"X-Tenant-Id": tenantId,
 				},
@@ -235,8 +242,8 @@ export const useUpdateClient = () => {
 			id: string;
 			data: any;
 		}) => {
-			console.log("API Request - PUT /api/client/" + id, data); // DEBUG LOG
-			const response = await api.put(`/client/${id}`, data, {
+			console.log("API Request - PUT /client-wp/api/clients/" + id, data); // DEBUG LOG
+			const response = await api.put(`/client-wp/api/clients/${id}`, data, {
 				headers: {
 					"X-Tenant-Id": tenantId,
 				},
