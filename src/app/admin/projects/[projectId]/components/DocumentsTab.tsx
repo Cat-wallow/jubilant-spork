@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDocuments, useUploadDocuments, useDeleteDocument, Document } from '@/hooks/useDocuments';
+import { AddDocumentModal, DocumentFormData } from './AddDocumentModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,15 +18,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -38,7 +30,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Upload,
   Search,
@@ -66,14 +57,17 @@ interface DocumentsTabProps {
   userId: string;
 }
 
-const DOCUMENT_CATEGORIES = [
-  { value: 'invoice', label: 'Invoice' },
-  { value: 'contract', label: 'Kontrak' },
-  { value: 'spt', label: 'SPT' },
-  { value: 'tax_document', label: 'Dokumen Pajak' },
-  { value: 'po', label: 'Purchase Order' },
-  { value: 'receipt', label: 'Kwitansi' },
-  { value: 'other', label: 'Lainnya' },
+// Jenis Dokumen options (matching AddDocumentModal)
+const JENIS_DOKUMEN_OPTIONS = [
+  { value: 'ppn_masukan', label: 'PPN Masukan' },
+  { value: 'ppn_keluaran', label: 'PPN Keluaran' },
+  { value: 'pph_21', label: 'PPh 21' },
+  { value: 'pph_22', label: 'PPh 22' },
+  { value: 'pph_23', label: 'PPh 23' },
+  { value: 'pph_4_2', label: 'PPh 4(2)' },
+  { value: 'pph_25', label: 'PPh 25' },
+  { value: 'pph_badan', label: 'PPh Badan' },
+  { value: 'lainnya', label: 'Lainnya' },
 ];
 
 // =============================================================================
@@ -98,17 +92,19 @@ const getFileIcon = (mimeType: string) => {
   return <File className="h-5 w-5 text-blue-500" />;
 };
 
-const getCategoryBadgeColor = (category: string) => {
+const getJenisDokumenBadgeColor = (jenisDokumen: string) => {
   const colors: Record<string, string> = {
-    invoice: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    contract: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-    spt: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    tax_document: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    po: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
-    receipt: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
-    other: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+    ppn_masukan: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    ppn_keluaran: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+    pph_21: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    pph_22: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+    pph_23: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
+    pph_4_2: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
+    pph_25: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+    pph_badan: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+    lainnya: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
   };
-  return colors[category] || colors.other;
+  return colors[jenisDokumen] || colors.lainnya;
 };
 
 // =============================================================================
@@ -117,20 +113,15 @@ const getCategoryBadgeColor = (category: string) => {
 
 export function DocumentsTab({ projectId, tenantId, userId }: DocumentsTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
+  const [jenisDokumenFilter, setJenisDokumenFilter] = useState<string>('');
   const [page, setPage] = useState(1);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
-  // Upload form state
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [uploadCategory, setUploadCategory] = useState('invoice');
-  const [uploadDescription, setUploadDescription] = useState('');
-  const [uploadDate, setUploadDate] = useState('');
 
   // Queries & Mutations
   const { data, isLoading, error } = useDocuments(tenantId, projectId, {
     search: searchQuery || undefined,
-    category: categoryFilter || undefined,
+    jenisDokumen: jenisDokumenFilter || undefined,
     page,
     pageSize: 10,
   });
@@ -142,42 +133,32 @@ export function DocumentsTab({ projectId, tenantId, userId }: DocumentsTabProps)
   // Handlers
   // =============================================================================
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles((prev) => [...prev, ...files]);
-  }, []);
-
-  const handleRemoveFile = useCallback((index: number) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-  }, []);
-
-  const handleUpload = async () => {
-    if (selectedFiles.length === 0) {
-      toast.error('Pilih minimal 1 file untuk diupload');
-      return;
-    }
-
+  const handleAddDocument = async (formData: DocumentFormData) => {
     try {
       await uploadMutation.mutateAsync({
         tenantId,
         projectId,
         userId,
         payload: {
-          files: selectedFiles,
-          category: uploadCategory,
-          description: uploadDescription || undefined,
-          documentDate: uploadDate || undefined,
+          files: formData.files,
+          jenisDokumen: formData.jenisDokumen,
+          tipeDokumen: formData.tipeDokumen,
+          nomorDokumen: formData.nomorDokumen,
+          documentDate: formData.tanggalDokumen,
+          jumlahLembar: formData.jumlahLembar,
+          asalDokumenSource: formData.asalDokumen,
+          adminPicKlien: formData.adminPicKlien,
+          divisi: formData.divisi,
+          posisiDokumenAsli: formData.posisiDokumenAsli,
+          noUrutSortiran: formData.noUrutSortiran || undefined,
         },
       });
 
-      toast.success(`${selectedFiles.length} dokumen berhasil diupload`);
+      toast.success('Dokumen berhasil ditambahkan');
       setIsUploadDialogOpen(false);
-      setSelectedFiles([]);
-      setUploadCategory('invoice');
-      setUploadDescription('');
-      setUploadDate('');
     } catch (error) {
-      toast.error('Gagal mengupload dokumen');
+      toast.error('Gagal menambahkan dokumen');
+      throw error;
     }
   };
 
@@ -214,157 +195,36 @@ export function DocumentsTab({ projectId, tenantId, userId }: DocumentsTabProps)
               className="pl-9"
             />
           </div>
-          <Select value={categoryFilter || 'all'} onValueChange={(val) => setCategoryFilter(val === 'all' ? '' : val)}>
+          <Select value={jenisDokumenFilter || 'all'} onValueChange={(val) => setJenisDokumenFilter(val === 'all' ? '' : val)}>
             <SelectTrigger className="w-[180px]">
               <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Semua Kategori" />
+              <SelectValue placeholder="Semua Jenis" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Kategori</SelectItem>
-              {DOCUMENT_CATEGORIES.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.label}
+              <SelectItem value="all">Semua Jenis</SelectItem>
+              {JENIS_DOKUMEN_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Dokumen
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Upload Dokumen</DialogTitle>
-              <DialogDescription>
-                Upload dokumen pendukung untuk proyek ini. Format yang didukung: PDF, JPG, PNG.
-              </DialogDescription>
-            </DialogHeader>
+        <Button 
+          onClick={() => setIsUploadDialogOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+        >
+          <Upload className="mr-2 h-4 w-4" />
+          Tambah Dokumen
+        </Button>
 
-            <div className="space-y-4 py-4">
-              {/* File Drop Zone */}
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-blue-500/50 transition-colors">
-                <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Klik untuk memilih file atau drag & drop
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    PDF, JPG, PNG (max 20MB)
-                  </p>
-                </label>
-              </div>
-
-              {/* Selected Files */}
-              {selectedFiles.length > 0 && (
-                <div className="space-y-2">
-                  <Label>File yang dipilih ({selectedFiles.length})</Label>
-                  <div className="max-h-32 overflow-y-auto space-y-1">
-                    {selectedFiles.map((file, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 bg-muted rounded-md"
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          {getFileIcon(file.type)}
-                          <span className="text-sm truncate">{file.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            ({formatFileSize(file.size)})
-                          </span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveFile(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Category */}
-              <div className="space-y-2">
-                <Label htmlFor="category">Kategori Dokumen</Label>
-                <Select value={uploadCategory} onValueChange={setUploadCategory}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DOCUMENT_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Document Date */}
-              <div className="space-y-2">
-                <Label htmlFor="date">Tanggal Dokumen (opsional)</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={uploadDate}
-                  onChange={(e) => setUploadDate(e.target.value)}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Deskripsi (opsional)</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Tambahkan deskripsi dokumen..."
-                  value={uploadDescription}
-                  onChange={(e) => setUploadDescription(e.target.value)}
-                  rows={2}
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsUploadDialogOpen(false)}
-              >
-                Batal
-              </Button>
-              <Button
-                onClick={handleUpload}
-                disabled={selectedFiles.length === 0 || uploadMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {uploadMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Mengupload...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <AddDocumentModal
+          open={isUploadDialogOpen}
+          onOpenChange={setIsUploadDialogOpen}
+          onSubmit={handleAddDocument}
+          isLoading={uploadMutation.isPending}
+        />
       </div>
 
       {/* Documents Table */}
@@ -401,7 +261,7 @@ export function DocumentsTab({ projectId, tenantId, userId }: DocumentsTabProps)
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nama File</TableHead>
-                    <TableHead>Kategori</TableHead>
+                    <TableHead>Jenis Dokumen</TableHead>
                     <TableHead>Ukuran</TableHead>
                     <TableHead>Tanggal Upload</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
@@ -426,10 +286,10 @@ export function DocumentsTab({ projectId, tenantId, userId }: DocumentsTabProps)
                       <TableCell>
                         <Badge
                           variant="secondary"
-                          className={getCategoryBadgeColor(doc.category)}
+                          className={getJenisDokumenBadgeColor(doc.jenisDokumen)}
                         >
-                          {DOCUMENT_CATEGORIES.find((c) => c.value === doc.category)?.label ||
-                            doc.category}
+                          {JENIS_DOKUMEN_OPTIONS.find((opt) => opt.value === doc.jenisDokumen)?.label ||
+                            doc.jenisDokumen}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">

@@ -75,6 +75,11 @@ export interface UploadDocumentPayload {
   folder?: string;
   description?: string;
   asalDokumenSource?: string;
+  // Informasi Administrasi
+  adminPicKlien?: string;
+  divisi?: string;
+  posisiDokumenAsli?: string;
+  noUrutSortiran?: string;
 }
 
 export interface UpdateDocumentPayload {
@@ -184,6 +189,10 @@ export const useUploadDocuments = () => {
       if (payload.folder) formData.append('folder', payload.folder);
       if (payload.description) formData.append('description', payload.description);
       if (payload.asalDokumenSource) formData.append('asal_dokumen_source', payload.asalDokumenSource);
+      if (payload.adminPicKlien) formData.append('admin_pic_klien', payload.adminPicKlien);
+      if (payload.divisi) formData.append('divisi', payload.divisi);
+      if (payload.posisiDokumenAsli) formData.append('posisi_dokumen_asli', payload.posisiDokumenAsli);
+      if (payload.noUrutSortiran) formData.append('no_urut_sortiran', payload.noUrutSortiran);
 
       const { data } = await api.post<{ items: Document[] }>(
         `/document/api/v1/projects/${projectId}/documents`,
