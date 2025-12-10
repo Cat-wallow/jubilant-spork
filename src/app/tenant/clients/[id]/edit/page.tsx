@@ -436,7 +436,7 @@ export default function EditClientPage() {
         description: 'Data klien berhasil diperbarui',
       });
       
-      router.push(`/clients/${id}`);
+      router.push(`/tenant/clients/${id}`);
     } catch (error) {
       console.error('Failed to update client:', error);
       const anyErr = error as any;
@@ -470,7 +470,7 @@ export default function EditClientPage() {
         { tenantId: tenant.id, id },
         {
           onSuccess: () => {
-            router.push('/clients');
+            router.push('/tenant/clients');
           },
         }
       );
@@ -492,9 +492,9 @@ export default function EditClientPage() {
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/clients" className="hover:text-primary">Client</Link>
+          <Link href="/tenant/clients" className="hover:text-primary">Client</Link>
           <span>/</span>
-          <Link href={`/clients/${id}`} className="hover:text-primary">Detail Client</Link>
+          <Link href={`/tenant/clients/${id}`} className="hover:text-primary">Detail Client</Link>
           <span>/</span>
           <span>Edit Client</span>
         </div>

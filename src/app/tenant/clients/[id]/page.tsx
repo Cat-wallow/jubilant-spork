@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useClient, useDeleteClient } from '@/hooks/useClients';
+import { useClient, useClientReadiness, useDeleteClient } from '@/hooks/useClients';
 import { useClientContacts } from '@/hooks/useClientContacts';
 import { useClientBranches } from '@/hooks/useClientBranches';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ export default function ClientDetailPage() {
   const deleteClientMutation = useDeleteClient();
 
   const { data: client, isLoading, error } = useClient(tenant.id, id);
+  const { data: readiness } = useClientReadiness(tenant.id, id);
   const {
     data: contacts,
     isLoading: isContactsLoading,
@@ -76,12 +77,27 @@ export default function ClientDetailPage() {
         { tenantId: tenant.id, id },
         {
           onSuccess: () => {
-            router.push('/clients');
+            router.push('/tenant/clients');
           },
         }
       );
     }
   };
+
+  // Legal document completeness purely from readiness API
+  // Backend considers 4 minimal docs: NPWP, Surat PKP, Akta Pendirian, KTP penanggung jawab
+  const TOTAL_REQUIRED_LEGAL_DOCS = 4;
+  let legalDocsFulfilled = 0;
+  let legalDocsPercent = 0;
+
+  if (readiness && readiness.checks) {
+    const legalCheck = readiness.checks.find((c) => c.key === 'legal_documents');
+    const missingCount = legalCheck?.missing?.length ?? 0;
+    legalDocsFulfilled = Math.max(0, TOTAL_REQUIRED_LEGAL_DOCS - missingCount);
+    legalDocsPercent = TOTAL_REQUIRED_LEGAL_DOCS
+      ? Math.round((legalDocsFulfilled / TOTAL_REQUIRED_LEGAL_DOCS) * 100)
+      : 0;
+  }
 
   // Format Date Helper
   const formatDate = (dateString?: string | null) => {
@@ -132,9 +148,9 @@ export default function ClientDetailPage() {
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/clients" className="hover:text-primary">Client</Link>
+          <Link href="/tenant/clients" className="hover:text-primary">Client</Link>
           <span>/</span>
-          <span>Edit Client</span>
+          <span>Detail Client</span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -152,7 +168,7 @@ export default function ClientDetailPage() {
               className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
               asChild
             >
-              <Link href={`/clients/${id}/edit`}>
+              <Link href={`/tenant/clients/${id}/edit`}>
                 Edit Data Klien
               </Link>
             </Button>
@@ -200,8 +216,10 @@ export default function ClientDetailPage() {
             <div>
               <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Kelengkapan Dokumen</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-slate-900 dark:text-slate-50">100%</span>
-                <span className="text-xs text-muted-foreground">4 dokumen wajib terpenuhi</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-slate-50">{legalDocsPercent}%</span>
+                <span className="text-xs text-muted-foreground">
+                  {legalDocsFulfilled} dokumen wajib terpenuhi
+                </span>
               </div>
             </div>
           </CardContent>
@@ -317,7 +335,10 @@ export default function ClientDetailPage() {
                   <Filter className="h-4 w-4" />
                   Filter
                 </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 gap-2"
+                  onClick={() => router.push(`/tenant/projects/new?clientId=${id}`)}
+                >
                   <Plus className="h-4 w-4" />
                   Tambah Project
                 </Button>

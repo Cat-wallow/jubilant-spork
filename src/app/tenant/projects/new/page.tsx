@@ -1,7 +1,7 @@
 "use client";
 
 import RBAC from "@/components/rbac/RBAC";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -13,13 +13,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { projectSchema, ProjectFormValues } from "@/validators/project.schema";
 import api from "@/lib/api";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 function NewProjectPageContent() {
 	const [published, setPublished] = useState(false);
 	const router = useRouter();
 	const queryClient = useQueryClient();
+	const searchParams = useSearchParams();
 
 	const methods = useForm<ProjectFormValues>({
 		resolver: zodResolver(projectSchema),
@@ -28,8 +29,17 @@ function NewProjectPageContent() {
 			escalation_user_ids: [],
 			team_assignments: {},
 			due_policy_days: 3, // Default H+3
+			client_id: searchParams.get("clientId") || "", // Read clientId from URL query
 		},
 	});
+
+	// Preselect client if clientId is provided in the query string
+	useEffect(() => {
+		const clientId = searchParams.get("clientId");
+		if (clientId) {
+			methods.setValue("client_id", clientId);
+		}
+	}, [searchParams, methods]);
 
 	const onSubmit = async (data: ProjectFormValues) => {
 		try {
@@ -161,7 +171,10 @@ function NewProjectPageContent() {
 
 export default function NewProjectPage() {
 	return (
-		<RBAC requiredPermission="project:manage" unauthorizedPage={true}>
+		<RBAC
+			requiredPermission={["project:manage", "client:manage"]}
+			unauthorizedPage={true}
+		>
 			<NewProjectPageContent />
 		</RBAC>
 	);

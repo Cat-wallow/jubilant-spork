@@ -21,6 +21,13 @@ import { useTenantUsers } from "@/hooks/useTenant"; // New import for fetching t
 import { useQueries } from "@tanstack/react-query"; // New import for fetching multiple queries
 import { User } from "@/types/users";
 
+// Preset due policy options matching design (H+3, H+7, etc.)
+const DUE_POLICY_OPTIONS = [
+	{ value: 3, label: "H+3 (3 hari setelah deadline)" },
+	{ value: 7, label: "H+7 (7 hari setelah deadline)" },
+	{ value: 14, label: "H+14 (14 hari setelah deadline)" },
+];
+
 // Helper to get color style based on module code (mimicking original)
 const getModuleStyle = (code: string) => {
 	if (["Form 1.0", "KK 2.0", "KK 4.0"].includes(code)) {
@@ -137,7 +144,7 @@ export default function ProjectSettingsTab() {
 				<div className="mb-5 flex flex-col gap-0 self-stretch">
 					<CardTitle>Team Assignment</CardTitle>
 					<CardDescription className="line-clamp-1 overflow-hidden text-ellipsis text-primary">
-						Assign Team Leader and Member for selected modules
+						Pilih modul yang akan dikerjakan dan atur Team Leader / Member untuk setiap modul
 					</CardDescription>
 				</div>
 
@@ -281,12 +288,32 @@ export default function ProjectSettingsTab() {
 
 					<div className="flex flex-col gap-0 self-stretch">
 						<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
-							Due Policy (Hari) *
+							Due Policy *
 						</Label>
-						<Input
-							type="number"
-							placeholder="3"
-							{...register("due_policy_days")}
+						<Controller
+							control={control}
+							name="due_policy_days"
+							render={({ field }) => (
+								<Select
+									onValueChange={(val) => field.onChange(Number(val))}
+									value={
+										field.value !== undefined && field.value !== null
+											? String(field.value)
+										: ""
+									}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="Pilih Due Policy" />
+									</SelectTrigger>
+									<SelectContent>
+										{DUE_POLICY_OPTIONS.map((opt) => (
+											<SelectItem key={opt.value} value={String(opt.value)}>
+												{opt.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							)}
 						/>
 						{errors.due_policy_days && (
 							<span className="text-red-500 text-xs">

@@ -73,6 +73,22 @@ export interface TenantComplianceSummary {
 	};
 }
 
+export type ReadinessStatus = "ready" | "warning" | "not_ready";
+
+export interface ClientReadinessCheck {
+	key: string;
+	label: string;
+	status: ReadinessStatus;
+	missing?: string[];
+}
+
+export interface ClientReadinessResult {
+	client_id: string;
+	status: ReadinessStatus;
+	score: number;
+	checks: ClientReadinessCheck[];
+}
+
 interface ClientsResponse {
 	items: Client[];
 	pagination: {
@@ -126,6 +142,25 @@ export const useTenantComplianceSummary = (tenantId: string) => {
 			return data;
 		},
 		enabled: !!tenantId,
+		staleTime: 1000 * 60 * 5,
+	});
+};
+
+export const useClientReadiness = (tenantId: string, clientId: string) => {
+	return useQuery<ClientReadinessResult>({
+		queryKey: ["client-readiness", tenantId, clientId],
+		queryFn: async () => {
+			const { data } = await api.get<ClientReadinessResult>(
+				"/client-wp/api/clients/" + clientId + "/readiness",
+				{
+					headers: {
+						"X-Tenant-Id": tenantId,
+					},
+				},
+			);
+			return data;
+		},
+		enabled: !!tenantId && !!clientId,
 		staleTime: 1000 * 60 * 5,
 	});
 };

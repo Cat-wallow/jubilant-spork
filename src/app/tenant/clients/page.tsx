@@ -331,11 +331,11 @@ export default function ClientsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => router.push(`/clients/${row.original.id}/edit`)}>
+              <DropdownMenuItem onClick={() => router.push(`/tenant/clients/${row.original.id}/edit`)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(`/clients/${row.original.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/tenant/clients/${row.original.id}`)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
