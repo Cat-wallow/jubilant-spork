@@ -71,7 +71,7 @@ export default function SignInPage() {
                 Login
               </h1>
               <p className="text-base leading-none tracking-[-0.32px] text-gray-700 dark:text-gray-400">
-                Masukan email/username dan password
+                Masukkan email/username dan password
               </p>
             </div>
 

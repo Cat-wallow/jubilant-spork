@@ -937,7 +937,7 @@ export default function ClientDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Chart of Accounts Card */}
             <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-              <Link href={`/admin/clients/${id}/accounts`}>
+              <Link href={`/tenant/clients/${id}/accounts`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
