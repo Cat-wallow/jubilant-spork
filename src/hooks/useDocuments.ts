@@ -12,6 +12,8 @@ export interface WorkflowStep {
   source?: string | null;
 }
 
+export type WorkflowStepKey = 'pengiriman' | 'penerimaan' | 'digitalisasi' | 'pendeskripsian';
+
 export interface Document {
   id: string;
   projectId: string;
@@ -46,6 +48,27 @@ export interface Document {
   uploadedBy: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DocumentVersion {
+  id: string;
+  documentId: string;
+  version: number;
+  fileSize: number;
+  checksum: string;
+  createdAt: string;
+}
+
+export interface DocumentComment {
+  id: string;
+  tenantId: string;
+  projectId: string;
+  documentId: string;
+  userId: string;
+  authorName: string;
+  content: string;
+  severity?: string | null;
+  createdAt: string;
 }
 
 export interface DocumentsResponse {
@@ -139,6 +162,50 @@ export const useDocuments = (
 };
 
 /**
+ * Hook to update a single workflow step for a document
+ */
+export const useUpdateWorkflow = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      documentId,
+      userId,
+      workflowStep,
+      date,
+    }: {
+      tenantId: string;
+      projectId: string;
+      documentId: string;
+      userId: string;
+      workflowStep: WorkflowStepKey;
+      date: string;
+    }) => {
+      const { data } = await api.patch<Document>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/workflow`,
+        {
+          workflow_step: workflowStep,
+          currentTenantId: tenantId,
+          currentUserId: userId,
+          date,
+        },
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['documents', variables.tenantId, variables.projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['document', variables.tenantId, variables.projectId, variables.documentId],
+      });
+    },
+  });
+};
+
+/**
  * Hook to fetch a single document
  */
 export const useDocument = (tenantId: string, projectId: string, documentId: string) => {
@@ -208,6 +275,90 @@ export const useUploadDocuments = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['documents', variables.tenantId, variables.projectId],
+      });
+    },
+  });
+};
+
+/**
+ * Hook to fetch versions for a document (used as attachments)
+ */
+export const useDocumentVersions = (
+  tenantId: string,
+  projectId: string,
+  documentId: string,
+) => {
+  return useQuery<DocumentVersion[]>({
+    queryKey: ['document-versions', tenantId, projectId, documentId],
+    queryFn: async () => {
+      const { data } = await api.get<{ items: DocumentVersion[] }>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/versions?currentTenantId=${tenantId}`,
+      );
+      return data.items;
+    },
+    enabled: !!tenantId && !!projectId && !!documentId,
+  });
+};
+
+/**
+ * Hook to fetch comments for a document
+ */
+export const useDocumentComments = (
+  tenantId: string,
+  projectId: string,
+  documentId: string,
+) => {
+  return useQuery<DocumentComment[]>({
+    queryKey: ['document-comments', tenantId, projectId, documentId],
+    queryFn: async () => {
+      const { data } = await api.get<{ items: DocumentComment[] }>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/comments?currentTenantId=${tenantId}`,
+      );
+      return data.items;
+    },
+    enabled: !!tenantId && !!projectId && !!documentId,
+  });
+};
+
+/**
+ * Hook to create a comment for a document
+ */
+export const useCreateDocumentComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      documentId,
+      userId,
+      authorName,
+      content,
+      severity,
+    }: {
+      tenantId: string;
+      projectId: string;
+      documentId: string;
+      userId: string;
+      authorName: string;
+      content: string;
+      severity?: string;
+    }) => {
+      const { data } = await api.post<DocumentComment>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/comments`,
+        {
+          content,
+          severity,
+          authorName,
+          currentTenantId: tenantId,
+          currentUserId: userId,
+        },
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['document-comments', variables.tenantId, variables.projectId, variables.documentId],
       });
     },
   });
