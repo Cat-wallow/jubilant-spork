@@ -113,7 +113,7 @@ export default function ProjectFormOnePage() {
       }
       return true;
     });
-  }, [search, statusFilter, assigneeFilter]);
+  }, [bundles, search, statusFilter, assigneeFilter]);
 
   const totalBundles = filteredBundles.length;
   const totalGaps = filteredBundles.reduce((sum, b) => sum + b.gaps, 0);

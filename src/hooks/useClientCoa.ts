@@ -2,8 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 
 export type AccountType = 'Asset' | 'Liability' | 'Equity' | 'Revenue' | 'Expense';
-export type NormalSide = 'Debit' | 'Credit';
-export type AccountStatus = 'Active' | 'Inactive';
+export type NormalBalance = 'debit' | 'credit';
 
 export interface ClientCoa {
   id: string;
@@ -11,16 +10,18 @@ export interface ClientCoa {
   account_number: string;
   account_name: string;
   account_type: AccountType;
-  normal_side: NormalSide;
-  tax_mapping: string[];
-  status: AccountStatus;
+  parent_code?: string | null;
+  level?: number | null;
+  is_header?: boolean | null;
+  normal_balance: NormalBalance;
   description?: string | null;
+  is_active: boolean;
+  tax_mapping?: string[];
   created_at?: string | null;
   updated_at?: string | null;
 }
 
 export interface CoaFilters {
-  status?: string;
   account_type?: string;
   search?: string;
 }
@@ -43,7 +44,6 @@ export const useClientCoa = (tenantId: string, clientId: string, filters?: CoaFi
     queryKey: ['clientCoa', tenantId, clientId, filters],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
       if (filters?.account_type) params.append('account_type', filters.account_type);
       if (filters?.search) params.append('search', filters.search);
 
@@ -70,11 +70,12 @@ export interface CreateCoaPayload {
     account_number: string;
     account_name: string;
     account_type?: AccountType;
-    normal_side?: NormalSide;
-    tax_mapping?: string[];
-    status?: AccountStatus;
-    description?: string;
-    parent_code?: string;
+    parent_code?: string | null;
+    level?: number;
+    is_header?: boolean;
+    normal_balance?: NormalBalance;
+    description?: string | null;
+    is_active?: boolean;
   };
 }
 
@@ -109,11 +110,12 @@ export interface UpdateCoaPayload {
     account_number: string;
     account_name: string;
     account_type: AccountType;
-    normal_side: NormalSide;
-    tax_mapping: string[];
-    status: AccountStatus;
-    description: string;
-    parent_code: string;
+    parent_code: string | null;
+    level: number;
+    is_header: boolean;
+    normal_balance: NormalBalance;
+    description: string | null;
+    is_active: boolean;
   }>;
 }
 

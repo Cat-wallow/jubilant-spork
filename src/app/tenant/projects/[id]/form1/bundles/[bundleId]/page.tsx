@@ -21,6 +21,7 @@ export default function FormOneBundleDetailPage() {
         userId={userId}
         pageTitle="Form 1.0 - Lembar Pengendalian Arus Dokumen"
         pageDescription={`Detail bundle ${bundleId}`}
+        bundleId={bundleId}
       />
     </div>
   );

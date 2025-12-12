@@ -103,6 +103,7 @@ export interface UploadDocumentPayload {
   divisi?: string;
   posisiDokumenAsli?: string;
   noUrutSortiran?: string;
+  bundleId?: string;
 }
 
 export interface UpdateDocumentPayload {
@@ -123,26 +124,30 @@ export interface UpdateDocumentPayload {
 /**
  * Hook to fetch documents for a project
  */
+export interface DocumentQueryParams {
+  jenisDokumen?: string;
+  tipeDokumen?: string;
+  status?: string;
+  search?: string;
+  documentDateFrom?: string;
+  documentDateTo?: string;
+  page?: number;
+  pageSize?: number;
+  bundleId?: string;
+}
+
 export const useDocuments = (
   tenantId: string,
   projectId: string,
-  params?: {
-    jenisDokumen?: string;
-    tipeDokumen?: string;
-    status?: string;
-    search?: string;
-    documentDateFrom?: string;
-    documentDateTo?: string;
-    page?: number;
-    pageSize?: number;
-  }
+  params?: DocumentQueryParams,
+  options?: { enabled?: boolean },
 ) => {
   return useQuery<DocumentsResponse>({
-    queryKey: ['documents', tenantId, projectId, params],
+    queryKey: ['documents', tenantId, projectId, params, options?.enabled ?? true],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       searchParams.append('currentTenantId', tenantId);
-      
+
       if (params?.jenisDokumen) searchParams.append('jenis_dokumen', params.jenisDokumen);
       if (params?.tipeDokumen) searchParams.append('tipe_dokumen', params.tipeDokumen);
       if (params?.status) searchParams.append('status', params.status);
@@ -151,13 +156,14 @@ export const useDocuments = (
       if (params?.documentDateTo) searchParams.append('document_date_to', params.documentDateTo);
       if (params?.page) searchParams.append('page', params.page.toString());
       if (params?.pageSize) searchParams.append('pageSize', params.pageSize.toString());
+      if (params?.bundleId) searchParams.append('bundleId', params.bundleId);
 
       const { data } = await api.get<DocumentsResponse>(
         `/document/api/v1/projects/${projectId}/documents?${searchParams.toString()}`
       );
       return data;
     },
-    enabled: !!tenantId && !!projectId,
+    enabled: (options?.enabled ?? true) && !!tenantId && !!projectId,
   });
 };
 
@@ -248,6 +254,7 @@ export const useUploadDocuments = () => {
       formData.append('tipe_dokumen', payload.tipeDokumen);
       formData.append('currentTenantId', tenantId);
       formData.append('currentUserId', userId);
+      if (payload.bundleId) formData.append('bundleId', payload.bundleId);
       
       if (payload.nomorDokumen) formData.append('nomor_dokumen', payload.nomorDokumen);
       if (payload.documentDate) formData.append('document_date', payload.documentDate);

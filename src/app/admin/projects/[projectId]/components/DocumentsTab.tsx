@@ -67,6 +67,7 @@ interface DocumentsTabProps {
   userId: string;
   pageTitle?: string;
   pageDescription?: string;
+  bundleId?: string;
 }
 
 // Jenis Dokumen options (matching AddDocumentModal)
@@ -192,7 +193,7 @@ const renderWorkflowStep = (step?: WorkflowStep, showSource?: boolean) => {
 // Component
 // =============================================================================
 
-export function DocumentsTab({ projectId, tenantId, userId, pageTitle, pageDescription }: DocumentsTabProps) {
+export function DocumentsTab({ projectId, tenantId, userId, pageTitle, pageDescription, bundleId }: DocumentsTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [jenisDokumenFilter, setJenisDokumenFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -206,13 +207,19 @@ export function DocumentsTab({ projectId, tenantId, userId, pageTitle, pageDescr
   const router = useRouter();
 
   // Queries & Mutations
-  const { data, isLoading, error } = useDocuments(tenantId, projectId, {
-    search: searchQuery || undefined,
-    jenisDokumen: jenisDokumenFilter || undefined,
-    status: statusFilter || undefined,
-    page,
-    pageSize,
-  });
+  const { data, isLoading, error } = useDocuments(
+    tenantId,
+    projectId,
+    {
+      search: searchQuery || undefined,
+      jenisDokumen: jenisDokumenFilter || undefined,
+      status: statusFilter || undefined,
+      page,
+      pageSize,
+      bundleId,
+    },
+    { enabled: !!tenantId && !!projectId },
+  );
 
   const uploadMutation = useUploadDocuments();
   const deleteMutation = useDeleteDocument();
@@ -241,6 +248,7 @@ export function DocumentsTab({ projectId, tenantId, userId, pageTitle, pageDescr
           posisiDokumenAsli: formData.posisiDokumenAsli,
           noUrutSortiran: formData.noUrutSortiran || undefined,
           description: formData.catatan,
+          bundleId,
         },
       });
 
