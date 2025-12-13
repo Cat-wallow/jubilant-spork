@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useRef, useState } from 'react';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
@@ -24,6 +24,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import api from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 import {
   ChevronLeft,
   ChevronRight,
@@ -49,6 +51,27 @@ import {
   TrendingUp
 } from 'lucide-react';
 
+const stripNonDigits = (value: unknown) => String(value ?? '').replace(/\D/g, '');
+
+const formatThousandsId = (value: number) => {
+  if (!Number.isFinite(value)) return '';
+  return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(value);
+};
+
+const formatNpwp = (value: unknown) => {
+  const digits = stripNonDigits(value).slice(0, 15);
+  let formatted = '';
+  for (let i = 0; i < digits.length; i += 1) {
+    formatted += digits[i];
+    if (i === 1 && digits.length > 2) formatted += '.';
+    if (i === 4 && digits.length > 5) formatted += '.';
+    if (i === 7 && digits.length > 8) formatted += '.';
+    if (i === 8 && digits.length > 9) formatted += '-';
+    if (i === 11 && digits.length > 12) formatted += '.';
+  }
+  return formatted;
+};
+
 // Complete form validation schema for all sections
 const clientFormSchema = z.object({
   // Basic Information
@@ -58,32 +81,67 @@ const clientFormSchema = z.object({
     legal_name: z.string().min(1, 'Nama legal wajib diisi'),
     brand_name: z.string().optional(),
     type: z.string().min(1, 'Tipe client wajib diisi'),
-    npwp: z.string().min(1, 'NPWP wajib diisi'),
-    nik: z.string().optional(),
-    nib: z.string().optional(),
+    npwp: z
+      .string()
+      .min(1, 'NPWP wajib diisi')
+      .transform((v) => stripNonDigits(v))
+      .refine((v) => /^\d{15}$/.test(v), 'NPWP harus 15 digit angka'),
+    nik: z
+      .string()
+      .optional()
+      .transform((v) => (v ? stripNonDigits(v) : ''))
+      .refine((v) => v === '' || /^\d{16}$/.test(v), 'NIK harus 16 digit angka'),
+    nib: z
+      .string()
+      .optional()
+      .transform((v) => (v ? stripNonDigits(v) : ''))
+      .refine((v) => v === '' || /^\d{13}$/.test(v), 'NIB harus 13 digit angka'),
     deed_number: z.string().optional(),
     notary_name: z.string().optional(),
     notary_location: z.string().optional(),
     notary_contact: z.string().optional(),
     establishment_date: z.string().optional(),
-    employee_count: z.number().min(0).default(0),
-    basic_capital: z.number().min(0).default(0),
-    paid_capital: z.number().min(0).default(0),
+    employee_count: z.coerce
+      .number()
+      .min(0)
+      .refine(Number.isInteger, 'Jumlah karyawan harus bilangan bulat')
+      .default(0),
+    basic_capital: z.coerce.number().min(0).default(0),
+    paid_capital: z.coerce.number().min(0).default(0),
     business_type: z.string().optional(),
     industry_sector: z.string().optional(),
     service_package: z.string().default('basic'),
     business_scale: z.string().optional(),
-    annual_revenue: z.number().min(0).default(0),
+    annual_revenue: z.coerce.number().min(0).default(0),
 
     // Address
     address: z.string().min(1, 'Alamat wajib diisi'),
     country: z.string().default('Indonesia'),
     city: z.string().min(1, 'Kota wajib diisi'),
     province: z.string().min(1, 'Provinsi wajib diisi'),
-    postal_code: z.string().min(1, 'Kode pos wajib diisi'),
-    phone: z.string().min(1, 'Telepon wajib diisi'),
+    postal_code: z
+      .string()
+      .min(1, 'Kode pos wajib diisi')
+      .transform((v) => stripNonDigits(v))
+      .refine((v) => /^\d{5}$/.test(v), 'Kode pos harus 5 digit angka'),
+    phone: z
+      .string()
+      .min(1, 'Telepon wajib diisi')
+      .transform((v) => stripNonDigits(v))
+      .refine((v) => /^\d{8,15}$/.test(v), 'Telepon harus 8–15 digit angka'),
     email: z.string().email('Email tidak valid'),
-    website: z.string().optional(),
+    website: z.preprocess(
+      (v) => {
+        if (typeof v !== 'string') return v;
+        const trimmed = v.trim();
+        return trimmed === '' ? undefined : trimmed;
+      },
+      z
+        .string()
+        .url('Website harus format http://... atau https://...')
+        .refine((v) => /^https?:\/\//.test(v), 'Website harus diawali http:// atau https://')
+        .optional(),
+    ),
   }),
 
   // Tax Information
@@ -92,6 +150,12 @@ const clientFormSchema = z.object({
     taxpayer_type: z.string().optional(),
     kpp_office: z.string().optional(),
     applicable_taxes: z.array(z.string()).default([]),
+    pic_pkp_name: z.string().optional(),
+    pic_pkp_contact: z
+      .string()
+      .optional()
+      .transform((v) => (v ? stripNonDigits(v) : ''))
+      .refine((v) => v === '' || /^\d{8,15}$/.test(v), 'Kontak/Whatsapp harus 8–15 digit angka'),
     pic_pkp_email: z.string().email('Email tidak valid').optional().or(z.literal('')),
 
     // Tax Documents
@@ -109,6 +173,12 @@ const clientFormSchema = z.object({
   contacts: z.array(z.object({
     name: z.string().min(1, 'Nama kontak wajib diisi'),
     position: z.string().min(1, 'Posisi wajib diisi'),
+    email: z.string().email('Email tidak valid'),
+    phone: z
+      .string()
+      .min(1, 'Telepon wajib diisi')
+      .transform((v) => stripNonDigits(v))
+      .refine((v) => /^\d{8,15}$/.test(v), 'Telepon harus 8–15 digit angka'),
     is_primary: z.boolean().default(false),
     is_billing_contact: z.boolean().default(false),
   })).default([]),
@@ -120,9 +190,19 @@ const clientFormSchema = z.object({
     country: z.string().default('Indonesia'),
     province: z.string().optional(),
     city: z.string().optional(),
-    phone: z.string().optional(),
+    phone: z
+      .string()
+      .optional()
+      .transform((v) => (v ? stripNonDigits(v) : ''))
+      .refine((v) => v === '' || /^\d{8,15}$/.test(v), 'Telepon harus 8–15 digit angka'),
+    pic_name: z.string().optional(),
+    pic_position: z.string().optional(),
     pic_email: z.string().email('Email tidak valid').optional().or(z.literal('')),
-    pic_phone: z.string().optional(),
+    pic_phone: z
+      .string()
+      .optional()
+      .transform((v) => (v ? stripNonDigits(v) : ''))
+      .refine((v) => v === '' || /^\d{8,15}$/.test(v), 'Telepon PIC harus 8–15 digit angka'),
     address: z.string().optional(),
     is_hq: z.boolean().default(false),
   })).default([]),
@@ -134,14 +214,22 @@ const clientFormSchema = z.object({
     use_tenant_voucher_numbering: z.boolean().default(true),
     voucher_format: z.string().optional(),
     reset_frequency: z.string().optional(),
-    padding_number: z.number().min(1).max(10).default(3),
+    padding_number: z.coerce
+      .number()
+      .min(1)
+      .max(10)
+      .refine(Number.isInteger, 'Padding angka harus bilangan bulat')
+      .default(3),
     prefix: z.string().optional(),
     suffix: z.string().optional(),
   }).optional(),
 
   // Custom COA
   customCoa: z.array(z.object({
-    account_number: z.string().min(1, 'Nomor akun wajib diisi'),
+    account_number: z
+      .string()
+      .min(1, 'Nomor akun wajib diisi')
+      .refine((v) => !/[A-Za-z]/.test(v), 'Nomor akun tidak boleh mengandung huruf'),
     account_name: z.string().min(1, 'Nama akun wajib diisi'),
     description: z.string().optional(),
   })).default([]),
@@ -152,6 +240,8 @@ const clientFormSchema = z.object({
     document_number: z.string().optional(),
     file_url: z.string().optional(),
     file_name: z.string().optional(),
+    file_size: z.coerce.number().optional(),
+    mime_type: z.string().optional(),
     status: z.string().default('missing'),
     upload_date: z.string().optional(),
     notes: z.string().optional(),
@@ -173,17 +263,21 @@ export function CreateClientModalUpdated({
 }: CreateClientModalUpdatedProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const submitIntentRef = useRef(false);
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    setFocus,
+    trigger,
     formState: { errors, isValid },
     control,
-  } = useForm({
+  } = useForm<ClientFormData>({
     mode: 'onChange',
-    resolver: zodResolver(clientFormSchema),
+    resolver: zodResolver(clientFormSchema) as any,
     defaultValues: {
       basicInfo: {
         code: '',
@@ -223,6 +317,52 @@ export function CreateClientModalUpdated({
   });
 
   const watchedValues = watch();
+
+  const flattenErrors = (errs: any, prefix = ''): Array<{ path: string; message: string }> => {
+    if (!errs) return [];
+
+    const out: Array<{ path: string; message: string }> = [];
+    for (const key of Object.keys(errs)) {
+      const v = errs[key];
+      const path = prefix ? `${prefix}.${key}` : key;
+      if (!v) continue;
+
+      if (v.message && typeof v.message === 'string') {
+        out.push({ path, message: v.message });
+        continue;
+      }
+
+      if (Array.isArray(v)) {
+        v.forEach((item, idx) => {
+          out.push(...flattenErrors(item, `${path}.${idx}`));
+        });
+        continue;
+      }
+
+      if (typeof v === 'object') {
+        out.push(...flattenErrors(v, path));
+      }
+    }
+
+    return out;
+  };
+
+  const getFirstError = (errs: any) => {
+    const list = flattenErrors(errs);
+    return list.length > 0 ? list[0] : null;
+  };
+
+  const registerDigitsOnly = (name: any) => {
+    const r = register(name);
+    return {
+      ...r,
+      inputMode: 'numeric' as const,
+      onChange: (e: any) => {
+        e.target.value = stripNonDigits(e.target.value);
+        r.onChange(e);
+      },
+    };
+  };
 
   // Steps configuration
   const steps = [
@@ -325,15 +465,26 @@ export function CreateClientModalUpdated({
   };
 
   // Form submission
-  const onFormSubmit = async (data: any) => {
+  const onFormSubmit: SubmitHandler<ClientFormData> = async (data) => {
     setIsSubmitting(true);
     try {
-      // Transform data to match backend structure
-      const transformedData = {
-        // Basic fields (flatten for backend)
-        ...data.basicInfo,
+      if (currentStep < steps.length - 1) {
+        submitIntentRef.current = false;
+        setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
+        return;
+      }
 
-        // Tax fields (flatten for backend)
+      // Only create client when user explicitly clicked the Simpan button.
+      if (!submitIntentRef.current) {
+        return;
+      }
+
+      // Reset intent immediately to avoid accidental double-submit.
+      submitIntentRef.current = false;
+
+      const transformedData = {
+        // Flatten basicInfo + taxInfo for backend
+        ...data.basicInfo,
         ...data.taxInfo,
 
         // Nested arrays for related tables
@@ -344,18 +495,26 @@ export function CreateClientModalUpdated({
 
         // Tax documents (transform from taxInfo)
         taxDocuments: [
-          ...(data.taxInfo.has_registered_letter ? [{
-            document_type: 'registered_letter',
-            document_number: data.taxInfo.registered_letter_number,
-            document_date: data.taxInfo.registered_letter_date,
-            description: data.taxInfo.registered_letter_description,
-          }] : []),
-          ...(data.taxInfo.has_pkp_confirmation ? [{
-            document_type: 'pkp_confirmation',
-            document_number: data.taxInfo.pkp_confirmation_number,
-            document_date: data.taxInfo.pkp_confirmation_date,
-            description: data.taxInfo.pkp_confirmation_description,
-          }] : []),
+          ...(data.taxInfo.has_registered_letter
+            ? [
+                {
+                  document_type: 'registered_letter',
+                  document_number: data.taxInfo.registered_letter_number,
+                  document_date: data.taxInfo.registered_letter_date,
+                  description: data.taxInfo.registered_letter_description,
+                },
+              ]
+            : []),
+          ...(data.taxInfo.has_pkp_confirmation
+            ? [
+                {
+                  document_type: 'pkp_confirmation',
+                  document_number: data.taxInfo.pkp_confirmation_number,
+                  document_date: data.taxInfo.pkp_confirmation_date,
+                  description: data.taxInfo.pkp_confirmation_description,
+                },
+              ]
+            : []),
         ],
 
         // Legal documents
@@ -366,22 +525,73 @@ export function CreateClientModalUpdated({
       onOpenChange(false);
     } catch (error) {
       console.error('Error creating client:', error);
+      // Re-throw so the caller (e.g. ClientsPage) can surface the error via toast.
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Navigation
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+  const getFirstInvalidStep = (errs: any) => {
+    if (!errs) return 0;
+    if (errs.basicInfo) return 0;
+    if (errs.taxInfo) return 1;
+    if (errs.contacts || errs.branches) return 2;
+    if (errs.preferences || errs.customCoa) return 3;
+    if (errs.legalDocuments) return 4;
+    return 0;
+  };
+
+  const onInvalid = (errs: any) => {
+    const step = getFirstInvalidStep(errs);
+    setCurrentStep(step);
+    const first = getFirstError(errs);
+    toast({
+      title: 'Form belum lengkap',
+      description: first?.message || 'Masih ada field yang wajib diisi. Cek input yang berwarna merah.',
+      variant: 'destructive',
+    });
+
+    if (first?.path) {
+      setTimeout(() => {
+        try {
+          setFocus(first.path as any);
+        } catch {
+          // ignore focus failures for array fields
+        }
+      }, 0);
     }
   };
 
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  // Navigation
+  const nextStep = async () => {
+    submitIntentRef.current = false;
+
+    const stepField: any =
+      currentStep === 0
+        ? 'basicInfo'
+        : currentStep === 1
+          ? 'taxInfo'
+          : currentStep === 2
+            ? ['contacts', 'branches']
+            : currentStep === 3
+              ? ['preferences', 'customCoa']
+              : currentStep === 4
+                ? 'legalDocuments'
+                : null;
+
+    const ok = stepField ? await trigger(stepField, { shouldFocus: true } as any) : true;
+    if (!ok) {
+      onInvalid(errors);
+      return;
     }
+
+    setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
+  };
+
+  const prevStep = () => {
+    submitIntentRef.current = false;
+    setCurrentStep((s) => Math.max(s - 1, 0));
   };
 
   // Render step content
@@ -457,10 +667,23 @@ export function CreateClientModalUpdated({
               </div>
               <div>
                 <Label htmlFor="basicInfo.npwp">NPWP *</Label>
-                <Input
-                  id="basicInfo.npwp"
-                  {...register('basicInfo.npwp')}
-                  placeholder="12.345.678.9-123.000"
+                <Controller
+                  control={control}
+                  name="basicInfo.npwp"
+                  render={({ field }) => (
+                    <Input
+                      id="basicInfo.npwp"
+                      inputMode="numeric"
+                      value={formatNpwp(field.value)}
+                      onChange={(e) => {
+                        const digits = stripNonDigits(e.target.value).slice(0, 15);
+                        field.onChange(digits);
+                      }}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      placeholder="12.345.678.9-123.000"
+                    />
+                  )}
                 />
                 {errors.basicInfo?.npwp && (
                   <p className="text-red-500 text-sm">{errors.basicInfo.npwp.message}</p>
@@ -473,17 +696,25 @@ export function CreateClientModalUpdated({
                 <Label htmlFor="basicInfo.nik">NIK</Label>
                 <Input
                   id="basicInfo.nik"
-                  {...register('basicInfo.nik')}
+                  maxLength={16}
+                  {...registerDigitsOnly('basicInfo.nik')}
                   placeholder="3171051505900001"
                 />
+                {errors.basicInfo?.nik && (
+                  <p className="text-red-500 text-sm">{errors.basicInfo.nik.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="basicInfo.nib">NIB</Label>
                 <Input
                   id="basicInfo.nib"
-                  {...register('basicInfo.nib')}
+                  maxLength={13}
+                  {...registerDigitsOnly('basicInfo.nib')}
                   placeholder="9120034567890"
                 />
+                {errors.basicInfo?.nib && (
+                  <p className="text-red-500 text-sm">{errors.basicInfo.nib.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="basicInfo.deed_number">No. Akta</Label>
@@ -533,29 +764,65 @@ export function CreateClientModalUpdated({
               </div>
               <div>
                 <Label htmlFor="basicInfo.employee_count">Jumlah Karyawan</Label>
-                <Input
-                  id="basicInfo.employee_count"
-                  type="number"
-                  {...register('basicInfo.employee_count', { valueAsNumber: true })}
-                  placeholder="50"
+                <Controller
+                  control={control}
+                  name="basicInfo.employee_count"
+                  render={({ field }) => (
+                    <Input
+                      id="basicInfo.employee_count"
+                      inputMode="numeric"
+                      value={field.value === 0 ? '' : formatThousandsId(field.value)}
+                      onChange={(e) => {
+                        const raw = stripNonDigits(e.target.value);
+                        field.onChange(raw ? parseInt(raw, 10) : 0);
+                      }}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      placeholder="50"
+                    />
+                  )}
                 />
               </div>
               <div>
                 <Label htmlFor="basicInfo.basic_capital">Modal Dasar</Label>
-                <Input
-                  id="basicInfo.basic_capital"
-                  type="number"
-                  {...register('basicInfo.basic_capital', { valueAsNumber: true })}
-                  placeholder="1000000000"
+                <Controller
+                  control={control}
+                  name="basicInfo.basic_capital"
+                  render={({ field }) => (
+                    <Input
+                      id="basicInfo.basic_capital"
+                      inputMode="numeric"
+                      value={field.value === 0 ? '' : formatThousandsId(field.value)}
+                      onChange={(e) => {
+                        const raw = stripNonDigits(e.target.value);
+                        field.onChange(raw ? parseInt(raw, 10) : 0);
+                      }}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      placeholder="1.000.000.000"
+                    />
+                  )}
                 />
               </div>
               <div>
                 <Label htmlFor="basicInfo.paid_capital">Modal Disetor</Label>
-                <Input
-                  id="basicInfo.paid_capital"
-                  type="number"
-                  {...register('basicInfo.paid_capital', { valueAsNumber: true })}
-                  placeholder="500000000"
+                <Controller
+                  control={control}
+                  name="basicInfo.paid_capital"
+                  render={({ field }) => (
+                    <Input
+                      id="basicInfo.paid_capital"
+                      inputMode="numeric"
+                      value={field.value === 0 ? '' : formatThousandsId(field.value)}
+                      onChange={(e) => {
+                        const raw = stripNonDigits(e.target.value);
+                        field.onChange(raw ? parseInt(raw, 10) : 0);
+                      }}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      placeholder="500.000.000"
+                    />
+                  )}
                 />
               </div>
             </div>
@@ -608,11 +875,23 @@ export function CreateClientModalUpdated({
               </div>
               <div>
                 <Label htmlFor="basicInfo.annual_revenue">Revenue Tahunan</Label>
-                <Input
-                  id="basicInfo.annual_revenue"
-                  type="number"
-                  {...register('basicInfo.annual_revenue', { valueAsNumber: true })}
-                  placeholder="1200000000"
+                <Controller
+                  control={control}
+                  name="basicInfo.annual_revenue"
+                  render={({ field }) => (
+                    <Input
+                      id="basicInfo.annual_revenue"
+                      inputMode="numeric"
+                      value={field.value === 0 ? '' : formatThousandsId(field.value)}
+                      onChange={(e) => {
+                        const raw = stripNonDigits(e.target.value);
+                        field.onChange(raw ? parseInt(raw, 10) : 0);
+                      }}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      placeholder="1.200.000.000"
+                    />
+                  )}
                 />
               </div>
             </div>
@@ -644,7 +923,8 @@ export function CreateClientModalUpdated({
                     <Label htmlFor="basicInfo.postal_code">Kode Pos *</Label>
                     <Input
                       id="basicInfo.postal_code"
-                      {...register('basicInfo.postal_code')}
+                      maxLength={5}
+                      {...registerDigitsOnly('basicInfo.postal_code')}
                       placeholder="12345"
                     />
                     {errors.basicInfo?.postal_code && (
@@ -684,7 +964,7 @@ export function CreateClientModalUpdated({
                 <Label htmlFor="basicInfo.phone">Telepon *</Label>
                 <Input
                   id="basicInfo.phone"
-                  {...register('basicInfo.phone')}
+                  {...registerDigitsOnly('basicInfo.phone')}
                   placeholder="021-1234567"
                 />
                 {errors.basicInfo?.phone && (
@@ -784,7 +1064,7 @@ export function CreateClientModalUpdated({
                     <Label htmlFor="taxInfo.pic_pkp_contact">Kontak/Whatsapp</Label>
                     <Input
                       id="taxInfo.pic_pkp_contact"
-                      {...register('taxInfo.pic_pkp_contact')}
+                      {...registerDigitsOnly('taxInfo.pic_pkp_contact')}
                       placeholder="08123456789"
                     />
                   </div>
@@ -941,10 +1221,20 @@ export function CreateClientModalUpdated({
                     </div>
                     <div>
                       <Label>Telepon *</Label>
-                      <Input
-                        {...register(`contacts.${index}.phone`)}
-                        placeholder="08123456789"
-                      />
+                      {(() => {
+                        const r = register(`contacts.${index}.phone` as const);
+                        return (
+                          <Input
+                            inputMode="numeric"
+                            {...r}
+                            onChange={(e) => {
+                              e.target.value = stripNonDigits(e.target.value);
+                              r.onChange(e);
+                            }}
+                            placeholder="08123456789"
+                          />
+                        );
+                      })()}
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -1054,10 +1344,20 @@ export function CreateClientModalUpdated({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Telepon</Label>
-                      <Input
-                        {...register(`branches.${index}.phone`)}
-                        placeholder="022-1234567"
-                      />
+                      {(() => {
+                        const r = register(`branches.${index}.phone` as const);
+                        return (
+                          <Input
+                            inputMode="numeric"
+                            {...r}
+                            onChange={(e) => {
+                              e.target.value = stripNonDigits(e.target.value);
+                              r.onChange(e);
+                            }}
+                            placeholder="0221234567"
+                          />
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -1105,10 +1405,20 @@ export function CreateClientModalUpdated({
                     </div>
                     <div>
                       <Label>Telepon PIC</Label>
-                      <Input
-                        {...register(`branches.${index}.pic_phone`)}
-                        placeholder="08123456789"
-                      />
+                      {(() => {
+                        const r = register(`branches.${index}.pic_phone` as const);
+                        return (
+                          <Input
+                            inputMode="numeric"
+                            {...r}
+                            onChange={(e) => {
+                              e.target.value = stripNonDigits(e.target.value);
+                              r.onChange(e);
+                            }}
+                            placeholder="08123456789"
+                          />
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -1284,28 +1594,48 @@ export function CreateClientModalUpdated({
         };
 
         // Helper to handle file upload for a specific document type
-        const handleDocUpload = (docType: string, file: File) => {
-          const existingIndex = currentDocs.findIndex(d => d.document_type === docType);
-          const fileSize = file.size < 1024 * 1024 
-            ? `${(file.size / 1024).toFixed(2)} KB` 
-            : `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
-          
-          const newDoc = {
-            document_type: docType,
-            document_number: '',
-            file_url: URL.createObjectURL(file),
-            file_name: file.name,
-            status: 'uploaded',
-            upload_date: new Date().toISOString(),
-            notes: fileSize,
-          };
+        const handleDocUpload = async (docType: string, file: File) => {
+          try {
+            const existingIndex = currentDocs.findIndex(d => d.document_type === docType);
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('document_type', docType);
 
-          if (existingIndex >= 0) {
-            const updatedDocs = [...currentDocs];
-            updatedDocs[existingIndex] = newDoc;
-            setValue('legalDocuments', updatedDocs);
-          } else {
-            setValue('legalDocuments', [...currentDocs, newDoc]);
+            const { data } = await api.post('/client-wp/api/uploads/legal-documents', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            const fileSizeLabel = file.size < 1024 * 1024
+              ? `${(file.size / 1024).toFixed(2)} KB`
+              : `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+
+            const newDoc = {
+              document_type: docType,
+              document_number: '',
+              file_url: data.objectKey || data.file_url,
+              file_name: data.file_name || file.name,
+              file_size: data.file_size || file.size,
+              mime_type: data.mime_type || file.type,
+              status: 'uploaded',
+              upload_date: new Date().toISOString(),
+              notes: fileSizeLabel,
+            };
+
+            if (existingIndex >= 0) {
+              const updatedDocs = [...currentDocs];
+              updatedDocs[existingIndex] = newDoc;
+              setValue('legalDocuments', updatedDocs);
+            } else {
+              setValue('legalDocuments', [...currentDocs, newDoc]);
+            }
+          } catch (e: any) {
+            console.error(e);
+            const msg = e?.response?.data?.message || e?.message || 'Upload dokumen gagal';
+            toast({
+              title: 'Upload gagal',
+              description: msg,
+              variant: 'destructive',
+            });
           }
         };
 
@@ -1354,7 +1684,24 @@ export function CreateClientModalUpdated({
                       </div>
                       <div className="flex items-center gap-2">
                         {isUploaded && (
-                          <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="text-muted-foreground"
+                            onClick={async () => {
+                              try {
+                                if (!doc?.file_url) return;
+                                const resp = await api.get('/client-wp/api/uploads/legal-documents/presign', {
+                                  params: { objectKey: doc.file_url },
+                                });
+                                const url = resp.data?.presigned_url;
+                                if (url) window.open(url, '_blank', 'noopener,noreferrer');
+                              } catch (e) {
+                                console.error(e);
+                              }
+                            }}
+                          >
                             <Eye className="h-4 w-4 mr-1" />
                             Preview
                           </Button>
@@ -1476,6 +1823,7 @@ export function CreateClientModalUpdated({
         const contacts = watchedValues.contacts || [];
         const legalDocs = watchedValues.legalDocuments || [];
         const preferences = watchedValues.preferences;
+        const errorList = flattenErrors(errors);
         
         // Calculate completeness
         const uploadedDocs = legalDocs.filter(d => d.status === 'uploaded' || d.status === 'verified').length;
@@ -1496,6 +1844,23 @@ export function CreateClientModalUpdated({
 
         return (
           <div className="space-y-6">
+            {errorList.length > 0 && (
+              <div className="border border-red-200 bg-red-50 dark:bg-red-950/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-red-700 dark:text-red-300 font-semibold">
+                  <AlertCircle className="h-4 w-4" />
+                  Ada data yang belum valid
+                </div>
+                <div className="mt-2 text-sm text-red-700 dark:text-red-300 space-y-1">
+                  {errorList.slice(0, 6).map((e, idx) => (
+                    <div key={idx}>{e.message}</div>
+                  ))}
+                  {errorList.length > 6 && (
+                    <div>Dan {errorList.length - 6} error lainnya...</div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Header Title */}
             <div className="text-center pb-2">
               <p className="text-sm text-muted-foreground">Ringkasan dan Validasi</p>
@@ -1744,7 +2109,7 @@ export function CreateClientModalUpdated({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onFormSubmit, onInvalid)} className="space-y-6">
           {/* Step Navigation */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -1752,7 +2117,10 @@ export function CreateClientModalUpdated({
                 <div key={step.id} className="flex items-center">
                   <button
                     type="button"
-                    onClick={() => setCurrentStep(index)}
+                    onClick={() => {
+                      submitIntentRef.current = false;
+                      setCurrentStep(index);
+                    }}
                     className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 cursor-pointer hover:opacity-80 ${
                       index <= currentStep
                         ? 'bg-blue-600 text-white shadow-md scale-110'
@@ -1801,7 +2169,7 @@ export function CreateClientModalUpdated({
 
             <div className="space-x-2">
               {currentStep < steps.length - 1 ? (
-                <Button type="button" onClick={nextStep}>
+                <Button type="button" onClick={() => void nextStep()}>
                   Selanjutnya
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -1810,6 +2178,9 @@ export function CreateClientModalUpdated({
                   type="submit" 
                   disabled={isSubmitting}
                   className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => {
+                    submitIntentRef.current = true;
+                  }}
                 >
                   {isSubmitting ? 'Menyimpan...' : 'Simpan'}
                 </Button>

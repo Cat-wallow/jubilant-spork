@@ -58,6 +58,12 @@ export interface ClientDetail extends Client {
 	padding_number?: number;
 	voucher_prefix?: string;
 	voucher_suffix?: string;
+
+	// Nested relations (when backend includes)
+	client_contacts?: any[];
+	client_branches?: any[];
+	client_legal_documents?: any[];
+	client_tax_documents?: any[];
 }
 
 export interface TenantComplianceSummary {

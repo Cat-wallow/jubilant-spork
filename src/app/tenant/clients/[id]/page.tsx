@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient, useClientReadiness, useDeleteClient } from '@/hooks/useClients';
 import { useClientContacts } from '@/hooks/useClientContacts';
 import { useClientBranches } from '@/hooks/useClientBranches';
+import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,13 +33,21 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function ClientDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { tenant } = useAuth();
+  const { toast } = useToast();
   const id = params.id as string;
   const deleteClientMutation = useDeleteClient();
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState<string>('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const { data: client, isLoading, error } = useClient(tenant.id, id);
   const { data: readiness } = useClientReadiness(tenant.id, id);
@@ -81,6 +91,38 @@ export default function ClientDetailPage() {
           },
         }
       );
+    }
+  };
+
+  const handlePreviewLegalDoc = async (doc: any) => {
+    const keyOrUrl = doc?.file_url;
+    if (!keyOrUrl) return;
+
+    setPreviewTitle(doc?.file_name || doc?.document_type || 'Dokumen');
+    setIsPreviewOpen(true);
+    setPreviewUrl(null);
+    setIsPreviewLoading(true);
+
+    try {
+      if (/^https?:\/\//i.test(keyOrUrl)) {
+        setPreviewUrl(keyOrUrl);
+        return;
+      }
+
+      const resp = await api.get('/client-wp/api/uploads/legal-documents/presign', {
+        params: { objectKey: keyOrUrl },
+        headers: { 'X-Tenant-Id': tenant.id },
+      });
+      setPreviewUrl(resp.data?.presigned_url || null);
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || 'Gagal membuka dokumen';
+      toast({
+        title: 'Preview gagal',
+        description: msg,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsPreviewLoading(false);
     }
   };
 
@@ -1008,9 +1050,97 @@ export default function ClientDetailPage() {
           </div>
         </TabsContent>
         <TabsContent value="documents">
+          {isLoading ? (
             <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
-                Dokumen Legal akan ditampilkan di sini
+              Memuat dokumen legal...
             </div>
+          ) : client?.client_legal_documents && client.client_legal_documents.length ? (
+            <div className="space-y-3">
+              {client.client_legal_documents.map((doc: any) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                >
+                  <div className="space-y-1">
+                    <p className="font-medium">{doc.file_name || doc.document_type}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {doc.document_type}
+                      {doc.uploaded_at && ` • Diupload ${new Date(doc.uploaded_at).toLocaleDateString('id-ID')}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {doc.file_url && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handlePreviewLegalDoc(doc)}
+                      >
+                        <Eye className="h-4 w-4" />
+                        Preview
+                      </Button>
+                    )}
+                    <Badge variant="secondary" className="capitalize">
+                      {doc.status || 'missing'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
+              Dokumen Legal akan ditampilkan di sini
+            </div>
+          )}
+
+          <Dialog
+            open={isPreviewOpen}
+            onOpenChange={(open) => {
+              setIsPreviewOpen(open);
+              if (!open) {
+                setPreviewUrl(null);
+                setIsPreviewLoading(false);
+                setPreviewTitle('');
+              }
+            }}
+          >
+            <DialogContent className="sm:max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>{previewTitle || 'Preview Dokumen'}</DialogTitle>
+              </DialogHeader>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm text-muted-foreground">
+                  {isPreviewLoading ? 'Memuat dokumen...' : previewUrl ? ' ' : 'Dokumen tidak tersedia'}
+                </div>
+                {previewUrl && (
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-blue-600 hover:underline"
+                  >
+                    Buka di tab baru
+                  </a>
+                )}
+              </div>
+
+              <div className="w-full h-[70vh] rounded-md border overflow-hidden bg-white">
+                {previewUrl ? (
+                  <iframe
+                    src={previewUrl}
+                    title={previewTitle || 'Preview Dokumen'}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-sm text-muted-foreground">
+                    {isPreviewLoading ? 'Memuat...' : 'Tidak ada preview'}
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </div>

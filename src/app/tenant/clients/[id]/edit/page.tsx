@@ -9,6 +9,7 @@ import { useClientBranches, useUpsertClientBranch, useDeleteClientBranch } from 
 import { useForm, Controller, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+
+const stripNonDigits = (value: unknown) => String(value ?? '').replace(/\D/g, '');
+
+const formatThousandsId = (value: number) => {
+  if (!Number.isFinite(value)) return '';
+  return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(value);
+};
+
+const formatFileSizeLabel = (bytes?: number | null) => {
+  if (!bytes || !Number.isFinite(bytes)) return '';
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
 
 // Zod Schema (Simplified version of CreateClientModalUpdated)
 const clientFormSchema = z.object({
@@ -49,15 +63,19 @@ const clientFormSchema = z.object({
   notary_location: z.string().optional(),
   notary_contact: z.string().optional(),
   establishment_date: z.string().optional(),
-  employee_count: z.number().optional(),
-  basic_capital: z.number().optional(), // Ensure type is number
-  paid_capital: z.number().optional(), // Ensure type is number
+  employee_count: z.coerce
+    .number()
+    .min(0)
+    .refine(Number.isInteger, 'Jumlah karyawan harus bilangan bulat')
+    .optional(),
+  basic_capital: z.coerce.number().min(0).optional(),
+  paid_capital: z.coerce.number().min(0).optional(),
 
   // Classification
   business_scale: z.string().optional(),
   business_type: z.string().optional(), // Renamed from industry to business_type
   industry_sector: z.string().optional(),
-  annual_revenue: z.number().optional(), // Ensure type is number
+  annual_revenue: z.coerce.number().min(0).optional(),
   service_package: z.string().optional(),
 
   // Tax Identity
@@ -139,15 +157,22 @@ export default function EditClientPage() {
   const [legalDocuments, setLegalDocuments] = useState<{
     id?: string;
     document_type: string;
-    document_name: string;
+    document_number?: string;
+    document_date?: string;
     expiry_date?: string;
-    file_size?: string;
+    issuing_authority?: string;
+    file_url?: string;
+    file_name?: string;
+    file_size?: number;
+    mime_type?: string;
+    status?: string;
     upload_date?: string;
+    notes?: string;
     is_required: boolean;
   }[]>([
-    { document_type: 'akta_pendirian', document_name: '', is_required: true },
-    { document_type: 'nib', document_name: '', is_required: true },
-    { document_type: 'npwp', document_name: '', is_required: true },
+    { document_type: 'akta_pendirian', is_required: true },
+    { document_type: 'nib', is_required: true },
+    { document_type: 'npwp', is_required: true },
   ]);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [newDocument, setNewDocument] = useState({
@@ -155,6 +180,11 @@ export default function EditClientPage() {
     expiry_date: '',
     file: null as File | null,
   });
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const {
     register,
@@ -285,6 +315,38 @@ export default function EditClientPage() {
         voucher_prefix: client.voucher_prefix || '',
         voucher_suffix: client.voucher_suffix || '',
       });
+
+      const clientDocs = (client as any)?.client_legal_documents as any[] | undefined;
+      if (Array.isArray(clientDocs)) {
+        setLegalDocuments((prev) => {
+          const requiredTypes = new Set(prev.filter((d) => d.is_required).map((d) => d.document_type));
+          const mapped = clientDocs.map((d) => ({
+            id: d.id,
+            document_type: d.document_type,
+            document_number: d.document_number || '',
+            document_date: d.document_date ? new Date(d.document_date).toISOString().split('T')[0] : '',
+            expiry_date: d.expiry_date ? new Date(d.expiry_date).toISOString().split('T')[0] : '',
+            issuing_authority: d.issuing_authority || '',
+            file_url: d.file_url || '',
+            file_name: d.file_name || '',
+            file_size: d.file_size != null ? Number(d.file_size) : undefined,
+            mime_type: d.mime_type || '',
+            status: d.status || '',
+            upload_date: d.uploaded_at ? new Date(d.uploaded_at).toISOString() : '',
+            notes: d.notes || '',
+            is_required: requiredTypes.has(d.document_type),
+          }));
+
+          const requiredBase = [...requiredTypes].map((t) => ({ document_type: t, is_required: true }));
+          const merged = [...requiredBase, ...mapped].reduce((acc: any[], cur: any) => {
+            const idx = acc.findIndex((x) => x.document_type === cur.document_type);
+            if (idx >= 0) acc[idx] = { ...acc[idx], ...cur };
+            else acc.push(cur);
+            return acc;
+          }, []);
+          return merged;
+        });
+      }
     }
   }, [client, reset]);
 
@@ -342,10 +404,30 @@ export default function EditClientPage() {
   const onSubmit = async (data: any) => {
     console.log('Submitting form data:', data); // DEBUG LOG
     try {
+      const payload = {
+        ...data,
+        legalDocuments: legalDocuments
+          .filter((d) => d.document_type)
+          .map((d) => ({
+            document_type: d.document_type,
+            document_number: d.document_number || '',
+            document_date: d.document_date || null,
+            expiry_date: d.expiry_date || null,
+            issuing_authority: d.issuing_authority || null,
+            file_url: d.file_url || null,
+            file_name: d.file_name || null,
+            file_size: d.file_size ?? null,
+            mime_type: d.mime_type || null,
+            status: d.status || (d.file_url ? 'uploaded' : 'missing'),
+            upload_date: d.upload_date || null,
+            notes: d.notes || null,
+          })),
+      };
+
       const result = await updateClientMutation.mutateAsync({
         tenantId: tenant.id,
         id,
-        data,
+        data: payload,
       });
       console.log('Update successful, server response:', result); // DEBUG LOG
 
@@ -440,7 +522,10 @@ export default function EditClientPage() {
     } catch (error) {
       console.error('Failed to update client:', error);
       const anyErr = error as any;
-      const errorMessage = anyErr?.response?.data?.message || anyErr?.message || 'Terjadi kesalahan saat menyimpan data';
+      const isNetworkError = !anyErr?.response && (anyErr?.message === 'Network Error' || anyErr?.code === 'ERR_NETWORK');
+      const errorMessage = isNetworkError
+        ? 'Network error: tidak bisa menghubungi server. Pastikan gateway (localhost:8000) dan service-client_management (localhost:3005) sedang berjalan.'
+        : anyErr?.response?.data?.message || anyErr?.message || 'Terjadi kesalahan saat menyimpan data';
       console.error('Error details:', anyErr?.response?.data || anyErr?.message); // DEBUG LOG
       
       toast({
@@ -705,11 +790,27 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="employee_count">Jumlah Karyawan</Label>
-                      <Input
-                        type="number"
-                        id="employee_count"
-                        {...register('employee_count', { valueAsNumber: true })}
-                        placeholder="0"
+                      <Controller
+                        control={control}
+                        name="employee_count"
+                        render={({ field }) => (
+                          <Input
+                            id="employee_count"
+                            inputMode="numeric"
+                            value={
+                              field.value === undefined || field.value === null
+                                ? ''
+                                : formatThousandsId(Number(field.value))
+                            }
+                            onChange={(e) => {
+                              const raw = stripNonDigits(e.target.value);
+                              field.onChange(raw ? parseInt(raw, 10) : 0);
+                            }}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            placeholder="0"
+                          />
+                        )}
                       />
                     </div>
                   </div>
@@ -717,20 +818,44 @@ export default function EditClientPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="basic_capital">Modal Dasar (Rp)</Label>
-                      <Input
-                        type="number"
-                        id="basic_capital"
-                        {...register('basic_capital', { valueAsNumber: true })}
-                        placeholder="0"
+                      <Controller
+                        control={control}
+                        name="basic_capital"
+                        render={({ field }) => (
+                          <Input
+                            id="basic_capital"
+                            inputMode="numeric"
+                            value={field.value ? formatThousandsId(Number(field.value)) : ''}
+                            onChange={(e) => {
+                              const raw = stripNonDigits(e.target.value);
+                              field.onChange(raw ? parseInt(raw, 10) : 0);
+                            }}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            placeholder="0"
+                          />
+                        )}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="paid_capital">Modal Disetor (Rp)</Label>
-                      <Input
-                        type="number"
-                        id="paid_capital"
-                        {...register('paid_capital', { valueAsNumber: true })}
-                        placeholder="0"
+                      <Controller
+                        control={control}
+                        name="paid_capital"
+                        render={({ field }) => (
+                          <Input
+                            id="paid_capital"
+                            inputMode="numeric"
+                            value={field.value ? formatThousandsId(Number(field.value)) : ''}
+                            onChange={(e) => {
+                              const raw = stripNonDigits(e.target.value);
+                              field.onChange(raw ? parseInt(raw, 10) : 0);
+                            }}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            placeholder="0"
+                          />
+                        )}
                       />
                     </div>
                   </div>
@@ -784,10 +909,23 @@ export default function EditClientPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="annual_revenue">Revenue Tahunan (Rp)</Label>
-                    <Input
-                      id="annual_revenue"
-                      {...register('annual_revenue', { valueAsNumber: true })}
-                      placeholder="0"
+                    <Controller
+                      control={control}
+                      name="annual_revenue"
+                      render={({ field }) => (
+                        <Input
+                          id="annual_revenue"
+                          inputMode="numeric"
+                          value={field.value ? formatThousandsId(Number(field.value)) : ''}
+                          onChange={(e) => {
+                            const raw = stripNonDigits(e.target.value);
+                            field.onChange(raw ? parseInt(raw, 10) : 0);
+                          }}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                          placeholder="0"
+                        />
+                      )}
                     />
                   </div>
                 </div>
@@ -1444,8 +1582,38 @@ export default function EditClientPage() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          {doc.document_name && (
-                            <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
+                          {doc.file_url && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-muted-foreground"
+                              onClick={async () => {
+                                const keyOrUrl = doc.file_url;
+                                if (!keyOrUrl) return;
+
+                                setPreviewTitle(doc.file_name || doc.document_type || 'Dokumen');
+                                setIsPreviewOpen(true);
+                                setPreviewUrl(null);
+                                setIsPreviewLoading(true);
+
+                                try {
+                                  if (/^https?:\/\//i.test(keyOrUrl)) {
+                                    setPreviewUrl(keyOrUrl);
+                                    return;
+                                  }
+                                  const resp = await api.get('/client-wp/api/uploads/legal-documents/presign', {
+                                    params: { objectKey: keyOrUrl },
+                                    headers: { 'X-Tenant-Id': tenant.id },
+                                  });
+                                  setPreviewUrl(resp.data?.presigned_url || null);
+                                } catch (e) {
+                                  console.error(e);
+                                } finally {
+                                  setIsPreviewLoading(false);
+                                }
+                              }}
+                            >
                               <Eye className="h-4 w-4 mr-1" />
                               Preview
                             </Button>
@@ -1464,16 +1632,16 @@ export default function EditClientPage() {
                         </div>
                       </div>
                       
-                      {doc.document_name ? (
+                      {doc.file_url ? (
                         <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg border">
-                          <p className="font-medium text-blue-900 dark:text-blue-100">{doc.document_name}</p>
+                          <p className="font-medium text-blue-900 dark:text-blue-100">{doc.file_name || 'Dokumen'}</p>
                           <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                             {doc.expiry_date && (
                               <span>Masa berlaku sampai: {new Date(doc.expiry_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            {doc.file_size && <span>{doc.file_size}</span>}
+                            {doc.file_size != null && <span>{formatFileSizeLabel(doc.file_size)}</span>}
                             {doc.upload_date && <span> • Diupload {new Date(doc.upload_date).toLocaleDateString('id-ID')}</span>}
                           </div>
                         </div>
@@ -1507,6 +1675,54 @@ export default function EditClientPage() {
           </TabsContent>
         </form>
       </Tabs>
+
+      <Dialog
+        open={isPreviewOpen}
+        onOpenChange={(open) => {
+          setIsPreviewOpen(open);
+          if (!open) {
+            setPreviewTitle('');
+            setPreviewUrl(null);
+            setIsPreviewLoading(false);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{previewTitle || 'Preview Dokumen'}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm text-muted-foreground">
+              {isPreviewLoading ? 'Memuat dokumen...' : previewUrl ? ' ' : 'Dokumen tidak tersedia'}
+            </div>
+            {previewUrl && (
+              <a
+                href={previewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-blue-600 hover:underline"
+              >
+                Buka di tab baru
+              </a>
+            )}
+          </div>
+
+          <div className="w-full h-[70vh] rounded-md border overflow-hidden bg-white">
+            {previewUrl ? (
+              <iframe
+                src={previewUrl}
+                title={previewTitle || 'Preview Dokumen'}
+                className="w-full h-full"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-sm text-muted-foreground">
+                {isPreviewLoading ? 'Memuat...' : 'Tidak ada preview'}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal Upload Dokumen */}
       <Dialog open={isDocumentModalOpen} onOpenChange={setIsDocumentModalOpen}>
@@ -1585,46 +1801,54 @@ export default function EditClientPage() {
               type="button"
               className="bg-blue-600 hover:bg-blue-700"
               disabled={!newDocument.document_type || !newDocument.file}
-              onClick={() => {
-                if (newDocument.document_type && newDocument.file) {
-                  const docTypeLabels: Record<string, string> = {
-                    akta_pendirian: 'Akta Pendirian',
-                    akta_perubahan: 'Akta Perubahan',
-                    nib: 'NIB',
-                    npwp: 'NPWP',
-                    siup: 'SIUP',
-                    tdp: 'TDP',
-                    pkp: 'Pernyataan PKP',
-                    ktp_direktur: 'KTP Direktur',
-                    sk_kemenkumham: 'SK Kemenkumham',
-                    surat_domisili: 'Surat Domisili',
-                    lainnya: 'Dokumen Lainnya',
+              onClick={async () => {
+                if (!newDocument.document_type || !newDocument.file) return;
+                try {
+                  const formData = new FormData();
+                  formData.append('file', newDocument.file);
+                  formData.append('document_type', newDocument.document_type);
+                  const { data } = await api.post('/client-wp/api/uploads/legal-documents', formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                      'X-Tenant-Id': tenant.id,
+                    },
+                  });
+
+                  const nextDoc = {
+                    document_type: newDocument.document_type,
+                    expiry_date: newDocument.expiry_date || undefined,
+                    file_url: data.objectKey || data.file_url,
+                    file_name: data.file_name || newDocument.file.name,
+                    file_size: data.file_size || newDocument.file.size,
+                    mime_type: data.mime_type || newDocument.file.type,
+                    status: 'uploaded',
+                    upload_date: new Date().toISOString(),
+                    is_required: ['akta_pendirian', 'nib', 'npwp'].includes(newDocument.document_type),
                   };
-                  
-                  // Format file size
-                  const fileSize = newDocument.file.size;
-                  const fileSizeStr = fileSize < 1024 * 1024 
-                    ? `${(fileSize / 1024).toFixed(2)} KB` 
-                    : `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
-                  
-                  setLegalDocuments(prev => [
-                    ...prev,
-                    {
-                      document_type: newDocument.document_type,
-                      document_name: `${docTypeLabels[newDocument.document_type]} ${watch('name') || 'Klien'}`,
-                      expiry_date: newDocument.expiry_date || undefined,
-                      file_size: fileSizeStr,
-                      upload_date: new Date().toISOString(),
-                      is_required: ['akta_pendirian', 'nib', 'npwp'].includes(newDocument.document_type),
+
+                  setLegalDocuments((prev) => {
+                    const idx = prev.findIndex((d) => d.document_type === nextDoc.document_type);
+                    if (idx >= 0) {
+                      const copy = [...prev];
+                      copy[idx] = { ...copy[idx], ...nextDoc };
+                      return copy;
                     }
-                  ]);
-                  
+                    return [...prev, nextDoc];
+                  });
+
                   setIsDocumentModalOpen(false);
                   setNewDocument({ document_type: '', expiry_date: '', file: null });
-                  
+
                   toast({
-                    title: 'Dokumen ditambahkan',
-                    description: 'Dokumen berhasil ditambahkan ke daftar',
+                    title: 'Upload berhasil',
+                    description: 'Dokumen berhasil diupload',
+                  });
+                } catch (e: any) {
+                  const msg = e?.response?.data?.message || e?.message || 'Upload dokumen gagal';
+                  toast({
+                    title: 'Upload gagal',
+                    description: msg,
+                    variant: 'destructive',
                   });
                 }
               }}
