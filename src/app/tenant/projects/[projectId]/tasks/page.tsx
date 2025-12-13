@@ -236,13 +236,10 @@ function TasksPageContent() {
 	const uniqueAssignees = Array.from(new Set(dummyTasks.map((t) => t.assigneeName)));
 
 	return (
-		<div className="flex w-full flex-col gap-[30px] p-[30px]">
+		<div className="flex w-full flex-col gap-[30px] ">
 			{/* Header */}
 			<div className="flex items-center justify-center gap-2.5">
 				<div className="flex flex-1 flex-col gap-[5px]">
-					<p className="font-dm text-sm font-medium leading-6 text-muted-foreground">
-						Project &gt; Detail Project
-					</p>
 					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight text-foreground">
 						Konsultasi Pajak PT Maju Bersama
 					</h1>
@@ -775,4 +772,3 @@ export default function TasksPage() {
 		</RBAC>
 	);
 }
-

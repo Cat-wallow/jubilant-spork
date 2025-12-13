@@ -70,7 +70,7 @@ export const columns: ColumnDef<Project>[] = [
 		),
 		cell: ({ row }) => {
 			const start = row.original.start_date
-				? format(row.original.start_date, "MMM yyyy")
+				? format(row.original.start_date, "mmm yyyy")
 				: "-";
 			return (
 				<div className="inline-flex items-center justify-center rounded-[6.25px] border border-[#C2C5CC] bg-[#EEEFF1] px-[3px] py-[3px]">

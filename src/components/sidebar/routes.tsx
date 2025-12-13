@@ -120,6 +120,7 @@ const routes = [
 				/>
 			</svg>
 		),
+		permission: ["tenant:tenant_manage", "tenant:tenant_read"],
 	},
 	{
 		name: "Tenants",
@@ -138,7 +139,7 @@ const routes = [
 				/>
 			</svg>
 		),
-		permission: ["platform:user_manage", "platform:user_read"],
+		permission: ["platform:tenant_manage", "platform:tenant_read"],
 	},
 	{
 		name: "Manajemen Pengguna",

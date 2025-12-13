@@ -54,28 +54,27 @@ export default function Admin({ children }: { children: ReactNode }) {
 	const [open, setOpen] = useState(false);
 	const pathname = usePathname();
 	const params = useParams();
-	const projectId = params?.id as string;
+	const projectId = params?.projectId as string;
 
 	if (isWindowAvailable()) document.documentElement.dir = "ltr";
 
 	// Check if we are in a project detail route
 	const isProjectDetail =
-		pathname?.includes(`/tenant/projects/${projectId}`) && !!projectId;
+		pathname?.includes(`/tenant/projects/${projectId}/`) && !!projectId;
 
 	return (
 		<RBAC redirect>
 			<div className="bg-background-100 dark:bg-background-900 flex h-full w-full">
 				<Sidebar
-					routes={routes}
+  				routes={routes}
 					open={open}
 					setOpen={setOpen}
 					variant="admin"
 				/>
 
 				{/* Project Specific Sidebar - Rendered only in project detail context */}
-				{isProjectDetail && (
-					<div className="fixed left-[80px] items-start hidden md:flex top-0 z-40  h-full w-[290px] flex-col gap-[26px]  pb-10 shadow-md transition-all duration-175 bg-card">
-						{/* Project Info */}
+				{isProjectDetail && (window.innerWidth >= 768 || (window.innerWidth <= 768 && open)) && (
+					<div className={`fixed left-[80px] items-start md:flex top-0 z-40  h-full w-[290px] flex-col gap-[26px]  pb-10 shadow-md transition-all duration-175 bg-card `}>
 						<div className="flex flex-col justify-start items-center  px-5 ">
 							<div className="flex h-24   flex-col justify-center">
 								<h3 className="font-dm text-sm font-bold leading-6 tracking-tight text-primary">
@@ -90,7 +89,6 @@ export default function Admin({ children }: { children: ReactNode }) {
 							/>
 						</div>
 
-						{/* Module Links */}
 						<div className="flex flex-col  gap-5 px-5">
 							{projectModules.map((module) => {
 								const href = `/tenant/projects/${projectId}/${module.path}`;
@@ -120,11 +118,11 @@ export default function Admin({ children }: { children: ReactNode }) {
 				)}
 
 				{/* Navbar & Main Content */}
-				<div className="h-full w-full font-dm dark:bg-navy-900">
+				<div className="h-full w-full font-dm dark:bg-navy-900 ">
 					{/* Main Content */}
 					<main
 						className={`mx-2.5 flex-none transition-all dark:bg-navy-900 md:pr-2 ${
-							isProjectDetail ? "xl:ml-[380px]" : "xl:ml-[323px]"
+							isProjectDetail ? "xl:ml-[380px]" : "xl:ml-[250px]"
 						}`}
 					>
 						{/* Routes */}
@@ -134,7 +132,7 @@ export default function Admin({ children }: { children: ReactNode }) {
 								brandText={getActiveRoute(routes, pathname)}
 								secondary={getActiveNavbar(routes, pathname)}
 							/>
-							<div className="mx-auto min-h-screen p-2 !pt-[4px] md:p-2">
+							<div className="mx-auto min-h-screen !pt-[4px]   ">
 								{children}
 							</div>
 							<div className="p-3">

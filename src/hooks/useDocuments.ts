@@ -15,31 +15,31 @@ export interface WorkflowStep {
 export interface Document {
   id: string;
   projectId: string;
-  
+
   // Document Identity
   jenisDokumen: string;
   tipeDokumen: string;
   nomorDokumen: string | null;
   documentDate: string | null;
   jumlahLembar: number;
-  
+
   // Document Status
   status: 'digital' | 'asli' | 'copy';
   folder: string | null;
-  
+
   // Workflow
   asalDokumen: WorkflowStep;
   pengiriman: WorkflowStep;
   penerimaan: WorkflowStep;
   digitalisasi: WorkflowStep;
   pendeskripsian: WorkflowStep;
-  
+
   // File Info
   originalFilename: string;
   storedFilename: string;
   mimeType: string;
   fileSize: number;
-  
+
   // Metadata
   description: string | null;
   version: number;
@@ -119,7 +119,7 @@ export const useDocuments = (
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       searchParams.append('currentTenantId', tenantId);
-      
+
       if (params?.jenisDokumen) searchParams.append('jenis_dokumen', params.jenisDokumen);
       if (params?.tipeDokumen) searchParams.append('tipe_dokumen', params.tipeDokumen);
       if (params?.status) searchParams.append('status', params.status);
@@ -146,7 +146,7 @@ export const useDocument = (tenantId: string, projectId: string, documentId: str
     queryKey: ['document', tenantId, projectId, documentId],
     queryFn: async () => {
       const { data } = await api.get<Document>(
-        `/document/api/v1/projects/${projectId}/documents/${documentId}?currentTenantId=${tenantId}`
+        `/document/api/v1/project/${projectId}/documents/${documentId}?currentTenantId=${tenantId}`
       );
       return data;
     },
@@ -173,7 +173,7 @@ export const useUploadDocuments = () => {
       payload: UploadDocumentPayload;
     }) => {
       const formData = new FormData();
-      
+
       payload.files.forEach((file) => {
         formData.append('files', file);
       });
@@ -181,7 +181,7 @@ export const useUploadDocuments = () => {
       formData.append('tipe_dokumen', payload.tipeDokumen);
       formData.append('currentTenantId', tenantId);
       formData.append('currentUserId', userId);
-      
+
       if (payload.nomorDokumen) formData.append('nomor_dokumen', payload.nomorDokumen);
       if (payload.documentDate) formData.append('document_date', payload.documentDate);
       if (payload.jumlahLembar) formData.append('jumlah_lembar', payload.jumlahLembar.toString());
@@ -232,7 +232,7 @@ export const useUpdateDocument = () => {
       payload: UpdateDocumentPayload;
     }) => {
       const { data } = await api.patch<Document>(
-        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
+        `/document/api/v1/project/${projectId}/documents/${documentId}`,
         {
           ...payload,
           currentTenantId: tenantId,
@@ -268,7 +268,7 @@ export const useDeleteDocument = () => {
       documentId: string;
     }) => {
       const { data } = await api.delete(
-        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
+        `/document/api/v1/project/${projectId}/documents/${documentId}`,
         {
           data: { currentTenantId: tenantId },
         }

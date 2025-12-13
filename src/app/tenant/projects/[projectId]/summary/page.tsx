@@ -189,7 +189,7 @@ export default function ProjectSummaryPage() {
 	const params = useParams();
 	const router = useRouter();
 	const pathname = usePathname();
-	const projectId = params.id as string;
+	const projectId = params.projectId as string;
 
 	const currentTab = pathname?.split("/").pop() || "summary";
 
@@ -198,7 +198,7 @@ export default function ProjectSummaryPage() {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[30px]  p-[30px]">
+		<div className="flex w-full flex-col gap-[30px] ">
 			{/* Header */}
 			<div className="flex items-center justify-center gap-2.5">
 				<div className="flex flex-1 flex-col gap-[5px]">

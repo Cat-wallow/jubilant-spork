@@ -18,6 +18,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import RBAC from "@/components/rbac/RBAC";
 
 interface DataTableToolbarProps<TData> {
 	table: Table<TData>;
@@ -108,13 +109,15 @@ export function DataTableToolbar<TData>({
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			<Button
-				onClick={() => router.push("/tenant/projects/new")}
-				className="gap-2"
-			>
-				<Plus className="h-4 w-4" />
-				Tambah Project
-			</Button>
+			<RBAC requiredPermission={["project:manage", "project:create"]}>
+				<Button
+					onClick={() => router.push("/tenant/projects/new")}
+					className="gap-2"
+				>
+					<Plus className="h-4 w-4" />
+					Tambah Project
+				</Button>
+			</RBAC>
 		</div>
 	);
 }
