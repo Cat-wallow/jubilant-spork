@@ -59,8 +59,11 @@ export default function Admin({ children }: { children: ReactNode }) {
 	if (isWindowAvailable()) document.documentElement.dir = "ltr";
 
 	// Check if we are in a project detail route
-	const isProjectDetail =
-		pathname?.includes(`/tenant/projects/${projectId}/`) && !!projectId;
+	const isProjectRoute =
+		pathname?.includes(`/tenant/projects/${projectId}`) && !!projectId;
+
+	// Show the project module sidebar on all project routes
+	const showProjectModuleSidebar = isProjectRoute;
 
 	return (
 		<RBAC redirect>
@@ -72,9 +75,10 @@ export default function Admin({ children }: { children: ReactNode }) {
 					variant="admin"
 				/>
 
-				{/* Project Specific Sidebar - Rendered only in project detail context */}
-				{isProjectDetail && (window.innerWidth >= 768 || (window.innerWidth <= 768 && open)) && (
-					<div className={`fixed left-[80px] items-start md:flex top-0 z-40  h-full w-[290px] flex-col gap-[26px]  pb-10 shadow-md transition-all duration-175 bg-card `}>
+				{/* Project Specific Sidebar - Rendered on all project routes */}
+				{showProjectModuleSidebar && (
+					<div className="fixed left-[80px] items-start hidden md:flex top-0 z-40  h-full w-[290px] flex-col gap-[26px]  pb-10 shadow-md transition-all duration-175 bg-card">
+						{/* Project Info */}
 						<div className="flex flex-col justify-start items-center  px-5 ">
 							<div className="flex h-24   flex-col justify-center">
 								<h3 className="font-dm text-sm font-bold leading-6 tracking-tight text-primary">
@@ -122,7 +126,7 @@ export default function Admin({ children }: { children: ReactNode }) {
 					{/* Main Content */}
 					<main
 						className={`mx-2.5 flex-none transition-all dark:bg-navy-900 md:pr-2 ${
-							isProjectDetail ? "xl:ml-[380px]" : "xl:ml-[250px]"
+							showProjectModuleSidebar ? "xl:ml-[380px]" : "xl:ml-[323px]"
 						}`}
 					>
 						{/* Routes */}

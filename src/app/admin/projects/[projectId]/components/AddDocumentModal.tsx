@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -56,6 +57,8 @@ export interface DocumentFormData {
   divisi: string;
   posisiDokumenAsli: string;
   noUrutSortiran: string;
+  // Informasi Tambahan
+  catatan: string;
 }
 
 // Tipe Dokumen options
@@ -148,6 +151,8 @@ export function AddDocumentModal({
   const [divisi, setDivisi] = useState('');
   const [posisiDokumenAsli, setPosisiDokumenAsli] = useState('');
   const [noUrutSortiran, setNoUrutSortiran] = useState('');
+  // Informasi Tambahan state
+  const [catatan, setCatatan] = useState('');
 
   // =============================================================================
   // Handlers
@@ -174,6 +179,7 @@ export function AddDocumentModal({
     setDivisi('');
     setPosisiDokumenAsli('');
     setNoUrutSortiran('');
+    setCatatan('');
   };
 
   const handleSubmit = async () => {
@@ -210,6 +216,10 @@ export function AddDocumentModal({
       toast.error('Masukkan posisi dokumen asli');
       return;
     }
+    if (!catatan) {
+      toast.error('Masukkan catatan');
+      return;
+    }
 
     const formData: DocumentFormData = {
       tipeDokumen,
@@ -223,6 +233,7 @@ export function AddDocumentModal({
       divisi,
       posisiDokumenAsli,
       noUrutSortiran,
+      catatan,
     };
 
     try {
@@ -465,6 +476,25 @@ export function AddDocumentModal({
                   onChange={(e) => setNoUrutSortiran(e.target.value)}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* ================================================================= */}
+          {/* Section: Informasi Tambahan */}
+          {/* ================================================================= */}
+          <div className="border rounded-lg p-4 space-y-4">
+            <h3 className="font-semibold text-base">Informasi Tambahan</h3>
+
+            <div className="space-y-2">
+              <Label>
+                Catatan <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                placeholder="Deskripsi catatan"
+                value={catatan}
+                onChange={(e) => setCatatan(e.target.value)}
+                rows={3}
+              />
             </div>
           </div>
         </div>

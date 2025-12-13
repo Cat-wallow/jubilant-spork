@@ -24,6 +24,7 @@ const projectData = {
 	client: "PT Maju Mundur Bersama",
 	startDate: "2024-02-20",
 	deadline: "2024-02-22",
+	breadcrumb: "Project > Detail Project",
 	description:
 		"Konsultasi pajak komprehensif untuk PT Maju Bersama periode Januari 2024, meliputi penyusunan laporan keuangan, kalkulasi pajak, dan optimasi tax planning.",
 	stats: {
@@ -175,7 +176,7 @@ const tabs = [
 	{ label: "Tasks", path: "tasks" },
 	{ label: "Timeline", path: "timeline" },
 	{ label: "Team", path: "team" },
-	{ label: "Diskusi", path: "diskusi" },
+	{ label: "Diskusi", path: "discussion" },
 	{ label: "Issues", path: "issues" },
 	{ label: "Activity", path: "activity" },
 	{ label: "Documents", path: "documents" },
@@ -218,21 +219,19 @@ export default function ProjectSummaryPage() {
 			</div>
 
 			{/* Tabs */}
-			<div className="flex h-[42px] items-center gap-5 rounded-[5px] bg-[#F4F7FE] p-[5px]">
+			<div className="flex h-[42px] items-center gap-2 overflow-x-auto rounded-[5px] bg-muted/60 p-[4px]">
 				{tabs.map((tab) => (
 					<button
 						key={tab.path}
 						onClick={() => handleTabClick(tab.path)}
 						className={cn(
-							"flex flex-1 items-center justify-center gap-2.5 rounded-[5px] px-[15px] py-[3px] transition-colors",
+							"flex shrink-0 items-center justify-center gap-2.5 rounded-[5px] px-[14px] py-[6px] font-public-sans text-sm font-semibold leading-[22px] transition-colors",
 							currentTab === tab.path
-								? "bg-white"
-								: "bg-transparent hover:bg-white/50",
+								? "bg-white text-[#332687]"
+								: "bg-transparent text-muted-foreground hover:bg-white/50",
 						)}
 					>
-						<span className="font-public-sans text-sm font-semibold leading-[22px] text-[#757575]">
-							{tab.label}
-						</span>
+						{tab.label}
 					</button>
 				))}
 			</div>

@@ -50,7 +50,7 @@ const tabs = [
 	{ label: "Task", path: "tasks" },
 	{ label: "Timeline", path: "timeline" },
 	{ label: "Team", path: "team" },
-	{ label: "Diskusi", path: "diskusi" },
+	{ label: "Diskusi", path: "discussion" },
 	{ label: "Issues", path: "issues" },
 	{ label: "Activity", path: "activity" },
 	{ label: "Documents", path: "documents" },
@@ -253,28 +253,19 @@ function TasksPageContent() {
 			</div>
 
 			{/* Tabs */}
-			<div className="flex h-[42px] items-center gap-5 rounded-[5px] bg-muted/60 p-[5px]">
+			<div className="flex h-[42px] items-center gap-2 overflow-x-auto rounded-[5px] bg-muted/60 p-[4px]">
 				{tabs.map((tab) => (
 					<button
 						key={tab.path}
 						onClick={() => handleTabClick(tab.path)}
 						className={cn(
-							"flex flex-1 items-center justify-center gap-2.5 rounded-[5px] px-[15px] py-[3px] transition-colors",
+							"flex shrink-0 items-center justify-center gap-2.5 rounded-[5px] px-[14px] py-[6px] font-public-sans text-sm font-semibold leading-[22px] transition-colors",
 							currentTab === tab.path
-								? "bg-white"
-								: "bg-transparent hover:bg-white/50",
+								? "bg-white text-[#332687]"
+								: "bg-transparent text-muted-foreground hover:bg-white/50",
 						)}
 					>
-						<span
-							className={cn(
-								"font-public-sans text-sm font-semibold leading-[22px]",
-								currentTab === tab.path
-									? "text-[#332687]"
-									: "text-muted-foreground",
-							)}
-						>
-							{tab.label}
-						</span>
+						{tab.label}
 					</button>
 				))}
 			</div>
@@ -594,7 +585,7 @@ function TaskTableView({
 								/>
 							</div>
 						</div>
-						<div className="flex items-center gap-2">
+						<div className="flex flex-col items-end gap-1">
 							<div className="flex items-center gap-1 rounded-[6px] border border-[#D9D9D9] bg-[#F9FAFB] px-2 py-[3px] text-xs">
 								<CalendarDays className="h-3 w-3 text-[#332687]" />
 								<span className="text-[#404040]">{task.dueDate}</span>
@@ -602,7 +593,7 @@ function TaskTableView({
 							{task.badge && (
 								<Badge
 									className={cn(
-										"rounded-[5px] px-2 py-[3px] text-xs",
+										"inline-flex items-center justify-center rounded-[5px] px-2 py-[3px] text-xs whitespace-nowrap",
 										task.badge === "OVERDUE"
 											? "bg-[#EC221F] text-white"
 											: "bg-[#FFE8A3] text-[#BF6A02]",

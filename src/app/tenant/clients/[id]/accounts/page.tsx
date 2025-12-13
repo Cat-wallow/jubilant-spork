@@ -54,11 +54,6 @@ const typeColors: Record<AccountType, string> = {
   Expense: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 };
 
-const taxBadgeColors: Record<string, string> = {
-  PPN: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  PPh: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-};
-
 export default function ClientAccountsPage() {
   const params = useParams();
   const { tenant } = useAuth();
@@ -70,7 +65,6 @@ export default function ClientAccountsPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch] = useDebounce(searchQuery, 300);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +74,6 @@ export default function ClientAccountsPage() {
     tenant?.id || '',
     id,
     {
-      status: statusFilter !== 'all' ? statusFilter : undefined,
       account_type: typeFilter !== 'all' ? typeFilter : undefined,
       search: debouncedSearch || undefined,
     },
@@ -187,17 +180,6 @@ export default function ClientAccountsPage() {
               />
             </div>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="All Type" />
@@ -228,8 +210,9 @@ export default function ClientAccountsPage() {
                   <TableHead className="font-semibold">Account No</TableHead>
                   <TableHead className="font-semibold">Account Name</TableHead>
                   <TableHead className="font-semibold">Type</TableHead>
-                  <TableHead className="font-semibold">Normal Side</TableHead>
-                  <TableHead className="font-semibold">Tax Mapping</TableHead>
+                  <TableHead className="font-semibold">Parent</TableHead>
+                  <TableHead className="font-semibold">Level</TableHead>
+                  <TableHead className="font-semibold">Normal Balance</TableHead>
                   <TableHead className="font-semibold">Status</TableHead>
                   <TableHead className="font-semibold text-center">Actions</TableHead>
                 </TableRow>
@@ -237,7 +220,7 @@ export default function ClientAccountsPage() {
               <TableBody>
                 {paginatedAccounts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       Tidak ada akun ditemukan
                     </TableCell>
                   </TableRow>
@@ -251,34 +234,19 @@ export default function ClientAccountsPage() {
                           {account.account_type}
                         </Badge>
                       </TableCell>
-                      <TableCell>{account.normal_side}</TableCell>
-                      <TableCell>
-                        {account.tax_mapping.length === 0 ? (
-                          <span className="text-muted-foreground">No Tax</span>
-                        ) : (
-                          <div className="flex gap-1">
-                            {account.tax_mapping.map((tax) => (
-                              <Badge
-                                key={tax}
-                                variant="secondary"
-                                className={taxBadgeColors[tax] || 'bg-gray-100 text-gray-700'}
-                              >
-                                {tax}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                      </TableCell>
+                      <TableCell>{account.parent_code ?? '-'}</TableCell>
+                      <TableCell>{account.level ?? '-'}</TableCell>
+                      <TableCell className="capitalize">{account.normal_balance}</TableCell>
                       <TableCell>
                         <Badge
                           variant="secondary"
                           className={
-                            account.status === 'Active'
+                            account.is_active
                               ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                               : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                           }
                         >
-                          {account.status}
+                          {account.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
                       <TableCell>

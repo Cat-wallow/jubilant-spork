@@ -12,6 +12,8 @@ export interface WorkflowStep {
   source?: string | null;
 }
 
+export type WorkflowStepKey = 'pengiriman' | 'penerimaan' | 'digitalisasi' | 'pendeskripsian';
+
 export interface Document {
   id: string;
   projectId: string;
@@ -48,6 +50,27 @@ export interface Document {
   updatedAt: string;
 }
 
+export interface DocumentVersion {
+  id: string;
+  documentId: string;
+  version: number;
+  fileSize: number;
+  checksum: string;
+  createdAt: string;
+}
+
+export interface DocumentComment {
+  id: string;
+  tenantId: string;
+  projectId: string;
+  documentId: string;
+  userId: string;
+  authorName: string;
+  content: string;
+  severity?: string | null;
+  createdAt: string;
+}
+
 export interface DocumentsResponse {
   items: Document[];
   pagination: {
@@ -80,6 +103,7 @@ export interface UploadDocumentPayload {
   divisi?: string;
   posisiDokumenAsli?: string;
   noUrutSortiran?: string;
+  bundleId?: string;
 }
 
 export interface UpdateDocumentPayload {
@@ -100,22 +124,26 @@ export interface UpdateDocumentPayload {
 /**
  * Hook to fetch documents for a project
  */
+export interface DocumentQueryParams {
+  jenisDokumen?: string;
+  tipeDokumen?: string;
+  status?: string;
+  search?: string;
+  documentDateFrom?: string;
+  documentDateTo?: string;
+  page?: number;
+  pageSize?: number;
+  bundleId?: string;
+}
+
 export const useDocuments = (
   tenantId: string,
   projectId: string,
-  params?: {
-    jenisDokumen?: string;
-    tipeDokumen?: string;
-    status?: string;
-    search?: string;
-    documentDateFrom?: string;
-    documentDateTo?: string;
-    page?: number;
-    pageSize?: number;
-  }
+  params?: DocumentQueryParams,
+  options?: { enabled?: boolean },
 ) => {
   return useQuery<DocumentsResponse>({
-    queryKey: ['documents', tenantId, projectId, params],
+    queryKey: ['documents', tenantId, projectId, params, options?.enabled ?? true],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       searchParams.append('currentTenantId', tenantId);
@@ -128,13 +156,58 @@ export const useDocuments = (
       if (params?.documentDateTo) searchParams.append('document_date_to', params.documentDateTo);
       if (params?.page) searchParams.append('page', params.page.toString());
       if (params?.pageSize) searchParams.append('pageSize', params.pageSize.toString());
+      if (params?.bundleId) searchParams.append('bundleId', params.bundleId);
 
       const { data } = await api.get<DocumentsResponse>(
         `/document/api/v1/projects/${projectId}/documents?${searchParams.toString()}`
       );
       return data;
     },
-    enabled: !!tenantId && !!projectId,
+    enabled: (options?.enabled ?? true) && !!tenantId && !!projectId,
+  });
+};
+
+/**
+ * Hook to update a single workflow step for a document
+ */
+export const useUpdateWorkflow = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      documentId,
+      userId,
+      workflowStep,
+      date,
+    }: {
+      tenantId: string;
+      projectId: string;
+      documentId: string;
+      userId: string;
+      workflowStep: WorkflowStepKey;
+      date: string;
+    }) => {
+      const { data } = await api.patch<Document>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/workflow`,
+        {
+          workflow_step: workflowStep,
+          currentTenantId: tenantId,
+          currentUserId: userId,
+          date,
+        },
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['documents', variables.tenantId, variables.projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['document', variables.tenantId, variables.projectId, variables.documentId],
+      });
+    },
   });
 };
 
@@ -181,7 +254,12 @@ export const useUploadDocuments = () => {
       formData.append('tipe_dokumen', payload.tipeDokumen);
       formData.append('currentTenantId', tenantId);
       formData.append('currentUserId', userId);
+<<<<<<< HEAD
 
+=======
+      if (payload.bundleId) formData.append('bundleId', payload.bundleId);
+      
+>>>>>>> 1ad73411a21f1bbf23bc2a273e06b3ec9ee8e8f5
       if (payload.nomorDokumen) formData.append('nomor_dokumen', payload.nomorDokumen);
       if (payload.documentDate) formData.append('document_date', payload.documentDate);
       if (payload.jumlahLembar) formData.append('jumlah_lembar', payload.jumlahLembar.toString());
@@ -208,6 +286,90 @@ export const useUploadDocuments = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['documents', variables.tenantId, variables.projectId],
+      });
+    },
+  });
+};
+
+/**
+ * Hook to fetch versions for a document (used as attachments)
+ */
+export const useDocumentVersions = (
+  tenantId: string,
+  projectId: string,
+  documentId: string,
+) => {
+  return useQuery<DocumentVersion[]>({
+    queryKey: ['document-versions', tenantId, projectId, documentId],
+    queryFn: async () => {
+      const { data } = await api.get<{ items: DocumentVersion[] }>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/versions?currentTenantId=${tenantId}`,
+      );
+      return data.items;
+    },
+    enabled: !!tenantId && !!projectId && !!documentId,
+  });
+};
+
+/**
+ * Hook to fetch comments for a document
+ */
+export const useDocumentComments = (
+  tenantId: string,
+  projectId: string,
+  documentId: string,
+) => {
+  return useQuery<DocumentComment[]>({
+    queryKey: ['document-comments', tenantId, projectId, documentId],
+    queryFn: async () => {
+      const { data } = await api.get<{ items: DocumentComment[] }>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/comments?currentTenantId=${tenantId}`,
+      );
+      return data.items;
+    },
+    enabled: !!tenantId && !!projectId && !!documentId,
+  });
+};
+
+/**
+ * Hook to create a comment for a document
+ */
+export const useCreateDocumentComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      documentId,
+      userId,
+      authorName,
+      content,
+      severity,
+    }: {
+      tenantId: string;
+      projectId: string;
+      documentId: string;
+      userId: string;
+      authorName: string;
+      content: string;
+      severity?: string;
+    }) => {
+      const { data } = await api.post<DocumentComment>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}/comments`,
+        {
+          content,
+          severity,
+          authorName,
+          currentTenantId: tenantId,
+          currentUserId: userId,
+        },
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['document-comments', variables.tenantId, variables.projectId, variables.documentId],
       });
     },
   });
