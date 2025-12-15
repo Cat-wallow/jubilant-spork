@@ -1,0 +1,223 @@
+export const activeServices = [
+  {
+    id: "form-1-0",
+    name: "Form 1.0",
+    description: "DMS intake & kontrol dokumen",
+    isMandatory: true,
+    hasData: true,
+    isActive: true,
+  },
+  {
+    id: "kk-1-0",
+    name: "KK 1.0 - Transaksi",
+    description: "SIM (Sistem Informasi Manajemen)",
+    isMandatory: false,
+    hasData: true,
+    isActive: true,
+  },
+  {
+    id: "kk-2-0",
+    name: "KK 2.0 - Akuntansi",
+    description: "SIA (Sistem Informasi Akuntansi)",
+    isMandatory: false,
+    hasData: true,
+    isActive: true,
+  },
+  {
+    id: "kk-3-0",
+    name: "KK 3.0 - Pajak",
+    description: "SIA (Sistem Informasi Perpajakan)",
+    isMandatory: true,
+    hasData: true,
+    isActive: true,
+  },
+  {
+    id: "kk-4-0",
+    name: "KK 4.0 - Analisis/QC",
+    description: "Analisis  Kualitas Pekerjaan",
+    isMandatory: true,
+    hasData: true,
+    isActive: true,
+  },
+  {
+    id: "kk-5-0",
+    name: "KK 5.0 - Review & BAST",
+    description: "Aktif otomatis jika satu layanan hulu aktif",
+    isAutoEnabled: true,
+    hasData: true,
+    isActive: true,
+  },
+];
+
+export const slaBaseline = [
+  {
+    id: "form-1-0",
+    module: "Form 1.0 - Active",
+    startOffset: "0",
+    due: "10",
+    review: "3",
+    calendar: "Default",
+  },
+  {
+    id: "kk-1-0",
+    module: "KK 1.0 - Active",
+    startOffset: "0",
+    due: "10",
+    review: "3",
+    calendar: "Default",
+  },
+  {
+    id: "kk-2-0",
+    module: "KK 2.0 - Active",
+    startOffset: "0",
+    due: "10",
+    review: "3",
+    calendar: "Default",
+  },
+  {
+    id: "kk-3-0",
+    module: "KK 3.0 - Active",
+    startOffset: "0",
+    due: "10",
+    review: "3",
+    calendar: "Default",
+  },
+  {
+    id: "kk-4-0",
+    module: "KK 4.0 - Active",
+    startOffset: "0",
+    due: "10",
+    review: "3",
+    calendar: "Default",
+  },
+  {
+    id: "kk-5-0",
+    module: "KK 5.0 - Active",
+    startOffset: "0",
+    due: "10",
+    review: "3",
+    calendar: "Default",
+  },
+];
+
+export const availableTokens = [
+  "{TENANT}",
+  "{CLIENT}",
+  "{PROJECT}",
+  "{YY}",
+  "{YYYY}",
+  "{MM}",
+  "{SEQ}",
+];
+
+export const numberingOverride = [
+  {
+    id: "bast",
+    entity: "BAST No",
+    description: "Berita Acara Serah Terima",
+    prefixPattern: "{TENANT}/{CLIENT..}",
+    seqStart: "1",
+    padding: "3",
+    separator: "/",
+    preview: "EASYTAX/PRJ/BAST/001",
+  },
+  {
+    id: "invoice",
+    entity: "Invoice No",
+    description: "Dokumen Penagihan",
+    prefixPattern: "{TENANT}/{CLIENT..}",
+    seqStart: "1",
+    padding: "3",
+    separator: "/",
+    preview: "EASYTAX/PRJ/INV/001",
+  },
+  {
+    id: "voucher",
+    entity: "Voucher No",
+    description: "Dokumen kerja (Optional)",
+    prefixPattern: "{TENANT}/{CLIENT..}",
+    seqStart: "1",
+    padding: "3",
+    separator: "/",
+    preview: "EASYTAX/PRJ/VCH/001",
+  },
+  {
+    id: "spt",
+    entity: "SPT Ref",
+    description: "Referensi SPT (Optional)",
+    prefixPattern: "{TENANT}/{CLIENT..}",
+    seqStart: "1",
+    padding: "3",
+    separator: "/",
+    preview: "EASYTAX/PRJ/SPT/001",
+  },
+];
+
+export const impactSummary = {
+  modules: [
+    {
+      name: "Form 1.0",
+      description: "Fitur ini bersifat mandatori",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+    {
+      name: "KK 1.0 - Transaksi",
+      description: "Fitur ini bersifat mandatori",
+      days: "+ 0 Days",
+      status: "Enabled",
+    },
+    {
+      name: "KK 2.0 - Akuntansi",
+      description: "Fitur akuntansi tidak akan tersedia",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+    {
+      name: "KK 3.0 - Pajak",
+      description: "Fitur perpajakan tidak akan tersedia",
+      days: "+ 0 Days",
+      status: "Enabled",
+    },
+    {
+      name: "KK 4.0 - Analisis/QC",
+      description: "Quality control dan analisis akan aktif",
+      days: "+ 0 Days",
+      status: "Enabled",
+    },
+    {
+      name: "KK 5.0 - Review & BAST",
+      description: "Fitur ini bersifat mandatori",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+  ],
+  billing: [
+    {
+      name: "Invoice Numbering",
+      description: "Format baru akan diterapkan untuk invoice berikutnya",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+    {
+      name: "BAST Numbering",
+      description: "Format baru akan diterapkan untuk BAST berikutnya",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+  ],
+  reports: [
+    {
+      name: "Timeline Reports",
+      description: "Baseline SLA akan Diperbarui",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+    {
+      name: "Modul Status Reports",
+      description: "Status aktif/nonaktif modul akan tercermin",
+      days: "+ 0 Days",
+      status: "Disabled",
+    },
+  ],
+};
