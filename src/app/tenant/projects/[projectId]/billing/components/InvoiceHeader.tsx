@@ -5,7 +5,7 @@ import { Download, Plus } from "lucide-react";
 
 export function InvoiceHeader() {
   return (
-    <div className="flex items-start justify-between">
+    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
       <div className="flex flex-col">
         <h2 className="font-dm text-2xl font-bold leading-8 text-[#2B3674]">
           Invoice
@@ -15,7 +15,7 @@ export function InvoiceHeader() {
         </p>
       </div>
 
-      <div className="flex items-center justify-end gap-2.5">
+      <div className="flex flex-wrap items-center justify-start gap-2.5 md:justify-end">
         <Button
           variant="outline"
           className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9]"

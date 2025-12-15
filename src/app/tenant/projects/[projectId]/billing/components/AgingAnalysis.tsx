@@ -17,7 +17,7 @@ export function AgingAnalysis({ data }: AgingAnalysisProps) {
   };
 
   return (
-    <div className="flex w-[450px] flex-col gap-[30px] rounded-[15px] border border-[#D9D9D9] p-6 shadow-md">
+    <div className="flex w-full flex-col gap-[30px] rounded-[15px] border border-[#D9D9D9] p-6 shadow-md xl:w-[450px]">
       <div className="flex flex-col">
         <h3 className="font-roboto text-base font-medium leading-6 text-[#404040]">
           Aging Analysis
