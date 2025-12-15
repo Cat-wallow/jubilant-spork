@@ -140,7 +140,9 @@ function TasksPageContent() {
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [dueFilter, setDueFilter] = useState<string>("all");
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [selectedTasks, setSelectedTasks] = useState<Record<string, boolean>>({});
+	const [selectedTasks, setSelectedTasks] = useState<Record<string, boolean>>(
+		{},
+	);
 
 	const handleTabClick = (tabPath: string) => {
 		router.push(`/tenant/projects/${projectId}/${tabPath}`);
@@ -163,19 +165,16 @@ function TasksPageContent() {
 				return false;
 			}
 
-			if (
-				priorityFilter !== "all" &&
-				priorityFilter !== task.priority
-			) {
+			if (priorityFilter !== "all" && priorityFilter !== task.priority) {
 				return false;
 			}
 
 			if (statusFilter !== "all") {
 				const map: Record<string, TaskStatus> = {
-					"todo": "TODO",
-					"in_progress": "IN_PROGRESS",
-					"in_review": "IN_REVIEW",
-					"done": "DONE",
+					todo: "TODO",
+					in_progress: "IN_PROGRESS",
+					in_review: "IN_REVIEW",
+					done: "DONE",
 				};
 				if (map[statusFilter] !== task.status) return false;
 			}
@@ -193,7 +192,14 @@ function TasksPageContent() {
 
 			return true;
 		});
-	}, [moduleFilter, assigneeFilter, priorityFilter, statusFilter, dueFilter, searchQuery]);
+	}, [
+		moduleFilter,
+		assigneeFilter,
+		priorityFilter,
+		statusFilter,
+		dueFilter,
+		searchQuery,
+	]);
 
 	const statusCounts = useMemo(() => {
 		return filteredTasks.reduce(
@@ -201,7 +207,10 @@ function TasksPageContent() {
 				acc[task.status] += 1;
 				return acc;
 			},
-			{ TODO: 0, IN_PROGRESS: 0, IN_REVIEW: 0, DONE: 0 } as Record<TaskStatus, number>,
+			{ TODO: 0, IN_PROGRESS: 0, IN_REVIEW: 0, DONE: 0 } as Record<
+				TaskStatus,
+				number
+			>,
 		);
 	}, [filteredTasks]);
 
@@ -223,7 +232,9 @@ function TasksPageContent() {
 		setSelectedTasks((prev) => ({ ...prev, [id]: checked }));
 	};
 
-	const handleBulkAction = (action: "reassign" | "changeDue" | "updateProgress") => {
+	const handleBulkAction = (
+		action: "reassign" | "changeDue" | "updateProgress",
+	) => {
 		const ids = Object.entries(selectedTasks)
 			.filter(([, v]) => v)
 			.map(([id]) => id);
@@ -233,43 +244,12 @@ function TasksPageContent() {
 	};
 
 	const uniqueModules = Array.from(new Set(dummyTasks.map((t) => t.module)));
-	const uniqueAssignees = Array.from(new Set(dummyTasks.map((t) => t.assigneeName)));
+	const uniqueAssignees = Array.from(
+		new Set(dummyTasks.map((t) => t.assigneeName)),
+	);
 
 	return (
 		<div className="flex w-full flex-col gap-[30px] ">
-			{/* Header */}
-			<div className="flex items-center justify-center gap-2.5">
-				<div className="flex flex-1 flex-col gap-[5px]">
-					<h1 className="font-dm text-[34px] font-bold leading-[42px]  text-foreground">
-						Konsultasi Pajak PT Maju Bersama
-					</h1>
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Publish</span>
-					<div className="relative h-6 w-11 rounded-[50px] bg-[#E2E8F0]">
-						<div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white" />
-					</div>
-				</div>
-			</div>
-
-			{/* Tabs */}
-			<div className="flex h-[42px] items-center gap-2 overflow-x-auto rounded-[5px] bg-muted/60 p-[4px]">
-				{tabs.map((tab) => (
-					<button
-						key={tab.path}
-						onClick={() => handleTabClick(tab.path)}
-						className={cn(
-							"flex shrink-0 items-center justify-center gap-2.5 rounded-[5px] px-[14px] py-[6px] font-public-sans text-sm font-semibold leading-[22px] transition-colors",
-							currentTab === tab.path
-								? "bg-white text-[#332687]"
-								: "bg-transparent text-muted-foreground hover:bg-white/50",
-						)}
-					>
-						{tab.label}
-					</button>
-				))}
-			</div>
-
 			{/* Status summary cards */}
 			<div className="grid grid-cols-4 gap-[30px]">
 				<Card className="flex h-[97px] items-center gap-[18px] rounded-[20px] px-5 py-[6px]">
@@ -358,7 +338,9 @@ function TasksPageContent() {
 								size="icon"
 								className={cn(
 									"h-9 w-9 rounded-[8px]",
-									viewMode === "list" ? "bg-white text-[#332687]" : "text-[#757575]",
+									viewMode === "list"
+										? "bg-white text-[#332687]"
+										: "text-[#757575]",
 								)}
 								onClick={() => setViewMode("list")}
 							>
@@ -369,7 +351,9 @@ function TasksPageContent() {
 								size="icon"
 								className={cn(
 									"h-9 w-9 rounded-[8px]",
-									viewMode === "kanban" ? "bg-white text-[#332687]" : "text-[#757575]",
+									viewMode === "kanban"
+										? "bg-white text-[#332687]"
+										: "text-[#757575]",
 								)}
 								onClick={() => setViewMode("kanban")}
 							>
@@ -554,7 +538,9 @@ function TaskTableView({
 								<span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 									{task.title}
 								</span>
-								<span className="text-xs text-[#6E7184]">Update: {task.updatedAt}</span>
+								<span className="text-xs text-[#6E7184]">
+									Update: {task.updatedAt}
+								</span>
 							</div>
 						</div>
 						<div>
@@ -577,7 +563,9 @@ function TaskTableView({
 							<StatusBadge status={task.status} />
 						</div>
 						<div className="flex items-center gap-2">
-							<span className="text-sm font-bold text-primary">{task.progress}%</span>
+							<span className="text-sm font-bold text-primary">
+								{task.progress}%
+							</span>
 							<div className="relative h-2 w-[70px] overflow-hidden rounded-[21px] bg-[#EFF4FB]">
 								<div
 									className="h-full rounded-[21px] bg-[#4318FF]"
@@ -621,9 +609,14 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 	return (
 		<div className="mt-4 grid gap-4 md:grid-cols-4">
 			{columns.map((col) => (
-				<div key={col.key} className="flex flex-col gap-3 rounded-[16px] bg-[#F4F7FE] p-3">
+				<div
+					key={col.key}
+					className="flex flex-col gap-3 rounded-[16px] bg-[#F4F7FE] p-3"
+				>
 					<div className="flex items-center justify-between">
-						<span className="text-sm font-semibold text-muted-foreground">{col.title}</span>
+						<span className="text-sm font-semibold text-muted-foreground">
+							{col.title}
+						</span>
 						<span className="text-xs text-[#6E7184]">
 							{tasks.filter((t) => t.status === col.key).length} Task
 						</span>
@@ -650,7 +643,9 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 											<div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#4F46E5] text-[11px] font-semibold text-white">
 												{task.assigneeInitials}
 											</div>
-											<span className="text-xs text-muted-foreground">{task.assigneeName}</span>
+											<span className="text-xs text-muted-foreground">
+												{task.assigneeName}
+											</span>
 										</div>
 										<div className="flex items-center gap-2">
 											<div className="flex items-center gap-1">

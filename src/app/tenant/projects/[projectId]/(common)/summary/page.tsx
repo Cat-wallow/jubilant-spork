@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -188,54 +188,10 @@ const tabs = [
 
 export default function ProjectSummaryPage() {
 	const params = useParams();
-	const router = useRouter();
-	const pathname = usePathname();
 	const projectId = params.projectId as string;
-
-	const currentTab = pathname?.split("/").pop() || "summary";
-
-	const handleTabClick = (tabPath: string) => {
-		router.push(`/tenant/projects/${projectId}/${tabPath}`);
-	};
 
 	return (
 		<div className="flex w-full flex-col gap-[30px] ">
-			{/* Header */}
-			<div className="flex items-center justify-center gap-2.5">
-				<div className="flex flex-1 flex-col gap-[5px]">
-					<p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">
-						{projectData.breadcrumb}
-					</p>
-					<h1 className="font-dm text-[34px] font-bold leading-[42px]  ">
-						{projectData.name}
-					</h1>
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Publish</span>
-					<div className="h-6 w-11 rounded-[50px] relative">
-						<div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white" />
-					</div>
-				</div>
-			</div>
-
-			{/* Tabs */}
-			<div className="flex h-[42px] items-center gap-2 overflow-x-auto rounded-[5px] bg-muted/60 p-[4px]">
-				{tabs.map((tab) => (
-					<button
-						key={tab.path}
-						onClick={() => handleTabClick(tab.path)}
-						className={cn(
-							"flex shrink-0 items-center justify-center gap-2.5 rounded-[5px] px-[14px] py-[6px] font-public-sans text-sm font-semibold leading-[22px] transition-colors",
-							currentTab === tab.path
-								? "bg-white text-[#332687]"
-								: "bg-transparent text-muted-foreground hover:bg-white/50",
-						)}
-					>
-						{tab.label}
-					</button>
-				))}
-			</div>
-
 			{/* Stats Cards */}
 			<div className="flex gap-[30px]">
 				{/* Progress */}
@@ -394,9 +350,7 @@ export default function ProjectSummaryPage() {
 								</span>
 							</div>
 							<div className="flex justify-between">
-								<span className="text-sm text-muted-foreground">
-									Deadline:
-								</span>
+								<span className="text-sm text-muted-foreground">Deadline:</span>
 								<span className="text-sm font-medium text-muted-foreground">
 									{projectData.deadline}
 								</span>
@@ -565,9 +519,7 @@ export default function ProjectSummaryPage() {
 										<span className="font-inter text-sm font-medium text-muted-foreground">
 											{member.name}
 										</span>
-										<span className="text-sm text-primary">
-											{member.role}
-										</span>
+										<span className="text-sm text-primary">{member.role}</span>
 									</div>
 									{member.modules.map((module) => (
 										<Badge
@@ -598,9 +550,7 @@ export default function ProjectSummaryPage() {
 								className="flex items-center gap-1 rounded-[5px] border border-[#CAC4D0]"
 							>
 								<Eye className="h-6 w-6" />
-								<span className="text-sm font-medium">
-									View All Issues
-								</span>
+								<span className="text-sm font-medium">View All Issues</span>
 							</Button>
 						</div>
 
@@ -645,7 +595,7 @@ export default function ProjectSummaryPage() {
 												: "bg-white",
 									)}
 								>
-									<AlertTriangle className="h-[30px] w-[30px] text-[#900B09]" />
+									<AlertTriangle className="h-[30px] w-[30px]" />
 									<div className="flex flex-1 flex-col justify-center">
 										<span className="text-sm text-muted-foreground">
 											{issue.title}
@@ -687,9 +637,7 @@ export default function ProjectSummaryPage() {
 								className="flex items-center gap-1 rounded-[5px] border border-[#CAC4D0]"
 							>
 								<Eye className="h-6 w-6" />
-								<span className="text-sm font-medium">
-									View Bundle
-								</span>
+								<span className="text-sm font-medium">View Bundle</span>
 							</Button>
 						</div>
 
@@ -720,7 +668,7 @@ export default function ProjectSummaryPage() {
 									key={index}
 									className="flex items-center gap-2.5 rounded-lg border  bg-[#FFFBEB] p-[10px_14px]"
 								>
-									<AlertTriangle className="h-[30px] w-[30px] text-[#900B09]" />
+									<AlertTriangle className="h-[30px] w-[30px]" />
 									<div className="flex flex-1 flex-col justify-center gap-[5px]">
 										<span className="text-sm text-muted-foreground">
 											{issue.title}

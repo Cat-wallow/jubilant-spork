@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams, useRouter, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,21 +16,6 @@ import {
 	AlertCircle,
 	Lock,
 } from "lucide-react";
-
-const tabs = [
-	{ label: "Ringkasan", path: "summary" },
-	{ label: "Tasks", path: "tasks" },
-	{ label: "Timeline", path: "timeline" },
-	{ label: "Team", path: "team" },
-	{ label: "Diskusi", path: "discussion" },
-	{ label: "Issues", path: "issues" },
-	{ label: "Activity", path: "activity" },
-	{ label: "Documents", path: "documents" },
-	{ label: "File", path: "file" },
-	{ label: "Billing", path: "billing" },
-	{ label: "Report", path: "report" },
-	{ label: "Settings", path: "settings" },
-];
 
 type ModuleStatus = "NOT_STARTED" | "IN_PROGRESS" | "REVIEW" | "APPROVED";
 
@@ -124,11 +109,7 @@ function getStatusConfig(status: ModuleStatus) {
 
 function DiscussionPageContent() {
 	const params = useParams();
-	const router = useRouter();
-	const pathname = usePathname();
 	const projectId = params.id as string;
-
-	const currentTab = pathname?.split("/").pop() || "summary";
 
 	const [activeModuleId, setActiveModuleId] = useState<string>(modules[0]?.id);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -136,7 +117,8 @@ function DiscussionPageContent() {
 
 	const kk5Index = modules.findIndex((m) => m.id === "kk-5");
 	const allBeforeKk5Approved =
-		kk5Index > 0 && modules.slice(0, kk5Index).every((m) => m.status === "APPROVED");
+		kk5Index > 0 &&
+		modules.slice(0, kk5Index).every((m) => m.status === "APPROVED");
 
 	const filteredModules = useMemo(() => {
 		return modules.filter((m) => {
@@ -152,10 +134,6 @@ function DiscussionPageContent() {
 		});
 	}, [searchQuery, statusFilter]);
 
-	const handleTabClick = (tabPath: string) => {
-		router.push(`/tenant/projects/${projectId}/${tabPath}`);
-	};
-
 	const handleGoToModule = (module: DiscussionModule, isLocked: boolean) => {
 		if (isLocked) return;
 		// Placeholder for actual navigation once module pages are ready
@@ -164,42 +142,6 @@ function DiscussionPageContent() {
 
 	return (
 		<div className="flex w-full flex-col gap-[30px] p-[30px]">
-			{/* Header */}
-			<div className="flex items-center justify-center gap-2.5">
-				<div className="flex flex-1 flex-col gap-[5px]">
-					<p className="font-dm text-sm font-medium leading-6 text-muted-foreground">
-						Project &gt; Detail Project
-					</p>
-					<h1 className="font-dm text-[34px] font-bold leading-[42px]  text-foreground">
-						Konsultasi Pajak PT Maju Bersama
-					</h1>
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Publish</span>
-					<div className="relative h-6 w-11 rounded-[50px] bg-[#E2E8F0]">
-						<div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white" />
-					</div>
-				</div>
-			</div>
-
-			{/* Tabs */}
-			<div className="flex h-[42px] items-center gap-2 overflow-x-auto rounded-[5px] bg-muted/60 p-[4px]">
-				{tabs.map((tab) => (
-					<button
-						key={tab.path}
-						onClick={() => handleTabClick(tab.path)}
-						className={cn(
-							"flex shrink-0 items-center justify-center gap-2.5 rounded-[5px] px-[14px] py-[6px] font-public-sans text-sm font-semibold leading-[22px] transition-colors",
-							currentTab === tab.path
-								? "bg-white text-[#332687]"
-								: "bg-transparent text-muted-foreground hover:bg-white/50",
-						)}
-					>
-						{tab.label}
-					</button>
-				))}
-			</div>
-
 			{/* Stepper */}
 			<Card className="rounded-[20px] border border-border p-5">
 				<CardHeader className="flex flex-col gap-1 p-0 pb-4">
@@ -207,7 +149,8 @@ function DiscussionPageContent() {
 						Alur Modul Project
 					</CardTitle>
 					<p className="text-sm text-muted-foreground">
-						Form 1.0 → KK1 → KK2 → KK3 → KK4 → KK5. Modul KK5 akan aktif setelah semua modul sebelumnya berstatus Approved.
+						Form 1.0 → KK1 → KK2 → KK3 → KK4 → KK5. Modul KK5 akan aktif setelah
+						semua modul sebelumnya berstatus Approved.
 					</p>
 				</CardHeader>
 				<CardContent className="p-0">
@@ -228,11 +171,17 @@ function DiscussionPageContent() {
 											}}
 											className={cn(
 												"flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
-												isCompleted && "bg-[#332687] text-white border-[#332687]",
-												!isCompleted && isActive && !isLocked &&
+												isCompleted &&
+													"bg-[#332687] text-white border-[#332687]",
+												!isCompleted &&
+													isActive &&
+													!isLocked &&
 													"bg-primary text-primary-foreground border-primary",
-												isLocked && "bg-muted text-muted-foreground border-dashed border-border",
-												!isCompleted && !isActive && !isLocked &&
+												isLocked &&
+													"bg-muted text-muted-foreground border-dashed border-border",
+												!isCompleted &&
+													!isActive &&
+													!isLocked &&
 													"bg-card text-muted-foreground border-border",
 											)}
 										>
@@ -338,7 +287,8 @@ function DiscussionPageContent() {
 								key={module.id}
 								className={cn(
 									"relative flex h-full flex-col gap-4 rounded-[20px] border border-border p-4 shadow-sm",
-									isActive && "border-primary ring-1 ring-primary/60 bg-muted/40",
+									isActive &&
+										"border-primary ring-1 ring-primary/60 bg-muted/40",
 								)}
 							>
 								<div className="flex items-start justify-between gap-2">
@@ -351,7 +301,12 @@ function DiscussionPageContent() {
 										</h3>
 									</div>
 									<div className="flex flex-col items-end gap-1">
-										<Badge className={cn("rounded-full px-3 py-1 text-xs", statusCfg.className)}>
+										<Badge
+											className={cn(
+												"rounded-full px-3 py-1 text-xs",
+												statusCfg.className,
+											)}
+										>
 											{statusCfg.label}
 										</Badge>
 										{isLocked && (
@@ -369,7 +324,10 @@ function DiscussionPageContent() {
 											Status % Complete
 										</p>
 										<div className="flex items-center gap-2">
-											<Progress value={module.progress} className="h-1.5 flex-1" />
+											<Progress
+												value={module.progress}
+												className="h-1.5 flex-1"
+											/>
 											<span className="text-xs font-semibold text-foreground">
 												{module.progress}%
 											</span>
