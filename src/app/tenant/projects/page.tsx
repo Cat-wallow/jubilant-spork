@@ -96,7 +96,7 @@ function ProjectsPageContent() {
 		<div className="w-full space-y-6 ">
 			{/* Header */}
 			<div className="flex flex-col gap-[5px]">
-				<h1 className="text-3xl font-bold tracking-tight text-primary">
+				<h1 className="text-3xl font-bold  text-primary">
 					Daftar Project
 				</h1>
 			</div>

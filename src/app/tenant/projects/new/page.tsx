@@ -139,7 +139,7 @@ function NewProjectPageContent() {
 						disabled={methods.formState.isSubmitting}
 					>
 						<Plus className="h-6 w-6" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
+						<span className="text-sm font-medium leading-5 tracking-[0.1px]">
 							{methods.formState.isSubmitting ? "Menyimpan..." : "Buat Project"}
 						</span>
 					</Button>

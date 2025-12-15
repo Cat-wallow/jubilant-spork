@@ -287,7 +287,7 @@ export default function ProjectSettingsTab() {
 					</div>
 
 					<div className="flex flex-col gap-0 self-stretch">
-						<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+						<Label className="text-base font-medium leading-6 tracking-[0.15px] ">
 							Due Policy *
 						</Label>
 						<Controller
@@ -323,7 +323,7 @@ export default function ProjectSettingsTab() {
 					</div>
 
 					<div className="mt-5 flex flex-col gap-2.5 py-[5px]">
-						<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+						<Label className="text-base font-medium leading-6 tracking-[0.15px] ">
 							Escalation Recipients
 						</Label>
 						<div className="flex flex-col gap-2">
@@ -373,7 +373,7 @@ export default function ProjectSettingsTab() {
 
 					<div className="flex flex-col gap-5 self-stretch">
 						<div className="flex flex-col gap-0">
-							<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+							<Label className="text-base font-medium leading-6 tracking-[0.15px] ">
 								BAST Template
 							</Label>
 							<Controller
@@ -397,7 +397,7 @@ export default function ProjectSettingsTab() {
 						</div>
 
 						<div className="flex flex-col gap-0">
-							<Label className="font-roboto text-base font-medium leading-6 tracking-[0.15px] ">
+							<Label className="text-base font-medium leading-6 tracking-[0.15px] ">
 								Invoice Template
 							</Label>
 							<Controller

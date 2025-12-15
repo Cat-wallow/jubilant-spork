@@ -63,7 +63,7 @@ export default function RingkasanTab({ tenant }: RingkasanTabProps) {
     <div className="flex flex-col gap-[30px]">
       {/* Company Information Card */}
       <Card className="flex flex-col gap-5 self-stretch rounded-[20px] p-5">
-        <h2 className="text-[22px] font-medium leading-7 text-primary">
+        <h2 className="text-[22px] font-medium  text-primary">
           Ringkasan Informasi Perusahaan
         </h2>
 
@@ -104,7 +104,7 @@ export default function RingkasanTab({ tenant }: RingkasanTabProps) {
 
       {/* Branding Settings Card */}
       <Card className="flex flex-col items-start gap-6 self-stretch rounded-[10.5px] border p-6">
-        <h2 className="self-stretch text-[22px] font-medium text-primary leading-7">
+        <h2 className="self-stretch text-[22px] font-medium text-primary ">
           Branding Settings
         </h2>
         <div className="flex w-full items-start justify-between self-stretch">

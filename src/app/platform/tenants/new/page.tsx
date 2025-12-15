@@ -154,7 +154,7 @@ function NewTenantPageContent() {
 			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div className="flex flex-1 flex-col gap-1">
-					<h1 className="text-3xl font-bold tracking-tight">
+					<h1 className="text-3xl font-bold ">
 						Tambah Tenant Baru
 					</h1>
 				</div>

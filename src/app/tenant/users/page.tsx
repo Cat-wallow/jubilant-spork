@@ -7,7 +7,7 @@ function UsersPageContent() {
     <div className="h-full w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-[5px]">
-        <h1 className="text-3xl font-bold tracking-tight">Manajemen Pengguna</h1>
+        <h1 className="text-3xl font-bold ">Manajemen Pengguna</h1>
       </div>
       <UserTable />
     </div>

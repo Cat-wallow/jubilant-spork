@@ -23,7 +23,7 @@ export default function TenantFilters({
       <div className="flex items-center gap-5">
         {/* Items per page */}
         <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-white px-1.5 dark:border-gray-600 dark:bg-navy-800">
-          <span className="font-roboto px-2.5 text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 dark:text-gray-300">
+          <span className="px-2.5 text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 dark:text-gray-300">
             20
           </span>
           <ChevronDown className="h-3 w-3 text-brand-500" />
@@ -47,7 +47,7 @@ export default function TenantFilters({
           <select
             value={statusFilter}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="font-roboto cursor-pointer bg-transparent text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 outline-none dark:text-gray-300"
+            className="cursor-pointer bg-transparent text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 outline-none dark:text-gray-300"
           >
             <option value="all">All Status</option>
             <option value="Active">Active</option>
@@ -61,7 +61,7 @@ export default function TenantFilters({
           <select
             value={planFilter}
             onChange={(e) => onPlanChange(e.target.value)}
-            className="font-roboto cursor-pointer bg-transparent text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 outline-none dark:text-gray-300"
+            className="cursor-pointer bg-transparent text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 outline-none dark:text-gray-300"
           >
             <option value="all">All Type</option>
             <option value="Free">Free</option>
@@ -74,7 +74,7 @@ export default function TenantFilters({
         {/* Filter Button */}
         <button className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-gray-50 px-3 hover:bg-gray-100 dark:border-gray-600 dark:bg-navy-700 dark:hover:bg-navy-600">
           <Filter className="h-[18px] w-[18px] text-brand-500" />
-          <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 dark:text-gray-300">
             Filter
           </span>
         </button>

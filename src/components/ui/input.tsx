@@ -19,7 +19,7 @@ const onlyNumber = (value: string) => {
 };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, variant = "", onChange, value, name, ...props }, ref) => {
+	({ className, type, variant, onChange, value, name, ...props }, ref) => {
 		const [displayValue, setDisplayValue] = React.useState("");
 		const hiddenInputRef = React.useRef<HTMLInputElement>(null);
 

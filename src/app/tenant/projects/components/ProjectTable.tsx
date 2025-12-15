@@ -171,7 +171,7 @@ export default function ProjectTable({
             className="h-[54px] rounded-[10px] border-[#D9D9D9] bg-[#F9FAFB] px-[5px]"
           >
             <Filter className="mr-1 h-[18px] w-[18px] text-[#332687]" />
-            <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+            <span className="text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
               Filter
             </span>
           </Button>
@@ -256,17 +256,17 @@ export default function ProjectTable({
                   <div className="flex items-center gap-2.5">
                     <Checkbox />
                     <div className="flex flex-col">
-                      <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+                      <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
                         {project.name}
                       </span>
-                      <span className="text-sm font-normal leading-[19.6px] text-[#2B3674]">
+                      <span className="text-sm font-normal leading-[19.6px] text-primary">
                         {project.code}
                       </span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="w-[120px]">
-                  <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+                  <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
                     {project.client}
                   </span>
                 </TableCell>
@@ -284,7 +284,7 @@ export default function ProjectTable({
                         key={idx}
                         className="inline-flex items-center justify-center rounded-[6.25px] border border-[rgba(145,158,171,0.2)] bg-[#F4F7FE] px-2.5 py-[5px]"
                       >
-                        <span className="font-inter text-xs font-normal text-[#404040]">
+                        <span className="font-inter text-xs font-normal text-muted-foreground">
                           {module}
                         </span>
                       </div>
@@ -294,7 +294,7 @@ export default function ProjectTable({
                 <TableCell className="w-[120px]">{getStatusBadge(project.status)}</TableCell>
                 <TableCell className="w-[120px]">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+                    <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
                       {project.progress}%
                     </span>
                     <div className="relative h-2 w-[63px] overflow-hidden rounded-[21px] bg-[#EFF4FB]">
@@ -313,7 +313,7 @@ export default function ProjectTable({
                   </div>
                 </TableCell>
                 <TableCell className="w-[120px]">
-                  <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+                  <span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
                     {project.contact}
                   </span>
                 </TableCell>

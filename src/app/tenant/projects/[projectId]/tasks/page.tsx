@@ -240,7 +240,7 @@ function TasksPageContent() {
 			{/* Header */}
 			<div className="flex items-center justify-center gap-2.5">
 				<div className="flex flex-1 flex-col gap-[5px]">
-					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight text-foreground">
+					<h1 className="font-dm text-[34px] font-bold leading-[42px]  text-foreground">
 						Konsultasi Pajak PT Maju Bersama
 					</h1>
 				</div>
@@ -277,13 +277,13 @@ function TasksPageContent() {
 						<ClipboardList className="h-[30px] w-[30px] text-[#332687]" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
 							Not Started
 						</span>
-						<span className="font-dm text-2xl font-bold leading-8 tracking-tight text-[#404040]">
+						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["TODO"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
 							12 My task
 						</span>
 					</div>
@@ -293,13 +293,13 @@ function TasksPageContent() {
 						<PlayCircle className="h-[30px] w-[30px] text-[#332687]" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
 							In Progress
 						</span>
-						<span className="font-dm text-2xl font-bold leading-8 tracking-tight text-[#404040]">
+						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["IN_PROGRESS"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
 							2 My task
 						</span>
 					</div>
@@ -309,13 +309,13 @@ function TasksPageContent() {
 						<Eye className="h-[30px] w-[30px] text-[#332687]" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
 							Awaiting Review and Approval
 						</span>
-						<span className="font-dm text-2xl font-bold leading-8 tracking-tight text-[#404040]">
+						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["IN_REVIEW"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
 							2 My task
 						</span>
 					</div>
@@ -325,13 +325,13 @@ function TasksPageContent() {
 						<CheckCircle2 className="h-[30px] w-[30px] text-[#332687]" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
 							Complete
 						</span>
-						<span className="font-dm text-2xl font-bold leading-8 tracking-tight text-[#404040]">
+						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["DONE"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5 tracking-tight text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
 							2 My task
 						</span>
 					</div>
@@ -551,7 +551,7 @@ function TaskTableView({
 								onCheckedChange={(v) => onToggleOne(task.id, Boolean(v))}
 							/>
 							<div className="flex flex-col">
-								<span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+								<span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 									{task.title}
 								</span>
 								<span className="text-xs text-[#6E7184]">Update: {task.updatedAt}</span>
@@ -566,7 +566,7 @@ function TaskTableView({
 							<div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4F46E5] text-xs font-semibold text-white">
 								{task.assigneeInitials}
 							</div>
-							<span className="text-sm font-medium text-[#404040]">
+							<span className="text-sm font-medium text-muted-foreground">
 								{task.assigneeName}
 							</span>
 						</div>
@@ -577,7 +577,7 @@ function TaskTableView({
 							<StatusBadge status={task.status} />
 						</div>
 						<div className="flex items-center gap-2">
-							<span className="text-sm font-bold text-[#2B3674]">{task.progress}%</span>
+							<span className="text-sm font-bold text-primary">{task.progress}%</span>
 							<div className="relative h-2 w-[70px] overflow-hidden rounded-[21px] bg-[#EFF4FB]">
 								<div
 									className="h-full rounded-[21px] bg-[#4318FF]"
@@ -588,7 +588,7 @@ function TaskTableView({
 						<div className="flex flex-col items-end gap-1">
 							<div className="flex items-center gap-1 rounded-[6px] border border-[#D9D9D9] bg-[#F9FAFB] px-2 py-[3px] text-xs">
 								<CalendarDays className="h-3 w-3 text-[#332687]" />
-								<span className="text-[#404040]">{task.dueDate}</span>
+								<span className="text-muted-foreground">{task.dueDate}</span>
 							</div>
 							{task.badge && (
 								<Badge
@@ -623,7 +623,7 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 			{columns.map((col) => (
 				<div key={col.key} className="flex flex-col gap-3 rounded-[16px] bg-[#F4F7FE] p-3">
 					<div className="flex items-center justify-between">
-						<span className="text-sm font-semibold text-[#404040]">{col.title}</span>
+						<span className="text-sm font-semibold text-muted-foreground">{col.title}</span>
 						<span className="text-xs text-[#6E7184]">
 							{tasks.filter((t) => t.status === col.key).length} Task
 						</span>
@@ -638,7 +638,7 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 								>
 									<div className="flex items-start justify-between gap-2">
 										<div className="flex-1">
-											<p className="font-dm text-sm font-bold leading-5 text-[#2B3674]">
+											<p className="font-dm text-sm font-bold leading-5 text-primary">
 												{task.title}
 											</p>
 											<p className="text-xs text-[#6E7184]">{task.module}</p>
@@ -650,11 +650,11 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 											<div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#4F46E5] text-[11px] font-semibold text-white">
 												{task.assigneeInitials}
 											</div>
-											<span className="text-xs text-[#404040]">{task.assigneeName}</span>
+											<span className="text-xs text-muted-foreground">{task.assigneeName}</span>
 										</div>
 										<div className="flex items-center gap-2">
 											<div className="flex items-center gap-1">
-												<span className="text-xs font-semibold text-[#2B3674]">
+												<span className="text-xs font-semibold text-primary">
 													{task.progress}%
 												</span>
 												<div className="relative h-1.5 w-[60px] overflow-hidden rounded-[21px] bg-[#EFF4FB]">
@@ -666,7 +666,7 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 											</div>
 											<div className="flex items-center gap-1 rounded-[6px] border border-[#D9D9D9] bg-[#F9FAFB] px-2 py-[2px] text-[10px]">
 												<CalendarDays className="h-3 w-3 text-[#332687]" />
-												<span className="text-[#2B3674]">{task.dueDate}</span>
+												<span className="text-primary">{task.dueDate}</span>
 											</div>
 										</div>
 									</div>
@@ -720,11 +720,11 @@ function StatusBadge({ status }: { status: TaskStatus }) {
 	const map: Record<TaskStatus, { label: string; className: string }> = {
 		TODO: {
 			label: "To-Do",
-			className: "bg-[#F4F7FE] text-[#404040]",
+			className: "bg-[#F4F7FE] text-muted-foreground",
 		},
 		IN_PROGRESS: {
 			label: "In Progress",
-			className: "bg-[#E8DEF8] text-[#404040]",
+			className: "bg-[#E8DEF8] text-muted-foreground",
 		},
 		IN_REVIEW: {
 			label: "In Review",
@@ -732,7 +732,7 @@ function StatusBadge({ status }: { status: TaskStatus }) {
 		},
 		DONE: {
 			label: "Selesai",
-			className: "bg-[#CFF7D3] text-[#404040]",
+			className: "bg-[#CFF7D3] text-muted-foreground",
 		},
 	};
 

@@ -178,7 +178,7 @@ export default function DocumentDetailPage() {
             Kembali
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+            <h1 className="text-2xl font-semibold  text-slate-900 dark:text-slate-50">
               Detail Dokumen
             </h1>
             <p className="text-sm text-muted-foreground dark:text-slate-300">{doc.originalFilename}</p>

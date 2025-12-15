@@ -39,12 +39,12 @@ export default function TimelinePage() {
 					<p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">
 						Project &gt; Add Project
 					</p>
-					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight text-[#0B1437]">
+					<h1 className="font-dm text-[34px] font-bold leading-[42px]  text-[#0B1437]">
 						Konsultasi Pajak PT Maju Bersama
 					</h1>
 				</div>
 				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-[#404040]">Publish</span>
+					<span className="text-sm font-medium text-muted-foreground">Publish</span>
 					<div className="relative h-6 w-11 rounded-[50px] bg-[#E2E8F0]">
 						<div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white" />
 					</div>

@@ -100,7 +100,7 @@ export default function ProjectsTab() {
 	return (
 		<div className="w-full space-y-6">
 			<div className="flex flex-col gap-[5px]">
-				<h2 className="text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+				<h2 className="text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 					Daftar Project
 				</h2>
 				<p className="text-sm text-muted-foreground">

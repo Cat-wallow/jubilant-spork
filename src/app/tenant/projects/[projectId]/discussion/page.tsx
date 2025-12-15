@@ -170,7 +170,7 @@ function DiscussionPageContent() {
 					<p className="font-dm text-sm font-medium leading-6 text-muted-foreground">
 						Project &gt; Detail Project
 					</p>
-					<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-tight text-foreground">
+					<h1 className="font-dm text-[34px] font-bold leading-[42px]  text-foreground">
 						Konsultasi Pajak PT Maju Bersama
 					</h1>
 				</div>
@@ -203,7 +203,7 @@ function DiscussionPageContent() {
 			{/* Stepper */}
 			<Card className="rounded-[20px] border border-border p-5">
 				<CardHeader className="flex flex-col gap-1 p-0 pb-4">
-					<CardTitle className="font-roboto text-[20px] font-medium leading-7 text-foreground">
+					<CardTitle className="text-[20px] font-medium  text-foreground">
 						Alur Modul Project
 					</CardTitle>
 					<p className="text-sm text-muted-foreground">

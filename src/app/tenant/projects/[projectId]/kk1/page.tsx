@@ -18,65 +18,82 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 
-import { getTransactions } from "@/services/transaction.service";
+import { getDocumentsForKK1 } from "@/services/document.service";
 import { DataTable } from "@/components/ui/data-table";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { columns } from "./components/columns";
-import { Transaction } from "@/types/transaction";
+import { TransactionStatus } from "@/types/transaction"; // Assuming TransactionStatus enum is available
+
+// Define the expected structure of a document returned by getDocumentsForKK1
+interface DocumentWithTransaction {
+  id: string;
+  original_filename: string;
+  nomor_dokumen: string;
+  document_date: string;
+  // ... other document fields
+  transaction?: {
+    id: string;
+    transaction_number: string;
+    description: string;
+    amount: number;
+    currency: string;
+    status: TransactionStatus;
+    // ... other transaction fields
+  } | null;
+}
 
 export default function KK1Page() {
   const params = useParams();
   const projectId = params.projectId as string;
 
-  // --- STATE FOR PENDING TABLE ---
-  const [paginationPending, setPaginationPending] = useState({ pageIndex: 0, pageSize: 10 });
-  const [sortingPending, setSortingPending] = useState<SortingState>([]);
-  const [columnFiltersPending, setColumnFiltersPending] = useState<ColumnFiltersState>([]);
-  const [columnVisibilityPending, setColumnVisibilityPending] = useState<VisibilityState>({});
-  const [rowSelectionPending, setRowSelectionPending] = useState({});
-  const [searchQueryPending, setSearchQueryPending] = useState("");
-  const [filterStatusPending, setFilterStatusPending] = useState("all");
-  const [filterTypePending, setFilterTypePending] = useState("all");
-  const [debouncedSearchPending] = useDebounce(searchQueryPending, 400);
+  // --- STATE FOR "DOCUMENTS AWAITING TRANSACTION" TABLE ---
+  const [paginationAwaiting, setPaginationAwaiting] = useState({ pageIndex: 0, pageSize: 10 });
+  const [sortingAwaiting, setSortingAwaiting] = useState<SortingState>([]);
+  const [columnFiltersAwaiting, setColumnFiltersAwaiting] = useState<ColumnFiltersState>([]);
+  const [columnVisibilityAwaiting, setColumnVisibilityAwaiting] = useState<VisibilityState>({});
+  const [rowSelectionAwaiting, setRowSelectionAwaiting] = useState({});
+  const [searchQueryAwaiting, setSearchQueryAwaiting] = useState("");
+  const [filterDocumentStatusAwaiting, setFilterDocumentStatusAwaiting] = useState("all");
+  // TransactionStatus.NOT_STARTED implies no transaction created yet
+  const [debouncedSearchAwaiting] = useDebounce(searchQueryAwaiting, 400);
 
-  // --- QUERY FOR PENDING TABLE ---
-  const { data: dataPending, isLoading: isLoadingPending, isError: isErrorPending } = useQuery({
-    queryKey: ["transactions", projectId, "pending", paginationPending, sortingPending, debouncedSearchPending, filterStatusPending, filterTypePending],
+  // --- QUERY FOR "DOCUMENTS AWAITING TRANSACTION" TABLE (isApproved: false) ---
+  const { data: dataAwaiting, isLoading: isLoadingAwaiting, isError: isErrorAwaiting } = useQuery({
+    queryKey: ["documentsForKK1", projectId, "awaiting", paginationAwaiting, sortingAwaiting, debouncedSearchAwaiting, filterDocumentStatusAwaiting],
     queryFn: () => {
-      const sortDescriptor = sortingPending[0];
-      return getTransactions(projectId, {
-        page: paginationPending.pageIndex + 1,
-        limit: paginationPending.pageSize,
-        search: debouncedSearchPending,
-        status: filterStatusPending === "all" ? undefined : filterStatusPending,
-        type: filterTypePending === "all" ? undefined : filterTypePending,
+      const sortDescriptor = sortingAwaiting[0];
+      return getDocumentsForKK1(projectId, {
+        page: paginationAwaiting.pageIndex + 1,
+        limit: paginationAwaiting.pageSize,
+        search: debouncedSearchAwaiting,
+        documentStatus: filterDocumentStatusAwaiting === "all" ? undefined : filterDocumentStatusAwaiting,
+        isApproved: 'false', // Fetch documents without transaction OR with non-approved transactions
         sortBy: sortDescriptor?.id,
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
-        isApproved: 'false',
       });
     },
-    keepPreviousData: true,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const transactionsPending = dataPending?.data?.transactions || [];
-  const pageCountPending = Math.ceil((dataPending?.data?.total || 0) / paginationPending.pageSize);
+  const documentsAwaiting = (dataAwaiting?.data?.documents || []) as DocumentWithTransaction[];
+  const pageCountAwaiting = Math.ceil((dataAwaiting?.data?.total || 0) / paginationAwaiting.pageSize);
 
-  const tablePending = useReactTable({
-    data: transactionsPending,
+  const tableAwaiting = useReactTable({
+    data: documentsAwaiting,
     columns,
-    pageCount: pageCountPending,
+    pageCount: pageCountAwaiting,
     state: {
-      pagination: paginationPending,
-      sorting: sortingPending,
-      columnFilters: columnFiltersPending,
-      columnVisibility: columnVisibilityPending,
-      rowSelection: rowSelectionPending,
+      pagination: paginationAwaiting,
+      sorting: sortingAwaiting,
+      columnFilters: columnFiltersAwaiting,
+      columnVisibility: columnVisibilityAwaiting,
+      rowSelection: rowSelectionAwaiting,
     },
-    onPaginationChange: setPaginationPending,
-    onSortingChange: setSortingPending,
-    onColumnFiltersChange: setColumnFiltersPending,
-    onColumnVisibilityChange: setColumnVisibilityPending,
-    onRowSelectionChange: setRowSelectionPending,
+    onPaginationChange: setPaginationAwaiting,
+    onSortingChange: setSortingAwaiting,
+    onColumnFiltersChange: setColumnFiltersAwaiting,
+    onColumnVisibilityChange: setColumnVisibilityAwaiting,
+    onRowSelectionChange: setRowSelectionAwaiting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -85,39 +102,39 @@ export default function KK1Page() {
     manualFiltering: true,
   });
 
-  // --- STATE FOR APPROVED TABLE ---
+  // --- STATE FOR "APPROVED TRANSACTIONS" TABLE ---
   const [paginationApproved, setPaginationApproved] = useState({ pageIndex: 0, pageSize: 10 });
   const [sortingApproved, setSortingApproved] = useState<SortingState>([]);
   const [columnFiltersApproved, setColumnFiltersApproved] = useState<ColumnFiltersState>([]);
   const [columnVisibilityApproved, setColumnVisibilityApproved] = useState<VisibilityState>({});
   const [rowSelectionApproved, setRowSelectionApproved] = useState({});
   const [searchQueryApproved, setSearchQueryApproved] = useState("");
-  const [filterTypeApproved, setFilterTypeApproved] = useState("all");
+  const [filterDocumentStatusApproved, setFilterDocumentStatusApproved] = useState("all");
   const [debouncedSearchApproved] = useDebounce(searchQueryApproved, 400);
 
-  // --- QUERY FOR APPROVED TABLE ---
+  // --- QUERY FOR "APPROVED TRANSACTIONS" TABLE (isApproved: true) ---
   const { data: dataApproved, isLoading: isLoadingApproved, isError: isErrorApproved } = useQuery({
-    queryKey: ["transactions", projectId, "approved", paginationApproved, sortingApproved, debouncedSearchApproved, filterTypeApproved],
+    queryKey: ["documentsForKK1", projectId, "approved", paginationApproved, sortingApproved, debouncedSearchApproved, filterDocumentStatusApproved],
     queryFn: () => {
       const sortDescriptor = sortingApproved[0];
-      return getTransactions(projectId, {
+      return getDocumentsForKK1(projectId, {
         page: paginationApproved.pageIndex + 1,
         limit: paginationApproved.pageSize,
         search: debouncedSearchApproved,
-        type: filterTypeApproved === "all" ? undefined : filterTypeApproved,
+        documentStatus: filterDocumentStatusApproved === "all" ? undefined : filterDocumentStatusApproved,
+        isApproved: 'true', // Fetch documents with approved transactions
         sortBy: sortDescriptor?.id,
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
-        isApproved: 'true',
       });
     },
     keepPreviousData: true,
   });
 
-  const transactionsApproved = dataApproved?.data?.transactions || [];
+  const documentsApproved = (dataApproved?.data?.documents || []) as DocumentWithTransaction[];
   const pageCountApproved = Math.ceil((dataApproved?.data?.total || 0) / paginationApproved.pageSize);
 
   const tableApproved = useReactTable({
-    data: transactionsApproved,
+    data: documentsApproved,
     columns,
     pageCount: pageCountApproved,
     state: {
@@ -140,18 +157,19 @@ export default function KK1Page() {
     manualFiltering: true,
   });
 
-  // Calculate totals from fetched data (approximate for now)
-  const totalRecorded = (dataPending?.data?.total || 0) + (dataApproved?.data?.total || 0);
-  const totalValuePending = transactionsPending.reduce((sum: number, tx: Transaction) => sum + Number(tx.amount || 0), 0);
-  const totalValueApproved = transactionsApproved.reduce((sum: number, tx: Transaction) => sum + Number(tx.amount || 0), 0);
-  const totalValue = totalValuePending + totalValueApproved;
+  // Calculate totals from fetched data
+  const totalRecorded = (dataApproved?.data?.total || 0);
+  const totalValue =
+    documentsAwaiting.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0) +
+    documentsApproved.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0);
+  const pendingTransactionsCount = dataAwaiting?.data?.total || 0; // Documents awaiting transaction creation
 
   return (
-    <div className="flex w-full flex-col gap-[30px] ">
+    <div className="flex w-full flex-col gap-7 overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center justify-between ">
         <div className="flex flex-col">
-          <h1 className="text-[34px] font-bold ">Pencatatan Transaksi</h1>
+          <h1 className="text-3xl font-bold ">Pencatatan Transaksi</h1>
           <p className="text-sm">Daftar transaksi yang terekam</p>
         </div>
       </div>
@@ -163,13 +181,13 @@ export default function KK1Page() {
             <FileText className="h-7 w-7 text-primary dark:text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold leading-6 tracking-tight text-muted-foreground">
+            <span className="text-sm font-bold   ">
               Total Tercatat
             </span>
-            <span className="text-2xl font-bold leading-8 tracking-tight ">
+            <span className="text-2xl font-bold   ">
               {totalRecorded}
             </span>
-            <span className="text-xs leading-5 tracking-tight text-muted-foreground">
+            <span className="text-xs leading-5  text-muted-foreground">
               Telah melengkapi pencatatan transaksi
             </span>
           </div>
@@ -180,13 +198,13 @@ export default function KK1Page() {
             <FileText className="h-7 w-7 text-primary dark:text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold leading-6 tracking-tight text-muted-foreground">
-              Total Nilai
+            <span className="text-sm font-bold ">
+              Total Nilai Transaksi
             </span>
-            <span className="text-2xl font-bold leading-8 tracking-tight  w-56 overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className="text-2xl font-bold    w-56 overflow-hidden text-ellipsis whitespace-nowrap">
               {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(totalValue)}
             </span>
-            <span className="text-xs leading-5 tracking-tight text-muted-foreground">
+            <span className="text-xs leading-5  text-muted-foreground">
               Total dari semua transaksi yang terekam
             </span>
           </div>
@@ -197,66 +215,66 @@ export default function KK1Page() {
             <FileText className="h-7 w-7 text-primary dark:text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold leading-6 tracking-tight text-muted-foreground">
-              Transaksi Pending
+            <span className="text-sm font-bold ">
+              Dokumen Menunggu Transaksi
             </span>
-            <span className="text-2xl font-bold leading-8 tracking-tight ">
-              {dataPending?.data?.total || 0}
+            <span className="text-2xl font-bold   ">
+              {pendingTransactionsCount}
             </span>
-            <span className="text-xs leading-5 tracking-tight text-muted-foreground">
-              Membutuhkan review dan persetujuan
+            <span className="text-xs leading-5  text-muted-foreground">
+              Membutuhkan pembuatan transaksi
             </span>
           </div>
         </Card>
       </div>
 
-      {/* PENDING TABLE */}
+      {/* TABLE: DOCUMENTS AWAITING TRANSACTION CREATION */}
       <Card className="rounded-[20px] border p-5">
         <CardHeader className="p-0 pb-5">
-          <CardTitle className="text-[22px] font-bold">Register Transaksi</CardTitle>
-          <p className="text-sm leading-5 tracking-[0.25px]">
-            Daftar dokumen dan form 1.0 yang menunggu pencatatan transaksi
+          <CardTitle className="text-[22px] font-bold">Dokumen Menunggu Transaksi</CardTitle>
+          <p className="text-sm ">
+            Daftar dokumen yang belum memiliki pencatatan transaksi
           </p>
         </CardHeader>
         <CardContent className="p-0">
           <DataTableToolbar
-            table={tablePending}
-            searchQuery={searchQueryPending}
-            setSearchQuery={setSearchQueryPending}
-            statusFilter={filterStatusPending}
-            setStatusFilter={setFilterStatusPending}
+            table={tableAwaiting}
+            searchQuery={searchQueryAwaiting}
+            setSearchQuery={setSearchQueryAwaiting}
+            statusFilter={filterDocumentStatusAwaiting}
+            setStatusFilter={setFilterDocumentStatusAwaiting}
             customFilters={[
               {
                 key: "type",
-                label: "Jenis Dokumen",
-                value: filterTypePending,
+                label: "Jenis Dokumen", // This filter might not be relevant here if all are "TRANSAKSI"
+                value: "all", // Hardcoded to 'all' for now as backend forces jenis_dokumen: 'TRANSAKSI'
                 options: [
                   { label: "All Type", value: "all" },
-                  { label: "Invoice", value: "Invoice" },
-                  { label: "Kwitansi", value: "Kwitansi" },
-                  { label: "Faktur Pajak", value: "Faktur Pajak" },
+                  // { label: "Invoice", value: "Invoice" }, // Example types
+                  // { label: "Kwitansi", value: "Kwitansi" },
+                  // { label: "Faktur Pajak", value: "Faktur Pajak" },
                 ],
-                onChange: setFilterTypePending,
+                onChange: () => {}, // No-op as it's hardcoded
               },
             ]}
           />
           <div className="mt-6">
             <DataTable
-              table={tablePending}
+              table={tableAwaiting}
               columns={columns}
-              isLoading={isLoadingPending}
-              isError={isErrorPending}
+              isLoading={isLoadingAwaiting}
+              isError={isErrorAwaiting}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* APPROVED TABLE */}
+      {/* TABLE: LEADER APPROVED TRANSACTIONS */}
       <Card className="rounded-[20px] border p-5">
         <CardHeader className="p-0 pb-5">
-          <CardTitle className="text-[22px] font-bold">Transaction Recorded</CardTitle>
-          <p className="text-sm leading-5 tracking-[0.25px]">
-            Daftar transaksi tercatat (Approved)
+          <CardTitle className="text-[22px] font-bold">Transaksi Disetujui Leader</CardTitle>
+          <p className="text-sm ">
+            Daftar transaksi yang telah disetujui oleh Leader
           </p>
         </CardHeader>
         <CardContent className="p-0">
@@ -264,19 +282,17 @@ export default function KK1Page() {
             table={tableApproved}
             searchQuery={searchQueryApproved}
             setSearchQuery={setSearchQueryApproved}
-            // No status filter for approved table as it's implicit
+            statusFilter={filterDocumentStatusApproved}
+            setStatusFilter={setFilterDocumentStatusApproved}
             customFilters={[
               {
                 key: "type",
                 label: "Jenis Dokumen",
-                value: filterTypeApproved,
+                value: "all",
                 options: [
                   { label: "All Type", value: "all" },
-                  { label: "Invoice", value: "Invoice" },
-                  { label: "Kwitansi", value: "Kwitansi" },
-                  { label: "Faktur Pajak", value: "Faktur Pajak" },
                 ],
-                onChange: setFilterTypeApproved,
+                onChange: () => {},
               },
             ]}
           />

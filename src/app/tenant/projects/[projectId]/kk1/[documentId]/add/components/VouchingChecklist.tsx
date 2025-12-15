@@ -95,14 +95,14 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
   const isBalanced = totalDebit === totalCredit && totalDebit > 0;
 
   return (
-    <Card className="rounded-[20px] border border-[rgba(145,158,171,0.20)] p-5">
+    <Card className="rounded-[20px] border  p-5">
       <div className="mb-5 flex items-start justify-between ">
-        <CardTitle className="font-roboto text-[22px] font-medium text-[#404040]">
+        <CardTitle className="text-[22px] font-medium text-muted-foreground">
           Vouching Checklist
         </CardTitle>
         <Button className="flex h-12 items-center gap-2 rounded-[10px] bg-[#08F] hover:bg-[#0077dd]">
           <RefreshCw className="h-5 w-5" />
-          <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
+          <span className="text-sm font-medium leading-5 tracking-[0.1px]">
             Run Vouching
           </span>
         </Button>
@@ -275,6 +275,7 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
                   <Input
                     type="number"
                     value={line.debit}
+                    variant="idr"
                     onChange={(e) => setJournalLines(journalLines.map(l => l.id === line.id ? { ...l, debit: parseFloat(e.target.value) || 0 } : l))}
                     className="h-9 text-right"
                   />
@@ -283,6 +284,7 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
                   <Input
                     type="number"
                     value={line.credit}
+                    variant="idr"
                     onChange={(e) => setJournalLines(journalLines.map(l => l.id === line.id ? { ...l, credit: parseFloat(e.target.value) || 0 } : l))}
                     className="h-9 text-right"
                   />

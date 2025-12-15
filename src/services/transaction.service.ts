@@ -10,6 +10,7 @@ export interface GetTransactionsParams {
   sortBy?: string;
   sortOrder?: string;
   isApproved?: string; // 'true' | 'false'
+  documentId?: string;
 }
 
 export interface ITransactionsResponse {
@@ -19,10 +20,10 @@ export interface ITransactionsResponse {
   message: string;
 }
 
-const BASE_URL = "project/transaction";
+const BASE_URL = "/transaction";
 
 export async function getTransactions(projectId: string, params: GetTransactionsParams): Promise<ITransactionsResponse> {
-  const { page, limit, search, status, type, sortBy, sortOrder, isApproved } = params;
+  const { page, limit, search, status, type, sortBy, sortOrder, isApproved, documentId } = params;
   try {
     const response = await api.get(`${BASE_URL}/${projectId}`, {
       params: {
@@ -33,7 +34,8 @@ export async function getTransactions(projectId: string, params: GetTransactions
         type,
         sortBy,
         sortOrder,
-        isApproved
+        isApproved,
+        documentId
       },
     });
     return response.data;
@@ -87,5 +89,27 @@ export async function deleteTransaction(id: string) {
   }
 }
 
-// Deprecated or Unused based on trigger logic, but kept for reference if needed
-// export async function createTransaction(projectId: string, payload: any) { ... }
+export async function createTransaction(projectId: string, payload: any) {
+  try {
+    const response = await api.post(`${BASE_URL}/${projectId}`, payload);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function uploadTransactionProof(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await api.post(`${BASE_URL}/upload-proof`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

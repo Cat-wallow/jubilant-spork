@@ -302,7 +302,7 @@ export default function ProjectFormOnePage() {
             {isProjectLoading ? (
               <Skeleton className="h-8 w-64" />
             ) : (
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+              <h1 className="text-2xl font-semibold  text-slate-900 dark:text-slate-50">
                 {`Kelola Form 1.0 ${project?.name || ''}`.trim()}
               </h1>
             )}
@@ -605,4 +605,3 @@ export default function ProjectFormOnePage() {
     </div>
   );
 }
-

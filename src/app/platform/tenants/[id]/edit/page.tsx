@@ -146,7 +146,7 @@ function EditTenantPageContent() {
 	if (isLoadingTenant) {
 		return (
 			<div className="w-full space-y-6">
-				<h1 className="text-3xl font-bold tracking-tight">Edit Tenant</h1>
+				<h1 className="text-3xl font-bold ">Edit Tenant</h1>
 				<div className="grid gap-6 lg:grid-cols-3">
 					<div className="lg:col-span-2">
 						<Skeleton className="h-[250px] w-full" />
@@ -172,7 +172,7 @@ function EditTenantPageContent() {
 			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div className="flex flex-1 flex-col gap-1">
-					<h1 className="text-3xl font-bold tracking-tight">Edit Tenant</h1>
+					<h1 className="text-3xl font-bold ">Edit Tenant</h1>
 					<p className="text-muted-foreground">{tenantData?.name}</p>
 				</div>
 				<Button

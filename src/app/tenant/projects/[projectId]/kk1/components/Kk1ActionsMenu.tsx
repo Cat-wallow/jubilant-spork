@@ -21,26 +21,31 @@ import {
 } from '@/components/ui/dialog';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { Transaction, TransactionStatus } from '@/types/transaction';
+import { TransactionStatus } from '@/types/transaction';
 import RBAC from '@/components/rbac/RBAC';
 
 interface Kk1ActionsMenuProps {
-  transaction: Transaction;
+  data: any; // DocumentWithTransaction
 }
 
-export function Kk1ActionsMenu({ transaction }: Kk1ActionsMenuProps) {
+export function Kk1ActionsMenu({ data }: Kk1ActionsMenuProps) {
   const [isPullApprovalOpen, setIsPullApprovalOpen] = useState(false);
   const router = useRouter();
   const params = useParams();
   const projectId = params.projectId as string;
   const queryClient = useQueryClient();
 
+  const transaction = data.transaction;
+  const status = transaction?.status || TransactionStatus.NOT_STARTED;
+  const transactionId = transaction?.id;
+  const documentId = data.id;
+
   const revertMutation = useMutation({
     mutationFn: (id: string) => revertApproval(id),
     onSuccess: () => {
       toast({ title: "Success", description: "Approval pulled successfully." });
       setIsPullApprovalOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["transactions", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["documentsForKK1", projectId] });
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -48,7 +53,9 @@ export function Kk1ActionsMenu({ transaction }: Kk1ActionsMenuProps) {
   });
 
   const handlePullApproval = () => {
-    revertMutation.mutate(transaction.id);
+    if (transactionId) {
+        revertMutation.mutate(transactionId);
+    }
   };
 
   return (
@@ -61,33 +68,33 @@ export function Kk1ActionsMenu({ transaction }: Kk1ActionsMenuProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center">
-          {(transaction.status === TransactionStatus.NOT_STARTED) && (
+          {(status === TransactionStatus.NOT_STARTED) && (
             <DropdownMenuItem
-              onSelect={() => router.push(`/tenant/projects/${projectId}/kk1/${transaction.id}/add`)}
+              onSelect={() => router.push(`/tenant/projects/${projectId}/kk1/${documentId}/add`)}
             >
               <Edit className="mr-2 h-4 w-4"/>
               Tambah transaksi
             </DropdownMenuItem>
           )}
-          {(transaction.status === TransactionStatus.IN_PROGRESS) && (
+          {(status === TransactionStatus.IN_PROGRESS) && (
             <DropdownMenuItem
-              onSelect={() => router.push(`/tenant/projects/${projectId}/kk1/${transaction.id}/add`)}
+              onSelect={() => router.push(`/tenant/projects/${projectId}/kk1/${documentId}/add`)}
             >
               <Edit className="mr-2 h-4 w-4"/>
               Lanjutkan transaksi
             </DropdownMenuItem>
           )}
 
-          {(transaction.status === TransactionStatus.SUBMITTED) && (
+          {(status === TransactionStatus.SUBMITTED) && (
             <RBAC requiredPermission={"kk1:approve"}>
-              <DropdownMenuItem onClick={() => router.push(`/tenant/projects/${projectId}/kk1/${transaction.id}/add`)}>
+              <DropdownMenuItem onClick={() => router.push(`/tenant/projects/${projectId}/kk1/${documentId}/add`)}>
                 <FilePenLine className="mr-2 h-4 w-4" />
                 Lihat Transaksi
               </DropdownMenuItem>
             </RBAC>
           )}
 
-          {(transaction.status === TransactionStatus.LEADER_APPROVED || transaction.status === TransactionStatus.PMO_APPROVED) && (
+          {(status === TransactionStatus.LEADER_APPROVED || status === TransactionStatus.PMO_APPROVED) && (
             <DropdownMenuItem onSelect={() => setIsPullApprovalOpen(true)}>
               <PenOff className="mr-2 h-4 w-4" />
               Tarik Approval

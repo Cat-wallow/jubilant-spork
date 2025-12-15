@@ -51,7 +51,7 @@ function EditProjectPageContent() {
 				// Map backend roles (with underscores) to what frontend might expect if mismatched
                 // Assuming backend sends "Team_Leader" but frontend logic might look for "Team Leader" or "Team_Leader"
                 // Based on provided data, backend sends "Team_Leader" and "Team_Member".
-                // The schema update changed roles to "Team_Leader". 
+                // The schema update changed roles to "Team_Leader".
                 // Let's handle both to be safe or strictly what's in response.
 				const leader = members.find((m) => m.role === "Team_Leader" || m.role === "Team Leader");
 				const member = members.find((m) => m.role === "Team_Member" || m.role === "Team Member");
@@ -186,7 +186,7 @@ function EditProjectPageContent() {
 						disabled={methods.formState.isSubmitting}
 					>
 						<Save className="h-4 w-4 mr-2 font-thin" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
+						<span className="text-sm font-medium leading-5 tracking-[0.1px]">
 							{methods.formState.isSubmitting
 								? "Menyimpan..."
 								: "Simpan Perubahan"}

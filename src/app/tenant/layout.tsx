@@ -81,7 +81,7 @@ export default function Admin({ children }: { children: ReactNode }) {
 						{/* Project Info */}
 						<div className="flex flex-col justify-start items-center  px-5 ">
 							<div className="flex h-24   flex-col justify-center">
-								<h3 className="font-dm text-sm font-bold leading-6 tracking-tight text-primary">
+								<h3 className="font-dm text-sm font-bold leading-6  text-primary">
 									Konsultasi Pajak PT Maju Bersama
 								</h3>
 								<p className="text-sm font-normal leading-[140%] text-primary">
@@ -111,7 +111,7 @@ export default function Admin({ children }: { children: ReactNode }) {
 										)}
 									>
 										<Icon className="h-5 w-5" />
-										<span className="font-semibold text-base leading-[30px] tracking-tight">
+										<span className="font-semibold text-base leading-[30px] ">
 											{module.name}
 										</span>
 									</Link>
