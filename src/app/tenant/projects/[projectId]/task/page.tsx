@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default function ProjectTaskAlias({ params }: { params: { id: string } }) {
-  const id = params.id;
-  redirect(`/tenant/projects/${id}/tasks`);
+export default function ProjectTaskAlias({ params }: { params: { projectId: string } }) {
+  const projectId = params.projectId;
+  redirect(`/tenant/projects/${projectId}/tasks`);
 }

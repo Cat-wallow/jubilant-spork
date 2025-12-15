@@ -126,7 +126,7 @@ function DiscussionPageContent() {
 	const params = useParams();
 	const router = useRouter();
 	const pathname = usePathname();
-	const projectId = params.id as string;
+	const projectId = params.projectId as string;
 
 	const currentTab = pathname?.split("/").pop() || "summary";
 

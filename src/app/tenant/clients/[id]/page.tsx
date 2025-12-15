@@ -727,6 +727,72 @@ export default function ClientDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Dokumen Pajak (SKT & PKP) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Dokumen Pajak
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                {(() => {
+                  const taxDocs = client.client_tax_documents || [];
+                  const skt = taxDocs.find((d: any) => d.document_type === 'registered_letter');
+                  const pkp = taxDocs.find((d: any) => d.document_type === 'pkp_confirmation');
+
+                  return (
+                    <div className="space-y-4">
+                      <div className="rounded-lg border p-4">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium">Surat Keterangan Terdaftar (SKT)</p>
+                          <Badge variant={skt ? 'default' : 'secondary'} className={skt ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                            {skt ? 'Tersedia' : 'Tidak Ada'}
+                          </Badge>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-muted-foreground mb-1">Nomor Surat</p>
+                            <p className="font-medium">{skt?.document_number || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Tanggal Surat</p>
+                            <p className="font-medium">{formatDate(skt?.document_date)}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-muted-foreground mb-1">Deskripsi</p>
+                            <p className="font-medium">{skt?.description || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg border p-4">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium">Surat Pengukuhan PKP</p>
+                          <Badge variant={pkp ? 'default' : 'secondary'} className={pkp ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                            {pkp ? 'Tersedia' : 'Tidak Ada'}
+                          </Badge>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-muted-foreground mb-1">Nomor Surat</p>
+                            <p className="font-medium">{pkp?.document_number || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Tanggal Surat</p>
+                            <p className="font-medium">{formatDate(pkp?.document_date)}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-muted-foreground mb-1">Deskripsi</p>
+                            <p className="font-medium">{pkp?.description || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
         <TabsContent value="contacts" className="space-y-6">

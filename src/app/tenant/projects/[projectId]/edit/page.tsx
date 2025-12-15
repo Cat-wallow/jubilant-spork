@@ -21,7 +21,7 @@ function EditProjectPageContent() {
 	const router = useRouter();
 	const params = useParams();
 	const queryClient = useQueryClient();
-	const projectId = params.id as string;
+	const projectId = params.projectId as string;
 
 	const { data: project, isLoading } = useQuery({
 		queryKey: ["project", projectId],

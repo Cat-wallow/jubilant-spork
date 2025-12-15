@@ -8,7 +8,7 @@ export default function FormOneBundleDetailPage() {
   const params = useParams();
   const { tenant, user } = useAuth();
 
-  const projectId = params.id as string;
+  const projectId = params.projectId as string;
   const bundleId = params.bundleId as string;
   const tenantId = tenant?.id || '';
   const userId = user?.id || '';
