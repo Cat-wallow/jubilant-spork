@@ -28,35 +28,44 @@ export function AgingAnalysis({ data }: AgingAnalysisProps) {
       </div>
 
       <div className="flex flex-col gap-5">
-        {data.map((item, idx) => (
-          <div key={idx} className="flex flex-col gap-5">
-            <Badge
-              variant="outline"
-              className="w-fit rounded-[5px] border border-[rgba(145,158,171,0.20)] font-inter text-xs font-normal text-[#404040]"
-            >
-              {item.count} Invoice
-            </Badge>
+        {data.map((item, idx) => {
+          // Different colors for different aging periods
+          const colors = ["#05CD99", "#FFB547", "#FFB547", "#EA4848"];
+          const bgColor = colors[idx] || "#05CD99";
 
-            <div className="flex flex-col gap-[5px]">
-              {/* Progress bars */}
-              <div className="flex flex-col">
-                <div
-                  className="h-2.5 rounded-full bg-[#05CD99]"
-                  style={{ width: `${item.percentage}%` }}
-                />
-              </div>
+          return (
+            <div key={idx} className="flex flex-col gap-5">
+              <Badge
+                variant="outline"
+                className="w-fit rounded-[5px] border border-[rgba(145,158,171,0.20)] font-inter text-xs font-normal text-[#404040]"
+              >
+                {item.count} Invoice
+              </Badge>
 
-              <div className="flex items-center justify-between">
-                <span className="font-inter text-xs font-normal text-[#6E7184]">
-                  {item.label}
-                </span>
-                <span className="font-inter text-xs font-normal text-[#6E7184]">
-                  {formatCurrency(item.amount)}
-                </span>
+              <div className="flex flex-col gap-[5px]">
+                {/* Progress bars */}
+                <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-[#F4F7FE]">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${item.percentage}%`,
+                      backgroundColor: bgColor,
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="font-inter text-xs font-normal text-[#6E7184]">
+                    {item.label}
+                  </span>
+                  <span className="font-inter text-xs font-normal text-[#6E7184]">
+                    {formatCurrency(item.amount)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
