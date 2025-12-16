@@ -1,8 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DocumentComplianceTab } from "./document-compliance";
-import { KK10Tab } from "./kk-1-0";
+import { KK20Tab } from "./kk-2-0";
 
 export default function ReportPage() {
 	return (
@@ -18,7 +17,7 @@ export default function ReportPage() {
 			</div>
 
 			{/* Report Tabs */}
-			<Tabs defaultValue="document-compliance" className="w-full">
+			<Tabs defaultValue="kk-2-0" className="w-full">
 				<TabsList className="grid h-auto w-full grid-cols-6 gap-2 bg-transparent p-0">
 					<TabsTrigger
 						value="document-compliance"
@@ -59,17 +58,19 @@ export default function ReportPage() {
 				</TabsList>
 
 				<TabsContent value="document-compliance" className="mt-6">
-					<DocumentComplianceTab />
+					<div className="text-center text-muted-foreground">
+						Document Compliance - Coming Soon
+					</div>
 				</TabsContent>
 
 				<TabsContent value="kk-1-0" className="mt-6">
-					<KK10Tab />
+					<div className="text-center text-muted-foreground">
+						KK 1.0 - Coming Soon
+					</div>
 				</TabsContent>
 
 				<TabsContent value="kk-2-0" className="mt-6">
-					<div className="text-center text-muted-foreground">
-						KK 2.0 GL/TB/LR - Coming Soon
-					</div>
+					<KK20Tab />
 				</TabsContent>
 
 				<TabsContent value="kk-3-0" className="mt-6">
