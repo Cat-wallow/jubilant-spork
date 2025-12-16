@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClient, useClientReadiness, useDeleteClient } from '@/hooks/useClients';
 import { useClientContacts } from '@/hooks/useClientContacts';
 import { useClientBranches } from '@/hooks/useClientBranches';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +37,11 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
+const formatThousandsId = (value: number) => {
+  if (!Number.isFinite(value)) return '';
+  return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(value);
+};
+
 export default function ClientDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -59,6 +65,26 @@ export default function ClientDetailPage() {
     data: branches,
     isLoading: isBranchesLoading,
   } = useClientBranches(tenant.id, id);
+
+  // Fetch projects for this client
+  const { data: projectsData, isLoading: isProjectsLoading } = useQuery({
+    queryKey: ['client-projects', tenant.id, id],
+    queryFn: async () => {
+      const response = await api.get('/project', {
+        params: {
+          client_id: id,
+          status: 'all',
+          page: 1,
+          limit: 50,
+        },
+        headers: { 'X-Tenant-Id': tenant.id },
+      });
+      return response.data?.data || { projects: [], total: 0 };
+    },
+    enabled: !!tenant.id && !!id,
+  });
+
+  const clientProjects = projectsData?.projects || [];
 
   if (isLoading) {
     return <div className="p-6 space-y-6">
@@ -151,39 +177,77 @@ export default function ClientDetailPage() {
     });
   };
 
-  // Mock Projects Data - dengan Form 1.0 sebagai milestone pertama
-  const projects = [
-    {
-      id: 'PRJ-25-SIP002',
-      client_name: 'PT. SUKSES INDO PRAMATA',
-      team_lead: 'Budi Dharma',
-      milestones: [
-        { name: 'Form 1.0', status: 'done', label: 'Done' },
-        { name: 'KK 1.0', status: 'done', label: 'Done' },
-        { name: 'KK 2.0', status: 'done', label: 'Done' },
-        { name: 'KK 3.0', status: 'in_progress', label: 'In Progress' },
-        { name: 'KK 4.0', status: 'not_started', label: 'Not started' },
-        { name: 'KK 5.0', status: 'not_started', label: 'Not started' },
-      ],
-      next_deadline: 'KK 3.0 Completion (2025-09-20)',
-      progress: 38.5,
-    },
-    {
-      id: 'PRJ-25-SIP003',
-      client_name: 'PT. SUKSES INDO PRAMATA',
-      team_lead: 'Budi Dharma',
-      milestones: [
-        { name: 'Form 1.0', status: 'in_progress', label: 'In Progress' },
-        { name: 'KK 1.0', status: 'not_started', label: 'Not started' },
-        { name: 'KK 2.0', status: 'not_started', label: 'Not started' },
-        { name: 'KK 3.0', status: 'not_started', label: 'Not started' },
-        { name: 'KK 4.0', status: 'not_started', label: 'Not started' },
-        { name: 'KK 5.0', status: 'not_started', label: 'Not started' },
-      ],
-      next_deadline: 'Form 1.0 Completion (2025-10-15)',
-      progress: 10,
-    },
-  ];
+  // Helper to get milestone status label
+  const getMilestoneLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      'NOT_STARTED': 'Not started',
+      'IN_PROGRESS': 'In Progress',
+      'SUBMITTED': 'Submitted',
+      'LEADER_APPROVED': 'Leader Approved',
+      'PMO_APPROVED': 'Done',
+    };
+    return labels[status] || status;
+  };
+
+  // Helper to get milestone status class
+  const getMilestoneStatusClass = (status: string) => {
+    if (status === 'PMO_APPROVED' || status === 'LEADER_APPROVED') return 'done';
+    if (status === 'IN_PROGRESS' || status === 'SUBMITTED') return 'in_progress';
+    return 'not_started';
+  };
+
+  // Transform project data for display
+  const transformProjectForDisplay = (project: any) => {
+    const scopes = project.project_scopes || [];
+    
+    // Build milestones from project_scopes
+    const defaultMilestones = ['FORM_1', 'KK_1', 'KK_2', 'KK_3', 'KK_4', 'KK_5'];
+    const milestoneLabels: Record<string, string> = {
+      'FORM_1': 'Form 1.0',
+      'KK_1': 'KK 1.0',
+      'KK_2': 'KK 2.0',
+      'KK_3': 'KK 3.0',
+      'KK_4': 'KK 4.0',
+      'KK_5': 'KK 5.0',
+    };
+
+    const milestones = defaultMilestones.map(scopeName => {
+      const scope = scopes.find((s: any) => s.scope_name === scopeName);
+      const status = scope?.status || 'NOT_STARTED';
+      return {
+        name: milestoneLabels[scopeName] || scopeName,
+        status: getMilestoneStatusClass(status),
+        label: getMilestoneLabel(status),
+      };
+    });
+
+    // Find next deadline from scopes
+    const inProgressScope = scopes.find((s: any) => s.status === 'IN_PROGRESS');
+    const nextDeadline = inProgressScope 
+      ? `${milestoneLabels[inProgressScope.scope_name] || inProgressScope.scope_name} Completion (${formatDate(project.end_date)})`
+      : project.end_date ? `Project Deadline (${formatDate(project.end_date)})` : '-';
+
+    return {
+      id: project.code || project.id,
+      name: project.name,
+      team_lead: project.users_projects_ketua_tim_idTousers?.name || project.users_projects_pmo_idTousers?.name || '-',
+      milestones,
+      next_deadline: nextDeadline,
+      progress: project.progress || 0,
+      status: project.status,
+      start_date: project.start_date,
+      end_date: project.end_date,
+      fiscal_year: project.fiscal_year,
+      budget: project.budget,
+    };
+  };
+
+  // Active projects (PLANNING or IN_PROGRESS)
+  const activeProjects = clientProjects
+    .filter((p: any) => p.status === 'PLANNING' || p.status === 'IN_PROGRESS')
+    .map(transformProjectForDisplay);
+  
+  const totalProjects = clientProjects.length;
 
   return (
     <div className="space-y-6 p-6">
@@ -228,8 +292,8 @@ export default function ClientDetailPage() {
             <div>
               <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Project Aktif</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-slate-900 dark:text-slate-50">5</span>
-                <span className="text-xs text-muted-foreground">dari 8 total</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-slate-50">{activeProjects.length}</span>
+                <span className="text-xs text-muted-foreground">dari {totalProjects} total</span>
               </div>
             </div>
           </CardContent>
@@ -387,7 +451,20 @@ export default function ClientDetailPage() {
               </div>
             </div>
 
-            {projects.map((project) => (
+            {activeProjects.length === 0 ? (
+              <Card className="overflow-hidden">
+                <CardContent className="p-6 text-center text-muted-foreground">
+                  <p>Belum ada proyek aktif untuk klien ini.</p>
+                  <Button
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 gap-2"
+                    onClick={() => router.push(`/tenant/projects/new?clientId=${id}`)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Buat Project Pertama
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : activeProjects.map((project: any) => (
               <Card key={project.id} className="overflow-hidden">
                 <CardContent className="p-6">
                   <div className="flex flex-col gap-6">
@@ -617,7 +694,7 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground mb-1">Jumlah Karyawan</p>
-                  <p className="font-medium">{client.employee_count ?? 0} Orang</p>
+                  <p className="font-medium">{formatThousandsId(Number(client.employee_count ?? 0))} Orang</p>
                 </div>
               </CardContent>
             </Card>
@@ -663,7 +740,7 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground mb-1">Jumlah Karyawan</p>
-                  <p className="font-medium">{client.employee_count ?? 0} Orang</p>
+                  <p className="font-medium">{formatThousandsId(Number(client.employee_count ?? 0))} Orang</p>
                 </div>
               </CardContent>
             </Card>
@@ -725,6 +802,67 @@ export default function ClientDetailPage() {
                     )}
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Dokumen Pajak */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                  Dokumen Pajak
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                {(() => {
+                  const taxDocs = client.client_tax_documents || [];
+                  
+                  // Label mapping for known document types
+                  const docTypeLabels: Record<string, string> = {
+                    registered_letter: 'Surat Keterangan Terdaftar (SKT)',
+                    pkp_confirmation: 'Surat Pengukuhan PKP',
+                  };
+
+                  const getDocLabel = (docType: string) => {
+                    return docTypeLabels[docType] || docType;
+                  };
+
+                  if (taxDocs.length === 0) {
+                    return (
+                      <p className="text-muted-foreground italic text-center py-4">
+                        Tidak ada dokumen pajak
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-4">
+                      {taxDocs.map((doc: any) => (
+                        <div key={doc.id || doc.document_type} className="rounded-lg border p-4">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium">{getDocLabel(doc.document_type)}</p>
+                            <Badge variant="default" className="bg-green-100 text-green-800">
+                              Tersedia
+                            </Badge>
+                          </div>
+                          <div className="mt-3 grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-muted-foreground mb-1">Nomor Surat</p>
+                              <p className="font-medium">{doc.document_number || '-'}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground mb-1">Tanggal Surat</p>
+                              <p className="font-medium">{formatDate(doc.document_date)}</p>
+                            </div>
+                            <div className="col-span-2">
+                              <p className="text-muted-foreground mb-1">Deskripsi</p>
+                              <p className="font-medium">{doc.description || '-'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </div>
@@ -852,30 +990,32 @@ export default function ClientDetailPage() {
                         {others.map((c) => (
                           <div
                             key={c.id}
-                            className="flex flex-col md:flex-row md:items-center md:justify-between border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900/40"
+                            className="py-2"
                           >
-                            <div className="space-y-1">
-                              <p className="font-medium">
-                                {c.name}{' '}
-                                {c.is_authorized_signer && (
-                                  <span className="ml-2 text-xs rounded-full bg-green-100 text-green-700 px-2 py-0.5 dark:bg-green-900/40 dark:text-green-300">
-                                    Penandatangan Berwenang
-                                  </span>
-                                )}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {c.position || 'Jabatan tidak diisi'}
-                              </p>
-                            </div>
-                            <div className="mt-2 md:mt-0 text-xs text-muted-foreground space-y-1 md:text-right">
-                              <p>
-                                <span className="font-medium">Email: </span>
-                                {c.email || '-'}
-                              </p>
-                              <p>
-                                <span className="font-medium">Telepon: </span>
-                                {c.phone || '-'}
-                              </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-muted-foreground mb-1">Nama Kontak</p>
+                                <p className="font-medium break-all">
+                                  {c.name}{' '}
+                                  {c.is_authorized_signer && (
+                                    <span className="ml-2 text-xs rounded-full bg-green-100 text-green-700 px-2 py-0.5 dark:bg-green-900/40 dark:text-green-300">
+                                      Penandatangan Berwenang
+                                    </span>
+                                  )}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground mb-1">Jabatan</p>
+                                <p className="font-medium break-all">{c.position || '-'}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground mb-1">Email</p>
+                                <p className="font-medium break-all">{c.email || '-'}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground mb-1">Telepon</p>
+                                <p className="font-medium break-all">{c.phone || '-'}</p>
+                              </div>
                             </div>
                           </div>
                         ))}

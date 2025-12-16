@@ -841,7 +841,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                   <Input
                     id="employee_count"
                     {...corporateForm.register('employee_count')}
-                    placeholder="Masukkan jumlah karyawan"
+                    placeholder="XX.XXX"
                   />
                 </div>
 

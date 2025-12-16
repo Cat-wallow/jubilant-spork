@@ -7,6 +7,7 @@ export interface Client {
 	name: string;
 	legal_name?: string | null;
 	type: string;
+	business_type?: string | null;
 	npwp?: string | null;
 	email?: string | null;
 	phone?: string | null;
@@ -16,6 +17,10 @@ export interface Client {
 	pkp_status?: boolean | null;
 	active_projects?: number | null;
 	deadline_project?: string | null;
+	project_fiscal_year?: number | null;
+	project_start_date?: string | null;
+	project_end_date?: string | null;
+	project_volume?: any;
 }
 
 export interface ClientDetail extends Client {
@@ -110,6 +115,7 @@ interface UseClientsParams {
 	search?: string;
 	status?: string;
 	type?: string;
+	business_type?: string;
 	pkp_status?: string;
 	page?: number;
 	limit?: number;
@@ -130,6 +136,29 @@ export const useClient = (tenantId: string, id: string) => {
 			return data;
 		},
 		enabled: !!tenantId && !!id,
+	});
+};
+
+export const useTerminateClient = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ tenantId, id }: { tenantId: string; id: string }) => {
+			const response = await api.post(`/client-wp/api/clients/${id}/terminate`, {}, {
+				headers: {
+					"X-Tenant-Id": tenantId,
+				},
+			});
+			return response.data;
+		},
+		onSuccess: (_, variables) => {
+			queryClient.invalidateQueries({
+				queryKey: ["clients", variables.tenantId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["clients-compliance", variables.tenantId],
+			});
+		},
 	});
 };
 
@@ -177,6 +206,7 @@ export const useClients = (params: UseClientsParams) => {
 		search,
 		status,
 		type,
+		business_type,
 		pkp_status,
 		page = 1,
 		limit = 10,
@@ -186,7 +216,7 @@ export const useClients = (params: UseClientsParams) => {
 		queryKey: [
 			"clients",
 			tenantId,
-			{ search, status, type, pkp_status, page, limit },
+			{ search, status, type, business_type, pkp_status, page, limit },
 		],
 		queryFn: async () => {
 			const { data } = await api.get<{
@@ -199,6 +229,7 @@ export const useClients = (params: UseClientsParams) => {
 					search,
 					status,
 					type,
+					business_type,
 					pkp_status,
 					page,
 					size: limit,
