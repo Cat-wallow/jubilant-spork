@@ -37,9 +37,7 @@ export function DocumentFolderCard({
 			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div className="flex flex-col">
-					<h3 className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#404040]">
-						{title}
-					</h3>
+					<h3 className="font-roboto text-base font-medium ">{title}</h3>
 					<p className="w-full font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C] sm:w-[228px]">
 						{description}
 					</p>
@@ -58,8 +56,12 @@ export function DocumentFolderCard({
 			<div className="flex flex-col gap-2.5">
 				<div className="flex flex-col gap-5">
 					<div className="flex items-center justify-between">
-						<span className="font-inter text-xs font-normal text-[#6E7184]">Progress</span>
-						<span className="font-inter text-xs font-normal text-[#6E7184]">{progress}%</span>
+						<span className="font-inter text-xs font-normal text-[#6E7184]">
+							Progress
+						</span>
+						<span className="font-inter text-xs font-normal text-[#6E7184]">
+							{progress}%
+						</span>
 					</div>
 					<div className="flex flex-col">
 						<Progress value={progress} className="h-2.5 w-full" />
@@ -69,14 +71,20 @@ export function DocumentFolderCard({
 					<span className="font-inter text-xs font-normal text-[#6E7184]">
 						{filesCount}/{totalFiles} File
 					</span>
-					<span className="font-inter text-xs font-normal text-[#6E7184]">{size}</span>
+					<span className="font-inter text-xs font-normal text-[#6E7184]">
+						{size}
+					</span>
 				</div>
 			</div>
 
 			{/* Footer */}
 			<div className="flex items-center justify-between">
-				<span className="font-inter text-xs font-normal text-[#6E7184]">Complete</span>
-				<span className="font-inter text-xs font-normal text-[#6E7184]">{completedDate}</span>
+				<span className="font-inter text-xs font-normal text-[#6E7184]">
+					Complete
+				</span>
+				<span className="font-inter text-xs font-normal text-[#6E7184]">
+					{completedDate}
+				</span>
 			</div>
 		</Card>
 	);

@@ -11,7 +11,6 @@ const projectData = {
 	client: "PT Maju Mundur Bersama",
 	startDate: "2024-02-20",
 	deadline: "2024-02-22",
-	breadcrumb: "Project > Detail Project",
 	description:
 		"Konsultasi pajak komprehensif untuk PT Maju Bersama periode Januari 2024, meliputi penyusunan laporan keuangan, kalkulasi pajak, dan optimasi tax planning.",
 	stats: {
@@ -64,22 +63,16 @@ export default function CommonProjectLayout({
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[30px] ">
+		<div className="flex w-full flex-col gap-4">
 			{/* Header */}
 			<div className="flex items-center justify-center gap-2.5">
 				<div className="flex flex-1 flex-col gap-[5px]">
 					<p className="font-dm text-sm font-medium leading-6 text-[#707EAE]">
 						{projectData.breadcrumb}
 					</p>
-					<h1 className="font-dm text-[34px] font-bold leading-[42px]  ">
+					<h1 className="font-dm text-[34px] mt-2 ml-2 font-bold leading-[42px]  ">
 						{projectData.name}
 					</h1>
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Publish</span>
-					<div className="h-6 w-11 rounded-[50px] relative">
-						<div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white" />
-					</div>
 				</div>
 			</div>
 

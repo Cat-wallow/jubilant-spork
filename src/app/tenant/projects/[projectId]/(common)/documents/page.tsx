@@ -8,6 +8,8 @@ import { DocumentUploadArea } from "./components/DocumentUploadArea";
 import { DocumentFilters } from "./components/DocumentFilters";
 import { DocumentTable } from "./components/DocumentTable";
 import { DocumentPagination } from "./components/DocumentPagination";
+import { FileUploader } from "@/components/shared/FileUploader";
+import { Card } from "@/components/ui/card";
 
 // Mock data for document folders
 const documentFolders = [
@@ -176,7 +178,9 @@ export default function DocumentsPage() {
 	const handleToggleVisibility = (id: string) => {
 		setDocuments(
 			documents.map((doc) =>
-				doc.id === id ? { ...doc, visibleToCustomer: !doc.visibleToCustomer } : doc,
+				doc.id === id
+					? { ...doc, visibleToCustomer: !doc.visibleToCustomer }
+					: doc,
 			),
 		);
 	};
@@ -191,12 +195,14 @@ export default function DocumentsPage() {
 
 	const handleToggleCheck = (id: string) => {
 		setDocuments(
-			documents.map((doc) => (doc.id === id ? { ...doc, checked: !doc.checked } : doc)),
+			documents.map((doc) =>
+				doc.id === id ? { ...doc, checked: !doc.checked } : doc,
+			),
 		);
 	};
 
 	return (
-		<div className="flex flex-col gap-[30px]">
+		<div className="flex flex-col p-4 gap-[30px]">
 			{/* Header Section */}
 			<div className="flex flex-col gap-[30px] sm:flex-row sm:items-start sm:justify-between">
 				<div className="flex-1">
@@ -204,7 +210,7 @@ export default function DocumentsPage() {
 						Document Project 1
 					</h2>
 				</div>
-				<Button className="h-12 w-full rounded-[10px] bg-[#332687] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] hover:bg-[#241963] sm:w-auto">
+				<Button>
 					<Plus className="mr-2 h-6 w-6" />
 					Buat Folder
 				</Button>
@@ -213,11 +219,10 @@ export default function DocumentsPage() {
 			{/* Document Folders Grid */}
 			<DocumentFolderGrid folders={documentFolders} />
 
-			{/* Upload Area */}
-			<DocumentUploadArea onFilesUploaded={handleFileUpload} />
+			<FileUploader />
 
 			{/* Document List Section */}
-			<div className="flex flex-col gap-5 rounded-[20px]">
+			<Card className="flex flex-col gap-5 rounded-[20px]  px-10 py-6">
 				{/* Section Header */}
 				<div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
 					<div className="flex flex-col">
@@ -261,7 +266,7 @@ export default function DocumentsPage() {
 					totalItems={100}
 					onPageChange={setCurrentPage}
 				/>
-			</div>
+			</Card>
 		</div>
 	);
 }

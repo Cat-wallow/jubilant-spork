@@ -6,6 +6,8 @@ import { FileFilters } from "./components/FileFilters";
 import { FileTable } from "./components/FileTable";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { FileUploader } from "@/components/shared/FileUploader";
 
 // Mock data
 const initialFiles = [
@@ -81,7 +83,9 @@ export default function FilePage() {
 	const handleToggleVisibility = (id: string) => {
 		setFiles(
 			files.map((file) =>
-				file.id === id ? { ...file, visibleToCustomer: !file.visibleToCustomer } : file,
+				file.id === id
+					? { ...file, visibleToCustomer: !file.visibleToCustomer }
+					: file,
 			),
 		);
 	};
@@ -96,19 +100,21 @@ export default function FilePage() {
 
 	const handleToggleCheck = (id: string) => {
 		setFiles(
-			files.map((file) => (file.id === id ? { ...file, checked: !file.checked } : file)),
+			files.map((file) =>
+				file.id === id ? { ...file, checked: !file.checked } : file,
+			),
 		);
 	};
 
 	return (
-		<div className="flex flex-col gap-[50px]">
+		<Card className="flex mt-[10px]  p-6 flex-col gap-[50px]">
 			{/* Header Section */}
 			<div className="flex items-start justify-between">
 				<div className="flex flex-col">
-					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 						Daftar File Internal Project
 					</h2>
-					<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+					<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-primary">
 						Kelola dokumen internal di dalam project
 					</p>
 				</div>
@@ -118,7 +124,7 @@ export default function FilePage() {
 			</div>
 
 			{/* Upload Area */}
-			<FileUploadArea onFilesUploaded={handleFileUpload} />
+			<FileUploader />
 
 			{/* Filters */}
 			<FileFilters
@@ -140,14 +146,6 @@ export default function FilePage() {
 				onSendFile={handleSendFile}
 				onToggleCheck={handleToggleCheck}
 			/>
-
-			{/* Upload Button */}
-			<div className="flex justify-center">
-				<Button className="h-[42px] rounded-[10px] bg-[#332687] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px]">
-					<Upload className="mr-2 h-6 w-6" />
-					Upload
-				</Button>
-			</div>
-		</div>
+		</Card>
 	);
 }

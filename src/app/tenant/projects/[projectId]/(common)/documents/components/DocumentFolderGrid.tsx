@@ -20,7 +20,7 @@ interface DocumentFolderGridProps {
 
 export function DocumentFolderGrid({ folders }: DocumentFolderGridProps) {
 	return (
-		<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+		<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 w-full lg:grid-cols-3 xl:grid-cols-3">
 			{folders.map((folder) => (
 				<DocumentFolderCard key={folder.id} {...folder} />
 			))}
