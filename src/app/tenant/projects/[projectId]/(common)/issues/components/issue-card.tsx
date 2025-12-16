@@ -40,27 +40,27 @@ export function IssueCard({ issue }: IssueCardProps) {
   };
 
   return (
-    <div className="flex w-full flex-col gap-2.5 rounded-[20px]">
-      <div className="flex flex-col gap-2.5 self-stretch rounded-[10px]">
+    <div className="flex w-full flex-col justify-center gap-2.5 rounded-[20px] border border-transparent p-4 hover:border-border hover:shadow-sm">
+      <div className="flex flex-col items-start gap-2.5 self-stretch rounded-[10px]">
         <div className="flex items-center justify-between self-stretch">
           <div className="flex items-center gap-2.5">
-            <span className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+            <span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#2B3674]">
               {issue.taskId}
             </span>
             {issue.module && (
-              <div className="flex items-center justify-center gap-2.5 rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2.5 py-1">
-                <span className="font-inter text-xs text-[#8C8C8C]">{issue.module}</span>
+              <div className="flex items-center justify-center gap-2.5 rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2.5 py-1.5">
+                <span className="font-inter text-xs font-normal text-[#8C8C8C]">{issue.module}</span>
               </div>
             )}
-            <span className={`font-inter text-[10px] ${getPriorityColor(issue.priority)}`}>
+            <span className={`font-inter text-[10px] font-normal ${getPriorityColor(issue.priority)}`}>
               {issue.priority}
             </span>
           </div>
           <div className="flex items-center justify-end gap-2.5">
-            <Button variant="ghost" size="icon" className="h-[18px] w-[18px] p-0">
+            <Button variant="ghost" size="icon" className="h-[18px] w-[18px] p-0 hover:bg-transparent">
               <Edit className="h-[18px] w-[18px] text-[#8C8C8C]" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-5 w-5 p-0">
+            <Button variant="ghost" size="icon" className="h-5 w-5 p-0 hover:bg-transparent">
               <Trash2 className="h-5 w-5 text-[#8C8C8C]" />
             </Button>
           </div>
@@ -70,22 +70,23 @@ export function IssueCard({ issue }: IssueCardProps) {
           <h3 className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#404040]">
             {issue.title}
           </h3>
-          <p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
+          <p className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
             {issue.description}
           </p>
           <div className="flex items-center gap-1.5">
             <Calendar
               className={`h-5 w-5 ${issue.isOverdue ? "text-[#BF6A02]" : "text-[#8C8C8C]"}`}
+              strokeWidth={2.5}
             />
             <span
-              className={`font-roboto text-xs leading-4 tracking-[0.4px] ${
+              className={`font-roboto text-xs font-normal leading-4 tracking-[0.4px] ${
                 issue.isOverdue ? "text-[#BF6A02]" : "text-[#8C8C8C]"
               }`}
             >
               {issue.date}
             </span>
             {issue.isOverdue && (
-              <Badge className="min-w-[48px] rounded-full bg-[#EC221F] px-2 py-0.5 text-[10px] font-medium text-white">
+              <Badge className="min-w-[48px] rounded-full bg-[#EC221F] px-3 py-1 text-[10px] font-medium leading-4 text-white hover:bg-[#EC221F]">
                 Overdue
               </Badge>
             )}
@@ -110,19 +111,19 @@ export function IssueCard({ issue }: IssueCardProps) {
             <div className="flex items-center gap-1.5">
               <div className="flex items-center gap-1.5">
                 <CheckSquare className="h-5 w-5 text-[#8C8C8C]" />
-                <span className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
+                <span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
                   {issue.checkboxes}/{issue.checkboxTotal}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <MessageSquare className="h-[18px] w-[18px] text-[#8C8C8C]" />
-                <span className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
+                <span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
                   {issue.comments}/{issue.commentTotal}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Paperclip className="h-[18px] w-[18px] text-[#8C8C8C]" />
-                <span className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
+                <span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
                   {issue.attachments}/{issue.attachmentTotal}
                 </span>
               </div>
@@ -130,7 +131,7 @@ export function IssueCard({ issue }: IssueCardProps) {
           </div>
           {issue.actionButton ? (
             <Button
-              className={`flex h-9 items-center gap-1 rounded-[10px] px-4 py-2 ${getActionButtonColor(
+              className={`flex items-center justify-center gap-1 rounded-[10px] px-4 py-2 ${getActionButtonColor(
                 issue.actionButton
               )}`}
             >

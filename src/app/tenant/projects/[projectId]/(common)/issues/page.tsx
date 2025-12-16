@@ -16,8 +16,8 @@ function IssuesPageContent() {
   const resolvedIssues = issues.filter((issue) => issue.status === "Resolved");
 
   return (
-    <div className="flex flex-col gap-[30px]">
-      <div className="flex flex-wrap items-start gap-5 self-stretch">
+    <div className="flex flex-col items-start gap-[30px] self-stretch">
+      <div className="flex items-start gap-5 self-stretch">
         <div className="flex h-[54px] flex-1 items-center gap-[15px] rounded-[10px] border border-[#D9D9D9] px-4">
           <div className="relative h-5 w-5">
             <div className="absolute left-0 top-0 h-[18px] w-[18px] rounded-full border-[3px] border-[#332687]" />
@@ -26,30 +26,30 @@ function IssuesPageContent() {
             placeholder="Cari nama issue"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-5 flex-1 border-0 bg-transparent p-0 font-dm-sans text-base text-[#8F9BBA] placeholder:text-[#8F9BBA] focus-visible:ring-0"
+            className="h-5 flex-1 border-0 bg-transparent p-0 font-dm-sans text-base leading-5 text-foreground placeholder:text-[#8F9BBA] focus-visible:ring-0"
           />
         </div>
-        <div className="flex items-center justify-end gap-2.5">
-          <Button className="flex items-center gap-1 rounded-[10px] bg-[#332687] px-4 py-2.5 hover:bg-[#332687]/90">
+        <div className="flex items-center justify-end gap-2.5 self-stretch">
+          <Button className="flex items-center gap-1 rounded-[10px] bg-[#332687] hover:bg-[#332687]/90">
             <Plus className="h-6 w-6 text-white" />
-            <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
+            <span className="whitespace-nowrap font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
               Tambah Tugas
             </span>
           </Button>
           <Button
             variant="outline"
-            className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9] bg-transparent px-4 py-2.5 hover:bg-accent"
+            className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9] bg-transparent hover:bg-accent"
           >
-            <List className="h-6 w-6 text-[#404040]" />
-            <span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+            <List className="h-6 w-6 text-[#404040]" strokeWidth={2.5} />
+            <span className="whitespace-nowrap font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
               List
             </span>
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-5 self-stretch xl:flex-nowrap">
-        <div className="flex w-full min-w-[300px] flex-1 flex-col gap-2.5 rounded-[20px]">
+      <div className="flex items-start gap-5 self-stretch">
+        <div className="flex w-full min-w-0 flex-1 flex-col items-start gap-2.5 rounded-[20px]">
           <div className="flex items-center gap-2.5">
             <h2 className="font-dm-sans text-[22px] font-bold leading-8 tracking-[-0.44px] text-[#2B3674]">
               Open
@@ -58,14 +58,14 @@ function IssuesPageContent() {
               <span className="font-inter text-sm font-bold text-[#404040]">{openIssues.length}</span>
             </div>
           </div>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex w-full flex-col items-start gap-2.5">
             {openIssues.map((issue) => (
               <IssueCard key={issue.id} issue={issue} />
             ))}
           </div>
         </div>
 
-        <div className="flex w-full min-w-[300px] flex-1 flex-col gap-2.5 rounded-[20px]">
+        <div className="flex w-full min-w-0 flex-1 flex-col items-start gap-2.5 rounded-[20px]">
           <div className="flex items-center gap-2.5">
             <h2 className="font-dm-sans text-[22px] font-bold leading-8 tracking-[-0.44px] text-[#2B3674]">
               In Progress
@@ -76,14 +76,14 @@ function IssuesPageContent() {
               </span>
             </div>
           </div>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex w-full flex-col items-start gap-2.5">
             {inProgressIssues.map((issue) => (
               <IssueCard key={issue.id} issue={issue} />
             ))}
           </div>
         </div>
 
-        <div className="flex w-full min-w-[300px] flex-1 flex-col gap-2.5 rounded-[20px]">
+        <div className="flex w-full min-w-0 flex-1 flex-col items-start gap-2.5 rounded-[20px]">
           <div className="flex items-center gap-2.5">
             <h2 className="font-dm-sans text-[22px] font-bold leading-8 tracking-[-0.44px] text-[#2B3674]">
               Resolved
@@ -94,7 +94,7 @@ function IssuesPageContent() {
               </span>
             </div>
           </div>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex w-full flex-col items-start gap-2.5">
             {resolvedIssues.map((issue) => (
               <IssueCard key={issue.id} issue={issue} />
             ))}
