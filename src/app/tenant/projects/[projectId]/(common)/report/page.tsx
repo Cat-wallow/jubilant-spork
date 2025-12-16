@@ -5,6 +5,7 @@ import { KK20Tab } from "./kk-2-0";
 import { KK10Tab } from "./kk-1-0";
 import { KK30Tab } from "./kk-3-0";
 import { KK40Tab } from "./kk-4-0";
+import { KK50Tab } from "./kk-5-0";
 import { DocumentComplianceTab } from "./document-compliance";
 
 export default function ReportPage() {
@@ -82,9 +83,7 @@ export default function ReportPage() {
 				</TabsContent>
 
 				<TabsContent value="kk-5-0" className="mt-6">
-					<div className="text-center text-muted-foreground">
-						KK 5.0 BAST/Invoice - Coming Soon
-					</div>
+					<KK50Tab />
 				</TabsContent>
 			</Tabs>
 		</div>
