@@ -131,9 +131,10 @@ export default function EditClientPage() {
   const { data: branches } = useClientBranches(tenant.id, id);
   const upsertBranchMutation = useUpsertClientBranch();
   const deleteBranchMutation = useDeleteClientBranch();
-  
+
   const [activeTab, setActiveTab] = useState('identity');
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
 
   const [picContact, setPicContact] = useState({
     id: '',
@@ -376,7 +377,44 @@ export default function EditClientPage() {
       }
     };
 
+    const loadCoaTemplates = async () => {
+      try {
+        const resp = await api.get('project/coa-templates');
+        const data = resp?.data?.data ?? resp?.data ?? [];
+
+        const normalized = Array.isArray(data)
+          ? data
+              .map((name: any) => String(name ?? '').trim())
+              .filter((name: string) => !!name)
+              .map((name: string) => ({ key: name, label: name }))
+          : [];
+
+        if (!cancelled) {
+          if (normalized.length > 0) {
+            setCoaTemplateOptions(normalized);
+          } else {
+            setCoaTemplateOptions([
+              { key: 'trading', label: 'Trading' },
+              { key: 'manufacturing', label: 'Manufacturing' },
+              { key: 'services', label: 'Services' },
+              { key: 'construction', label: 'Construction' },
+            ]);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setCoaTemplateOptions([
+            { key: 'trading', label: 'Trading' },
+            { key: 'manufacturing', label: 'Manufacturing' },
+            { key: 'services', label: 'Services' },
+            { key: 'construction', label: 'Construction' },
+          ]);
+        }
+      }
+    };
+
     loadBusinessTypes();
+    loadCoaTemplates();
 
     return () => {
       cancelled = true;
@@ -1493,11 +1531,11 @@ export default function EditClientPage() {
                         <SelectValue placeholder="Pilih template COA..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="trading">Trading COA Template</SelectItem>
-                        <SelectItem value="manufacturing">Manufacturing COA Template</SelectItem>
-                        <SelectItem value="services">Services COA Template</SelectItem>
-                        <SelectItem value="construction">Construction COA Template</SelectItem>
-                        <SelectItem value="retail">Retail COA Template</SelectItem>
+                        {coaTemplateOptions.map((opt) => (
+                          <SelectItem key={opt.key} value={opt.key}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
