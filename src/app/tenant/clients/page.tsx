@@ -576,6 +576,7 @@ export default function ClientsPage() {
             columns={columns}
             isLoading={isLoading || isFetching}
             isError={!!error}
+            onRowClick={(row) => router.push(`/tenant/clients/${(row as any).original.id}`)}
           />
         </div>
       </div>

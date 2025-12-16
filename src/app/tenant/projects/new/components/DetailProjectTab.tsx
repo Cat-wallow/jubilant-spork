@@ -57,7 +57,10 @@ export default function DetailProjectTab() {
 		limit: 100,
 	});
 
-	const pms = useMemo(() => pmsData?.items || [], [pmsData]);
+	const pms = useMemo(
+		() => (pmsData?.items || []).filter((u: any) => u?.role !== "Admin Tenant"),
+		[pmsData],
+	);
 
 	return (
 		<div className="flex items-start gap-[30px] self-stretch">

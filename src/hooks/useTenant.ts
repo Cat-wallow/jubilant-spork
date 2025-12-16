@@ -95,6 +95,7 @@ export const useTenantUsers = (params: UseTenantUsersParams) => {
           first_name: firstName,
           last_name: lastName,
           status: String(u.status ?? 'active'),
+          role: typeof u.role === 'string' ? u.role : undefined,
         };
       });
 
