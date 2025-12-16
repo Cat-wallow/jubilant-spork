@@ -35,14 +35,14 @@ export default function TimelinePage() {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[30px] bg-[#F4F7FE] p-[30px]">
+		<Card className="flex w-full flex-col gap-[30px]  p-[30px]">
 			<div className="flex flex-col items-start gap-[50px] rounded-[20px]">
 				<div className="flex w-full items-start justify-between">
 					<div className="flex flex-col items-start">
-						<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+						<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 							Project Timeline
 						</h2>
-						<p className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#2B3674]">
+						<p className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-primary">
 							Tinjau dan kelola timeline project
 						</p>
 					</div>
@@ -66,7 +66,7 @@ export default function TimelinePage() {
 					milestones={milestoneTypes}
 				/>
 
-				<div className="w-full">
+				<Card className="overflow-hidden border-2 border-[#D9D9D9] rounded-[30px] w-full p-10">
 					<Tabs
 						value={viewMode}
 						onValueChange={(v) => setViewMode(v as "gantt" | "board")}
@@ -89,8 +89,8 @@ export default function TimelinePage() {
 							<BoardChart cards={mockBoardCards} />
 						</TabsContent>
 					</Tabs>
-				</div>
+				</Card>
 			</div>
-		</div>
+		</Card>
 	);
 }

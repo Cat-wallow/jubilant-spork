@@ -9,28 +9,28 @@ import { InvoicePagination } from "./components/InvoicePagination";
 import { invoices, agingAnalysis } from "./data/invoices";
 
 export default function BillingPage() {
-  return (
-    <div className="flex flex-col gap-[30px]">
-      {/* Summary Cards */}
-      <BillingSummary />
+	return (
+		<div className="flex flex-col gap-[30px] px-4">
+			{/* Summary Cards */}
+			<BillingSummary />
 
-      {/* Main Content Grid */}
-      <div className="flex flex-col gap-[30px] xl:flex-row">
-        {/* Left Column - Invoice Table */}
-        <div className="flex flex-1 flex-col gap-5 rounded-[20px] bg-card p-4 md:p-6">
-          <InvoiceHeader />
-          <InvoiceFilters />
-          <div className="overflow-x-auto">
-            <InvoiceTable invoices={invoices} />
-          </div>
-          <InvoicePagination />
-        </div>
+			{/* Main Content Grid */}
+			<div className="flex  flex-col gap-[30px]  xl:flex-row">
+				{/* Left Column - Invoice Table */}
+				<div className="flex flex-3 flex-col w-2/3 gap-5 rounded-[20px] bg-card p-4 md:p-6">
+					<InvoiceHeader />
+					<InvoiceFilters />
+					<div className="overflow-x-auto">
+						<InvoiceTable invoices={invoices} />
+					</div>
+					<InvoicePagination />
+				</div>
 
-        {/* Right Column - Aging Analysis */}
-        <div className="xl:w-[450px]">
-          <AgingAnalysis data={agingAnalysis} />
-        </div>
-      </div>
-    </div>
-  );
+				{/* Right Column - Aging Analysis */}
+				<div className="flex flex-item w-1/3">
+					<AgingAnalysis data={agingAnalysis} />
+				</div>
+			</div>
+		</div>
+	);
 }
