@@ -2,6 +2,8 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KK20Tab } from "./kk-2-0";
+import { KK10Tab } from "./kk-1-0";
+import { DocumentComplianceTab } from "./document-compliance";
 
 export default function ReportPage() {
 	return (
@@ -58,15 +60,11 @@ export default function ReportPage() {
 				</TabsList>
 
 				<TabsContent value="document-compliance" className="mt-6">
-					<div className="text-center text-muted-foreground">
-						Document Compliance - Coming Soon
-					</div>
+					<DocumentComplianceTab />
 				</TabsContent>
 
 				<TabsContent value="kk-1-0" className="mt-6">
-					<div className="text-center text-muted-foreground">
-						KK 1.0 - Coming Soon
-					</div>
+					<KK10Tab />
 				</TabsContent>
 
 				<TabsContent value="kk-2-0" className="mt-6">
