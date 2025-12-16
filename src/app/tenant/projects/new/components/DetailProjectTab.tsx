@@ -45,7 +45,7 @@ export default function DetailProjectTab() {
 	// Fetch Clients using hook
 	const { data: clientsData, isLoading: isLoadingClients } = useClients({
 		tenantId: tenant?.id || "",
-		limit: 1000, // Fetch all clients
+		limit: 100,
 	});
 
 	const clients = useMemo(() => clientsData?.items || [], [clientsData]);
@@ -54,7 +54,7 @@ export default function DetailProjectTab() {
 	const { data: pmsData, isLoading: isLoadingPms } = useTenantUsers({
 		tenantId: tenant?.id || "",
 		permission: "project:manage",
-		limit: 1000,
+		limit: 100,
 	});
 
 	const pms = useMemo(() => pmsData?.items || [], [pmsData]);

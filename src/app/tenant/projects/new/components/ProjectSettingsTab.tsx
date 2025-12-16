@@ -65,11 +65,11 @@ export default function ProjectSettingsTab() {
 	useEffect(() => {
 		if (tenant?.id) {
 			api
-				.get("/tenant/report-templates", {
+				.get("/project/report-templates", {
 					headers: { "X-Tenant-Id": tenant.id },
 				})
 				.then((res) => {
-					const templates = res.data.data || [];
+					const templates = res?.data?.data || [];
 					setBastTemplates(
 						templates.filter((t: any) => t.report_type === "BAST"),
 					);
@@ -77,7 +77,11 @@ export default function ProjectSettingsTab() {
 						templates.filter((t: any) => t.report_type === "INVOICE"),
 					);
 				})
-				.catch((err) => console.error("Failed to fetch templates", err));
+				.catch((err) => {
+					setBastTemplates([]);
+					setInvoiceTemplates([]);
+					console.error("Failed to fetch templates", err);
+				});
 		}
 	}, [tenant?.id]); // Added tenant dependency
 
@@ -98,17 +102,16 @@ export default function ProjectSettingsTab() {
 			return {
 				queryKey: ["moduleUsers", tenant?.id, scope], // Unique query key for each scope
 				queryFn: async () => {
-					const [resLeader, resMember] = await Promise.all([
-						api.get(`/tenant/user?permission=${permPrefix}:approve`, {
-							headers: { "X-Tenant-Id": tenant?.id },
-						}),
-						api.get(`/tenant/user?permission=${permPrefix}:manage`, {
-							headers: { "X-Tenant-Id": tenant?.id },
-						}),
-					]);
+					const { data } = await api.get(`/api/v1/tenants/${tenant?.id}/users`, {
+						params: { page: 1, size: 100 },
+					});
+
+					const items = data?.data?.items || [];
 					return {
-						leaders: resLeader.data.data || [],
-						members: resMember.data.data || [],
+						// NOTE: permission-based filtering is not supported by this endpoint currently.
+						// We return the same list for leaders/members to keep the form usable.
+						leaders: items,
+						members: items,
 					};
 				},
 				enabled: !!tenant?.id, // Only enable if tenantId is available

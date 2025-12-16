@@ -211,12 +211,13 @@ export const useClients = (params: UseClientsParams) => {
 		page = 1,
 		limit = 10,
 	} = params;
+	const safeLimit = Math.min(Math.max(1, limit), 100);
 
 	return useQuery<ClientsResponse>({
 		queryKey: [
 			"clients",
 			tenantId,
-			{ search, status, type, business_type, pkp_status, page, limit },
+			{ search, status, type, business_type, pkp_status, page, limit: safeLimit },
 		],
 		queryFn: async () => {
 			const { data } = await api.get<{
@@ -232,7 +233,7 @@ export const useClients = (params: UseClientsParams) => {
 					business_type,
 					pkp_status,
 					page,
-					size: limit,
+					size: safeLimit,
 				},
 				headers: {
 					"X-Tenant-Id": tenantId,
