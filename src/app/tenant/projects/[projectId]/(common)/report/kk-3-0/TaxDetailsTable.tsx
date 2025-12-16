@@ -202,7 +202,42 @@ export function TaxDetailsTable({ data }: TaxDetailsTableProps) {
 						Showing 1-10 of 100 products
 					</div>
 					<div className="flex items-center gap-2">
-						{/* Add pagination controls here if needed */}
+						<Button
+							variant="ghost"
+							size="sm"
+							className="font-geist text-sm font-medium text-[#404040]"
+						>
+							Previous
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							className="h-9 w-9 border-[#D4D4D4] font-geist text-sm font-medium text-[#0A0A0A]"
+						>
+							1
+						</Button>
+						<Button variant="ghost" size="sm" className="font-geist text-sm font-medium text-[#404040]">
+							2
+						</Button>
+						<Button variant="ghost" size="sm" className="font-geist text-sm font-medium text-[#404040]">
+							3
+						</Button>
+						<Button variant="ghost" size="sm" className="font-geist text-sm font-medium text-[#404040]">
+							4
+						</Button>
+						<Button variant="ghost" size="sm" className="font-geist text-sm font-medium text-[#404040]">
+							...
+						</Button>
+						<Button variant="ghost" size="sm" className="font-geist text-sm font-medium text-[#404040]">
+							10
+						</Button>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="font-geist text-sm font-medium text-[#404040]"
+						>
+							Next
+						</Button>
 					</div>
 				</div>
 			</CardContent>
