@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 export default function SettingsPage() {
 	return (
 		// <div className="flex w-full flex-col gap-[30px] lg:flex-row lg:items-start">
-		<Card className="flex mt-[10px]  p-6 mx-4 flex-col gap-[50px]">
+		<Card className="flex   p-6  flex-col gap-[50px]">
 			{/* Left Column - Main Content */}
 			<div className="flex flex-1 flex-col gap-[30px]">
 				{/* Active Service Section */}

@@ -3,16 +3,16 @@ import { BASTTable } from "./BASTTable";
 import { InvoiceTable } from "./InvoiceTable";
 
 export function KK50Tab() {
-  return (
-    <div className="flex flex-col gap-5">
-      {/* Stats Cards */}
-      <StatsCards />
+	return (
+		<div className="flex w-full flex-col gap-5">
+			{/* Stats Cards */}
+			<StatsCards />
 
-      {/* BAST Table */}
-      <BASTTable />
+			{/* BAST Table */}
+			<BASTTable />
 
-      {/* Invoice Table */}
-      <InvoiceTable />
-    </div>
-  );
+			{/* Invoice Table */}
+			<InvoiceTable />
+		</div>
+	);
 }
