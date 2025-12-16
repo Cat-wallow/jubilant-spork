@@ -167,6 +167,14 @@ const clientFormSchema = z.object({
     pkp_confirmation_description: z.string().optional(),
     pkp_confirmation_number: z.string().optional(),
     pkp_confirmation_date: z.string().optional(),
+
+    // Dynamic other tax documents
+    otherTaxDocuments: z.array(z.object({
+      document_type: z.string().min(1, 'Jenis surat wajib diisi'),
+      document_number: z.string().optional(),
+      document_date: z.string().optional(),
+      description: z.string().optional(),
+    })).default([]),
   }),
 
   // Contacts
@@ -306,6 +314,7 @@ export function CreateClientModalUpdated({
         applicable_taxes: [],
         has_registered_letter: false,
         has_pkp_confirmation: false,
+        otherTaxDocuments: [],
       },
       contacts: [],
       branches: [],
@@ -392,11 +401,9 @@ export function CreateClientModalUpdated({
   // Helper functions for dynamic arrays
   const addContact = () => {
     const currentContacts = watchedValues.contacts || [];
-    // First contact is automatically primary
-    const isPrimary = currentContacts.length === 0;
     setValue('contacts', [
       ...currentContacts,
-      { name: '', position: '', email: '', phone: '', is_primary: isPrimary, is_billing_contact: false }
+      { name: '', position: '', email: '', phone: '', is_primary: false, is_billing_contact: false }
     ]);
   };
 
@@ -437,6 +444,19 @@ export function CreateClientModalUpdated({
       ...currentCoa,
       { account_number: '', account_name: '', account_type: '', description: '' }
     ]);
+  };
+
+  const addOtherTaxDocument = () => {
+    const current = watchedValues.taxInfo?.otherTaxDocuments || [];
+    setValue('taxInfo.otherTaxDocuments', [
+      ...current,
+      { document_type: '', document_number: '', document_date: '', description: '' }
+    ]);
+  };
+
+  const removeOtherTaxDocument = (index: number) => {
+    const current = watchedValues.taxInfo?.otherTaxDocuments || [];
+    setValue('taxInfo.otherTaxDocuments', current.filter((_, i) => i !== index));
   };
 
   const removeCustomCoa = (index: number) => {
@@ -605,6 +625,8 @@ export function CreateClientModalUpdated({
                 },
               ]
             : []),
+          // Include dynamic other tax documents
+          ...(data.taxInfo.otherTaxDocuments || []).filter((doc) => doc.document_type),
         ],
 
         // Legal documents
@@ -901,7 +923,7 @@ export function CreateClientModalUpdated({
                       }}
                       onBlur={field.onBlur}
                       ref={field.ref}
-                      placeholder="50"
+                      placeholder="XX.XXX"
                     />
                   )}
                 />
@@ -1304,6 +1326,74 @@ export function CreateClientModalUpdated({
                     />
                   </div>
                 </div>
+              )}
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Surat Perpajakan Lainnya</Label>
+                <Button type="button" variant="outline" size="sm" onClick={addOtherTaxDocument}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Tambah Surat
+                </Button>
+              </div>
+
+              {watchedValues.taxInfo?.otherTaxDocuments?.map((doc, index) => (
+                <div key={index} className="border rounded-lg p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Surat {index + 1}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeOtherTaxDocument(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Jenis Surat *</Label>
+                      <Input
+                        {...register(`taxInfo.otherTaxDocuments.${index}.document_type`)}
+                        placeholder="Contoh: SPPKP, SKB, dll"
+                      />
+                    </div>
+                    <div>
+                      <Label>Nomor Surat</Label>
+                      <Input
+                        {...register(`taxInfo.otherTaxDocuments.${index}.document_number`)}
+                        placeholder="Nomor surat"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Tanggal Surat</Label>
+                      <Input
+                        type="date"
+                        {...register(`taxInfo.otherTaxDocuments.${index}.document_date`)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Deskripsi</Label>
+                      <Input
+                        {...register(`taxInfo.otherTaxDocuments.${index}.description`)}
+                        placeholder="Keterangan tambahan"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {(!watchedValues.taxInfo?.otherTaxDocuments || watchedValues.taxInfo.otherTaxDocuments.length === 0) && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Belum ada surat perpajakan lainnya. Klik &quot;Tambah Surat&quot; untuk menambahkan.
+                </p>
               )}
             </div>
           </div>
@@ -1832,7 +1922,7 @@ export function CreateClientModalUpdated({
         return (
           <div className="space-y-4">
             <div className="space-y-1">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Upload Dokumen Legal</h3>
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Upload Dokumen Legal *</h3>
             </div>
 
             <div className="space-y-3">

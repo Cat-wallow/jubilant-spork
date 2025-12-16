@@ -843,7 +843,7 @@ export default function EditClientPage() {
                             }}
                             onBlur={field.onBlur}
                             ref={field.ref}
-                            placeholder="0"
+                            placeholder="XX.XXX"
                           />
                         )}
                       />
