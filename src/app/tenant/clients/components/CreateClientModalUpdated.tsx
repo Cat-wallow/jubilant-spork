@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -167,6 +167,14 @@ const clientFormSchema = z.object({
     pkp_confirmation_description: z.string().optional(),
     pkp_confirmation_number: z.string().optional(),
     pkp_confirmation_date: z.string().optional(),
+
+    // Dynamic other tax documents
+    otherTaxDocuments: z.array(z.object({
+      document_type: z.string().min(1, 'Jenis surat wajib diisi'),
+      document_number: z.string().optional(),
+      document_date: z.string().optional(),
+      description: z.string().optional(),
+    })).default([]),
   }),
 
   // Contacts
@@ -231,6 +239,7 @@ const clientFormSchema = z.object({
       .min(1, 'Nomor akun wajib diisi')
       .refine((v) => !/[A-Za-z]/.test(v), 'Nomor akun tidak boleh mengandung huruf'),
     account_name: z.string().min(1, 'Nama akun wajib diisi'),
+    account_type: z.string().min(1, 'Tipe akun wajib dipilih'),
     description: z.string().optional(),
   })).default([]),
 
@@ -259,10 +268,13 @@ interface CreateClientModalUpdatedProps {
 export function CreateClientModalUpdated({
   open,
   onOpenChange,
-  onSubmit
+  onSubmit,
 }: CreateClientModalUpdatedProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [accountTypeOptions, setAccountTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
   const { toast } = useToast();
   const submitIntentRef = useRef(false);
 
@@ -303,6 +315,7 @@ export function CreateClientModalUpdated({
         applicable_taxes: [],
         has_registered_letter: false,
         has_pkp_confirmation: false,
+        otherTaxDocuments: [],
       },
       contacts: [],
       branches: [],
@@ -389,11 +402,9 @@ export function CreateClientModalUpdated({
   // Helper functions for dynamic arrays
   const addContact = () => {
     const currentContacts = watchedValues.contacts || [];
-    // First contact is automatically primary
-    const isPrimary = currentContacts.length === 0;
     setValue('contacts', [
       ...currentContacts,
-      { name: '', position: '', email: '', phone: '', is_primary: isPrimary, is_billing_contact: false }
+      { name: '', position: '', email: '', phone: '', is_primary: false, is_billing_contact: false }
     ]);
   };
 
@@ -432,14 +443,126 @@ export function CreateClientModalUpdated({
     const currentCoa = watchedValues.customCoa || [];
     setValue('customCoa', [
       ...currentCoa,
-      { account_number: '', account_name: '', description: '' }
+      { account_number: '', account_name: '', account_type: '', description: '' }
     ]);
+  };
+
+  const addOtherTaxDocument = () => {
+    const current = watchedValues.taxInfo?.otherTaxDocuments || [];
+    setValue('taxInfo.otherTaxDocuments', [
+      ...current,
+      { document_type: '', document_number: '', document_date: '', description: '' }
+    ]);
+  };
+
+  const removeOtherTaxDocument = (index: number) => {
+    const current = watchedValues.taxInfo?.otherTaxDocuments || [];
+    setValue('taxInfo.otherTaxDocuments', current.filter((_, i) => i !== index));
   };
 
   const removeCustomCoa = (index: number) => {
     const currentCoa = watchedValues.customCoa || [];
     setValue('customCoa', currentCoa.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAccountTypes = async () => {
+      try {
+        const resp = await api.get('project/reference-types', {
+          params: { type: 'ACCOUNT_TYPE' },
+        });
+
+        const data = resp?.data?.data ?? resp?.data ?? [];
+
+        const normalized = Array.isArray(data)
+          ? data
+            .map((item: any) => ({
+              id: String(item?.id ?? item?.name ?? ''),
+              name: String(item?.name ?? item?.description ?? item?.id ?? ''),
+            }))
+            .filter((x: any) => x.id && x.name)
+          : [];
+
+        if (!cancelled) setAccountTypeOptions(normalized);
+      } catch {
+        if (!cancelled) setAccountTypeOptions([]);
+      }
+    };
+
+    const loadCoaTemplates = async () => {
+      try {
+        const resp = await api.get('project/coa-templates');
+        const data = resp?.data?.data ?? resp?.data ?? [];
+
+        const normalized = Array.isArray(data)
+          ? data
+              .map((name: any) => String(name ?? '').trim())
+              .filter((name: string) => !!name)
+              .map((name: string) => ({
+                key: name,
+                label: name,
+              }))
+          : [];
+
+        if (!cancelled) {
+          if (normalized.length > 0) {
+            setCoaTemplateOptions(normalized);
+          } else {
+            setCoaTemplateOptions([
+              { key: 'trading', label: 'Trading' },
+              { key: 'manufacturing', label: 'Manufacturing' },
+              { key: 'services', label: 'Services' },
+              { key: 'construction', label: 'Construction' },
+            ]);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setCoaTemplateOptions([
+            { key: 'trading', label: 'Trading' },
+            { key: 'manufacturing', label: 'Manufacturing' },
+            { key: 'services', label: 'Services' },
+            { key: 'construction', label: 'Construction' },
+          ]);
+        }
+      }
+    };
+
+    const loadBusinessTypes = async () => {
+      try {
+        const resp = await api.get('project/reference-types', {
+          params: { type: 'BUSINESS_TYPE' },
+        });
+
+        const data = resp?.data?.data ?? resp?.data ?? [];
+
+        const normalized = Array.isArray(data)
+          ? data
+              .map((item: any) => ({
+                id: String(item?.id ?? item?.name ?? ''),
+                name: String(item?.name ?? item?.description ?? item?.id ?? ''),
+              }))
+              .filter((x: any) => x.id && x.name)
+          : [];
+
+        if (!cancelled) setBusinessTypeOptions(normalized);
+      } catch {
+        if (!cancelled) setBusinessTypeOptions([]);
+      }
+    };
+
+    if (open) {
+      loadAccountTypes();
+      loadBusinessTypes();
+      loadCoaTemplates();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const addLegalDocument = () => {
     const currentDocs = watchedValues.legalDocuments || [];
@@ -479,6 +602,34 @@ export function CreateClientModalUpdated({
         return;
       }
 
+      {
+        const requiredDocTypeIds = [
+          'akta_pendirian',
+          'nib',
+          'npwp',
+          'surat_pkp',
+          'siup',
+          'izin_usaha',
+          'dokumen_lainnya',
+        ];
+
+        const docs = data.legalDocuments || [];
+        const missing = requiredDocTypeIds.filter((docType) => {
+          const doc = docs.find((d) => d.document_type === docType);
+          return !(doc && (doc.status === 'uploaded' || doc.status === 'not_available'));
+        });
+
+        if (missing.length > 0) {
+          toast({
+            title: 'Dokumen legal belum lengkap',
+            description: 'Setiap dokumen wajib diupload atau pilih "Tidak tersedia".',
+            variant: 'destructive',
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Reset intent immediately to avoid accidental double-submit.
       submitIntentRef.current = false;
 
@@ -515,6 +666,8 @@ export function CreateClientModalUpdated({
                 },
               ]
             : []),
+          // Include dynamic other tax documents
+          ...(data.taxInfo.otherTaxDocuments || []).filter((doc) => doc.document_type),
         ],
 
         // Legal documents
@@ -579,6 +732,33 @@ export function CreateClientModalUpdated({
               : currentStep === 4
                 ? 'legalDocuments'
                 : null;
+
+    if (currentStep === 4) {
+      const requiredDocTypeIds = [
+        'akta_pendirian',
+        'nib',
+        'npwp',
+        'surat_pkp',
+        'siup',
+        'izin_usaha',
+        'dokumen_lainnya',
+      ];
+
+      const docs = watchedValues.legalDocuments || [];
+      const missing = requiredDocTypeIds.filter((docType) => {
+        const doc = docs.find((d) => d.document_type === docType);
+        return !(doc && (doc.status === 'uploaded' || doc.status === 'not_available'));
+      });
+
+      if (missing.length > 0) {
+        toast({
+          title: 'Dokumen legal belum lengkap',
+          description: 'Setiap dokumen wajib diupload atau pilih "Tidak tersedia".',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
 
     const ok = stepField ? await trigger(stepField, { shouldFocus: true } as any) : true;
     if (!ok) {
@@ -650,17 +830,23 @@ export function CreateClientModalUpdated({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="basicInfo.type">Tipe Client *</Label>
-                <Select onValueChange={(value) => setValue('basicInfo.type', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih tipe client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="corporate">Corporate</SelectItem>
-                    <SelectItem value="individual">Individual</SelectItem>
-                    <SelectItem value="government">Government</SelectItem>
-                    <SelectItem value="non_profit">Non-Profit</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  control={control}
+                  name="basicInfo.type"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih tipe client" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="corporate">Corporate</SelectItem>
+                        <SelectItem value="individual">Individual</SelectItem>
+                        <SelectItem value="government">Government</SelectItem>
+                        <SelectItem value="non_profit">Non-Profit</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.basicInfo?.type && (
                   <p className="text-red-500 text-sm">{errors.basicInfo.type.message}</p>
                 )}
@@ -778,7 +964,7 @@ export function CreateClientModalUpdated({
                       }}
                       onBlur={field.onBlur}
                       ref={field.ref}
-                      placeholder="50"
+                      placeholder="XX.XXX"
                     />
                   )}
                 />
@@ -830,10 +1016,29 @@ export function CreateClientModalUpdated({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="basicInfo.business_type">Jenis Usaha</Label>
-                <Input
-                  id="basicInfo.business_type"
-                  {...register('basicInfo.business_type')}
-                  placeholder="Trading"
+                <Controller
+                  control={control}
+                  name="basicInfo.business_type"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih jenis usaha" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {businessTypeOptions.length > 0 ? (
+                          businessTypeOptions.map((opt) => (
+                            <SelectItem key={opt.id} value={opt.name}>
+                              {opt.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="__empty" disabled>
+                            Tidak ada data referensi
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
               </div>
               <div>
@@ -1164,6 +1369,74 @@ export function CreateClientModalUpdated({
                 </div>
               )}
             </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Surat Perpajakan Lainnya</Label>
+                <Button type="button" variant="outline" size="sm" onClick={addOtherTaxDocument}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Tambah Surat
+                </Button>
+              </div>
+
+              {watchedValues.taxInfo?.otherTaxDocuments?.map((doc, index) => (
+                <div key={index} className="border rounded-lg p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Surat {index + 1}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeOtherTaxDocument(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Jenis Surat *</Label>
+                      <Input
+                        {...register(`taxInfo.otherTaxDocuments.${index}.document_type`)}
+                        placeholder="Contoh: SPPKP, SKB, dll"
+                      />
+                    </div>
+                    <div>
+                      <Label>Nomor Surat</Label>
+                      <Input
+                        {...register(`taxInfo.otherTaxDocuments.${index}.document_number`)}
+                        placeholder="Nomor surat"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Tanggal Surat</Label>
+                      <Input
+                        type="date"
+                        {...register(`taxInfo.otherTaxDocuments.${index}.document_date`)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Deskripsi</Label>
+                      <Input
+                        {...register(`taxInfo.otherTaxDocuments.${index}.description`)}
+                        placeholder="Keterangan tambahan"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {(!watchedValues.taxInfo?.otherTaxDocuments || watchedValues.taxInfo.otherTaxDocuments.length === 0) && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Belum ada surat perpajakan lainnya. Klik &quot;Tambah Surat&quot; untuk menambahkan.
+                </p>
+              )}
+            </div>
           </div>
         );
 
@@ -1443,15 +1716,19 @@ export function CreateClientModalUpdated({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Template COA</Label>
-                  <Select onValueChange={(value) => setValue('preferences.coa_template', value)}>
+                  <Select
+                    onValueChange={(value) => setValue('preferences.coa_template', value)}
+                    value={watchedValues.preferences?.coa_template || ''}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih template COA" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="trading">Trading</SelectItem>
-                      <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="construction">Construction</SelectItem>
+                      {coaTemplateOptions.map((opt) => (
+                        <SelectItem key={opt.key} value={opt.key}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -1561,6 +1838,31 @@ export function CreateClientModalUpdated({
                   </div>
 
                   <div>
+                    <Label>Tipe Akun *</Label>
+                    <Controller
+                      control={control}
+                      name={`customCoa.${index}.account_type` as const}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih tipe akun" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {accountTypeOptions.map((opt) => (
+                              <SelectItem key={opt.id} value={opt.name}>
+                                {opt.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.customCoa?.[index]?.account_type && (
+                      <p className="text-red-500 text-sm">{errors.customCoa[index]?.account_type?.message as any}</p>
+                    )}
+                  </div>
+
+                  <div>
                     <Label>Deskripsi</Label>
                     <Textarea
                       {...register(`customCoa.${index}.description`)}
@@ -1665,7 +1967,7 @@ export function CreateClientModalUpdated({
         return (
           <div className="space-y-4">
             <div className="space-y-1">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Upload Dokumen Legal</h3>
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Upload Dokumen Legal *</h3>
             </div>
 
             <div className="space-y-3">

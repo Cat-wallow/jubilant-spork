@@ -34,6 +34,7 @@ interface UseTenantUsersParams {
   permission?: string; // Added permission filter
   page?: number;
   limit?: number;
+  enabled?: boolean;
 }
 
 export const useTenantById = (tenantId: string) => {
@@ -45,41 +46,74 @@ export const useTenantById = (tenantId: string) => {
 };
 
 export const useTenantUsers = (params: UseTenantUsersParams) => {
-  const { tenantId, search, status, permission, page = 1, limit = 10 } = params;
+  const { tenantId, search, status, permission, page = 1, limit = 10, enabled } = params;
+  const safeLimit = Math.min(Math.max(1, limit), 100);
 
   return useQuery<TenantUsersResponse>({
-    queryKey: ['tenantUsers', tenantId, { search, status, permission, page, limit }],
+    queryKey: ['tenantUsers', tenantId, { search, status, permission, page, limit: safeLimit }],
     queryFn: async () => {
-      const { data } = await api.get<any>('/tenant/user', {
+      const { data } = await api.get<{
+        success: boolean;
+        data?: {
+          items?: Array<{
+            id: string;
+            name: string;
+            email: string;
+            role?: string;
+            status?: string;
+            joinedAt?: string;
+          }>;
+          total?: number;
+          page?: number;
+          size?: number;
+        };
+      }>(`/api/v1/tenants/${tenantId}/users`, {
         params: {
           search,
-          status,
-          permission, // Pass permission to API
+          status: status || 'all',
           page,
-          size: limit,
-        },
-        headers: {
-          'X-Tenant-Id': tenantId,
+          size: safeLimit,
+          // NOTE: permission filter is not supported by this endpoint currently.
+          // We keep it in the queryKey for caching but ignore it in request params.
         },
       });
 
-      // Handle response structure: { success: true, data: [...] }
-      const items = Array.isArray(data.data) ? data.data : [];
-      const total = items.length; // Fallback if no total provided
+      const d = data?.data || {};
+      const rawItems = Array.isArray(d.items) ? d.items : [];
 
-      const response: TenantUsersResponse = {
-        items: items,
+      const items: ITenantUser[] = rawItems.map((u) => {
+        const fullName = String(u.name ?? '').trim();
+        const parts = fullName.split(/\s+/).filter(Boolean);
+        const firstName = parts[0] || undefined;
+        const lastName = parts.length > 1 ? parts.slice(1).join(' ') : undefined;
+
+        return {
+          id: String(u.id),
+          email: String(u.email ?? ''),
+          username: fullName || String(u.email ?? ''),
+          name: fullName,
+          first_name: firstName,
+          last_name: lastName,
+          status: String(u.status ?? 'active'),
+          role: typeof u.role === 'string' ? u.role : undefined,
+        };
+      });
+
+      const total = typeof d.total === 'number' ? d.total : items.length;
+      const resolvedPage = typeof d.page === 'number' ? d.page : page;
+      const resolvedLimit = typeof d.size === 'number' ? d.size : safeLimit;
+
+      return {
+        items,
         pagination: {
-          page: page,
-          limit: limit,
-          total: total,
-          totalPages: Math.ceil(total / limit),
+          page: resolvedPage,
+          limit: resolvedLimit,
+          total,
+          totalPages: Math.ceil((total || 0) / (resolvedLimit || 1)),
         },
       };
-
-      return response;
     },
-    enabled: !!tenantId,
+    enabled: typeof enabled === 'boolean' ? enabled : !!tenantId,
     staleTime: 1000 * 60 * 5,
   });
 };

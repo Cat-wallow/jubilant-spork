@@ -18,7 +18,6 @@ import api from "@/lib/api";
 import { MODULES } from "./DetailProjectTab";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenantUsers } from "@/hooks/useTenant"; // New import for fetching tenant users
-import { useQueries } from "@tanstack/react-query"; // New import for fetching multiple queries
 import { User } from "@/types/users";
 
 // Preset due policy options matching design (H+3, H+7, etc.)
@@ -34,12 +33,6 @@ const getModuleStyle = (code: string) => {
 		return { bg: "bg-[#F4F7FE]", textColor: "text-[#332687]" };
 	}
 	return { bg: "bg-[rgba(255,204,0,0.1)]", textColor: "" };
-};
-
-// Helper function for permission prefix, memoized to prevent re-creation
-const cleanCode = (code: string) => {
-	const parts = code.split("_");
-	return parts[0].toLowerCase() + parts[1].split(".")[0];
 };
 
 // Helper to sanitize scope key for form field names (replace dots and spaces)
@@ -65,11 +58,11 @@ export default function ProjectSettingsTab() {
 	useEffect(() => {
 		if (tenant?.id) {
 			api
-				.get("/tenant/report-templates", {
+				.get("/project/report-templates", {
 					headers: { "X-Tenant-Id": tenant.id },
 				})
 				.then((res) => {
-					const templates = res.data.data || [];
+					const templates = res?.data?.data || [];
 					setBastTemplates(
 						templates.filter((t: any) => t.report_type === "BAST"),
 					);
@@ -77,7 +70,11 @@ export default function ProjectSettingsTab() {
 						templates.filter((t: any) => t.report_type === "INVOICE"),
 					);
 				})
-				.catch((err) => console.error("Failed to fetch templates", err));
+				.catch((err) => {
+					setBastTemplates([]);
+					setInvoiceTemplates([]);
+					console.error("Failed to fetch templates", err);
+				});
 		}
 	}, [tenant?.id]); // Added tenant dependency
 
@@ -89,53 +86,35 @@ export default function ProjectSettingsTab() {
 		limit: 100, // Reasonable limit for PMO users
 	});
 
-	const pmoUsers = useMemo(() => pmoUsersData?.items || [], [pmoUsersData]);
+	const pmoUsers = useMemo(
+		() => (pmoUsersData?.items || []).filter((u: any) => u?.role !== "Admin Tenant"),
+		[pmoUsersData],
+	);
 
-	// Fetch users for selected scopes using useQueries
-	const moduleUserQueries = useQueries({
-		queries: selectedScopes.map((scope) => {
-			const permPrefix = cleanCode(scope);
-			return {
-				queryKey: ["moduleUsers", tenant?.id, scope], // Unique query key for each scope
-				queryFn: async () => {
-					const [resLeader, resMember] = await Promise.all([
-						api.get(`/tenant/user?permission=${permPrefix}:approve`, {
-							headers: { "X-Tenant-Id": tenant?.id },
-						}),
-						api.get(`/tenant/user?permission=${permPrefix}:manage`, {
-							headers: { "X-Tenant-Id": tenant?.id },
-						}),
-					]);
-					return {
-						leaders: resLeader.data.data || [],
-						members: resMember.data.data || [],
-					};
-				},
-				enabled: !!tenant?.id, // Only enable if tenantId is available
-				staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-			};
-		}),
+	// Fetch tenant-scoped users once, reuse for all module leader/member dropdowns
+	const { data: tenantUsersData } = useTenantUsers({
+		tenantId: tenant?.id || "",
+		enabled: !!tenant?.id,
+		limit: 100,
 	});
 
-	// Transform the results from useQueries into the moduleUsers format
+	const tenantUsers = useMemo(
+		() => (tenantUsersData?.items || []).filter((u: any) => u?.role !== "Admin Tenant"),
+		[tenantUsersData],
+	);
+
 	const moduleUsers = useMemo(() => {
 		return selectedScopes.reduce(
-			(acc, scope, index) => {
-				const queryResult = moduleUserQueries[index];
-				if (queryResult && queryResult.isSuccess) {
-					acc[scope] = {
-						leaders: queryResult.data.leaders,
-						members: queryResult.data.members,
-					};
-				} else if (queryResult && queryResult.isFetching) {
-					// Optionally handle loading state per scope
-					acc[scope] = { leaders: [], members: [] };
-				}
+			(acc, scope) => {
+				acc[scope] = {
+					leaders: tenantUsers,
+					members: tenantUsers,
+				};
 				return acc;
 			},
 			{} as Record<string, { leaders: any[]; members: any[] }>,
 		);
-	}, [selectedScopes, moduleUserQueries]); // Dependencies for useMemo
+	}, [selectedScopes, tenantUsers]);
 
 	return (
 		<div className="flex items-start gap-[30px] self-stretch">

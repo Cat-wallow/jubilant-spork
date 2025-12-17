@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ColumnDef, Table as TableInstance, flexRender } from '@tanstack/react-table';
+import { ColumnDef, Table as TableInstance, flexRender, Row } from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -18,6 +18,7 @@ interface DataTableProps<TData, TValue> {
   table: TableInstance<TData>;
   isLoading?: boolean;
   isError?: boolean;
+  onRowClick?: (row: Row<TData>) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -25,6 +26,7 @@ export function DataTable<TData, TValue>({
   columns,
   isLoading,
   isError,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   return (
     <div className="space-y-4">
@@ -66,7 +68,19 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : undefined}
+                  onClick={(e) => {
+                    if (!onRowClick) return;
+                    const target = e.target as HTMLElement | null;
+                    if (target?.closest('button, a, input, select, textarea, [data-row-click-disable]')) {
+                      return;
+                    }
+                    onRowClick(row);
+                  }}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

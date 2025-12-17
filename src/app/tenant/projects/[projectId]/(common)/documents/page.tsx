@@ -202,7 +202,7 @@ export default function DocumentsPage() {
 	};
 
 	return (
-		<div className="flex flex-col p-4 gap-[30px]">
+		<div className="flex flex-col gap-[30px]">
 			{/* Header Section */}
 			<div className="flex flex-col gap-[30px] sm:flex-row sm:items-start sm:justify-between">
 				<div className="flex-1">

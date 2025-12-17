@@ -21,10 +21,10 @@ import { useDebounce } from "use-debounce";
 import { getDocumentsForKK1 } from "@/services/document.service";
 import { DataTable } from "@/components/ui/data-table";
 import { DataTableToolbar } from "./components/data-table-toolbar";
-import { columns } from "./components/columns";
-import { TransactionStatus } from "@/types/transaction"; // Assuming TransactionStatus enum is available
+import { columnsAwaiting } from "./components/columns-awaiting";
+import { columnsApproved } from "./components/columns-approved";
+import { TransactionStatus } from "@/types/transaction"; 
 
-// Define the expected structure of a document returned by getDocumentsForKK1
 interface DocumentWithTransaction {
   id: string;
   original_filename: string;
@@ -54,7 +54,6 @@ export default function KK1Page() {
   const [rowSelectionAwaiting, setRowSelectionAwaiting] = useState({});
   const [searchQueryAwaiting, setSearchQueryAwaiting] = useState("");
   const [filterDocumentStatusAwaiting, setFilterDocumentStatusAwaiting] = useState("all");
-  // TransactionStatus.NOT_STARTED implies no transaction created yet
   const [debouncedSearchAwaiting] = useDebounce(searchQueryAwaiting, 400);
 
   // --- QUERY FOR "DOCUMENTS AWAITING TRANSACTION" TABLE (isApproved: false) ---
@@ -67,12 +66,12 @@ export default function KK1Page() {
         limit: paginationAwaiting.pageSize,
         search: debouncedSearchAwaiting,
         documentStatus: filterDocumentStatusAwaiting === "all" ? undefined : filterDocumentStatusAwaiting,
-        isApproved: 'false', // Fetch documents without transaction OR with non-approved transactions
+        isApproved: 'false', 
         sortBy: sortDescriptor?.id,
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
       });
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 
   const documentsAwaiting = (dataAwaiting?.data?.documents || []) as DocumentWithTransaction[];
@@ -80,7 +79,7 @@ export default function KK1Page() {
 
   const tableAwaiting = useReactTable({
     data: documentsAwaiting,
-    columns,
+    columns: columnsAwaiting,
     pageCount: pageCountAwaiting,
     state: {
       pagination: paginationAwaiting,
@@ -122,7 +121,7 @@ export default function KK1Page() {
         limit: paginationApproved.pageSize,
         search: debouncedSearchApproved,
         documentStatus: filterDocumentStatusApproved === "all" ? undefined : filterDocumentStatusApproved,
-        isApproved: 'true', // Fetch documents with approved transactions
+        isApproved: 'true', 
         sortBy: sortDescriptor?.id,
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
       });
@@ -135,7 +134,7 @@ export default function KK1Page() {
 
   const tableApproved = useReactTable({
     data: documentsApproved,
-    columns,
+    columns: columnsApproved,
     pageCount: pageCountApproved,
     state: {
       pagination: paginationApproved,
@@ -162,7 +161,7 @@ export default function KK1Page() {
   const totalValue =
     documentsAwaiting.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0) +
     documentsApproved.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0);
-  const pendingTransactionsCount = dataAwaiting?.data?.total || 0; // Documents awaiting transaction creation
+  const pendingTransactionsCount = dataAwaiting?.data?.total || 0; 
 
   return (
     <div className="flex w-full flex-col gap-7 overflow-x-hidden">
@@ -246,22 +245,19 @@ export default function KK1Page() {
             customFilters={[
               {
                 key: "type",
-                label: "Jenis Dokumen", // This filter might not be relevant here if all are "TRANSAKSI"
-                value: "all", // Hardcoded to 'all' for now as backend forces jenis_dokumen: 'TRANSAKSI'
+                label: "Jenis Dokumen", 
+                value: "all", 
                 options: [
                   { label: "All Type", value: "all" },
-                  // { label: "Invoice", value: "Invoice" }, // Example types
-                  // { label: "Kwitansi", value: "Kwitansi" },
-                  // { label: "Faktur Pajak", value: "Faktur Pajak" },
                 ],
-                onChange: () => {}, // No-op as it's hardcoded
+                onChange: () => {}, 
               },
             ]}
           />
           <div className="mt-6">
             <DataTable
               table={tableAwaiting}
-              columns={columns}
+              columns={columnsAwaiting}
               isLoading={isLoadingAwaiting}
               isError={isErrorAwaiting}
             />
@@ -299,7 +295,7 @@ export default function KK1Page() {
           <div className="mt-6">
             <DataTable
               table={tableApproved}
-              columns={columns}
+              columns={columnsApproved}
               isLoading={isLoadingApproved}
               isError={isErrorApproved}
             />

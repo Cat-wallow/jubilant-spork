@@ -16,8 +16,9 @@ interface AdvancedFiltersProps {
   onSearchQueryChange: (value: string) => void;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
-  typeFilter: string;
-  onTypeFilterChange: (value: string) => void;
+  businessTypeFilter: string;
+  onBusinessTypeFilterChange: (value: string) => void;
+  businessTypeOptions?: Array<{ id: string; name: string }>;
   pkpFilter: string;
   onPkpFilterChange: (value: string) => void;
   onClearFilters: () => void;
@@ -29,14 +30,20 @@ export function AdvancedFilters({
   onSearchQueryChange,
   statusFilter,
   onStatusFilterChange,
-  typeFilter,
-  onTypeFilterChange,
+  businessTypeFilter,
+  onBusinessTypeFilterChange,
+  businessTypeOptions,
   pkpFilter,
   onPkpFilterChange,
   onClearFilters,
   isFetching,
 }: AdvancedFiltersProps) {
-  const hasActiveFilters = statusFilter || typeFilter || pkpFilter || searchQuery;
+  const hasActiveFilters = statusFilter || businessTypeFilter || pkpFilter || searchQuery;
+  const fallbackBusinessTypes = ['Trading', 'Konstruksi', 'Manufaktur', 'Jasa'];
+  const normalizedOptions =
+    businessTypeOptions && businessTypeOptions.length > 0
+      ? businessTypeOptions
+      : fallbackBusinessTypes.map((name) => ({ id: name, name }));
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border bg-card p-4">
@@ -70,18 +77,20 @@ export function AdvancedFilters({
         </Select>
 
         <Select
-          value={typeFilter || 'all'}
-          onValueChange={(value) => onTypeFilterChange(value === 'all' ? '' : value)}
+          value={businessTypeFilter || 'all'}
+          onValueChange={(value) => onBusinessTypeFilterChange(value === 'all' ? '' : value)}
           disabled={isFetching}
         >
           <SelectTrigger className="h-10 w-[140px]">
-            <SelectValue placeholder="All Type" />
+            <SelectValue placeholder="Jenis Usaha" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Type</SelectItem>
-            <SelectItem value="corporate">Konstruksi</SelectItem>
-            <SelectItem value="individual">Trading</SelectItem>
-            <SelectItem value="other">Manufaktur</SelectItem>
+            <SelectItem value="all">All Jenis Usaha</SelectItem>
+            {normalizedOptions.map((opt) => (
+              <SelectItem key={opt.id} value={opt.name}>
+                {opt.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 

@@ -107,7 +107,7 @@ export default function FilePage() {
 	};
 
 	return (
-		<Card className="flex mt-[10px]  p-6 flex-col gap-[50px]">
+		<Card className="flex p-6 flex-col gap-[50px]">
 			{/* Header Section */}
 			<div className="flex items-start justify-between">
 				<div className="flex flex-col">

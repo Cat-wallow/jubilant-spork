@@ -131,8 +131,10 @@ export default function EditClientPage() {
   const { data: branches } = useClientBranches(tenant.id, id);
   const upsertBranchMutation = useUpsertClientBranch();
   const deleteBranchMutation = useDeleteClientBranch();
-  
+
   const [activeTab, setActiveTab] = useState('identity');
+  const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
 
   const [picContact, setPicContact] = useState({
     id: '',
@@ -349,6 +351,75 @@ export default function EditClientPage() {
       }
     }
   }, [client, reset]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadBusinessTypes = async () => {
+      try {
+        const resp = await api.get('project/reference-types', {
+          params: { type: 'BUSINESS_TYPE' },
+        });
+
+        const data = resp?.data?.data ?? resp?.data ?? [];
+        const normalized = Array.isArray(data)
+          ? data
+              .map((item: any) => ({
+                id: String(item?.id ?? item?.name ?? ''),
+                name: String(item?.name ?? item?.description ?? item?.id ?? ''),
+              }))
+              .filter((x: any) => x.id && x.name)
+          : [];
+
+        if (!cancelled) setBusinessTypeOptions(normalized);
+      } catch {
+        if (!cancelled) setBusinessTypeOptions([]);
+      }
+    };
+
+    const loadCoaTemplates = async () => {
+      try {
+        const resp = await api.get('project/coa-templates');
+        const data = resp?.data?.data ?? resp?.data ?? [];
+
+        const normalized = Array.isArray(data)
+          ? data
+              .map((name: any) => String(name ?? '').trim())
+              .filter((name: string) => !!name)
+              .map((name: string) => ({ key: name, label: name }))
+          : [];
+
+        if (!cancelled) {
+          if (normalized.length > 0) {
+            setCoaTemplateOptions(normalized);
+          } else {
+            setCoaTemplateOptions([
+              { key: 'trading', label: 'Trading' },
+              { key: 'manufacturing', label: 'Manufacturing' },
+              { key: 'services', label: 'Services' },
+              { key: 'construction', label: 'Construction' },
+            ]);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setCoaTemplateOptions([
+            { key: 'trading', label: 'Trading' },
+            { key: 'manufacturing', label: 'Manufacturing' },
+            { key: 'services', label: 'Services' },
+            { key: 'construction', label: 'Construction' },
+          ]);
+        }
+      }
+    };
+
+    loadBusinessTypes();
+    loadCoaTemplates();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleAddBranch = () => {
     setBranchesState((prev) => [
@@ -678,8 +749,10 @@ export default function EditClientPage() {
                           <SelectValue placeholder="Pilih tipe" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="corporate">Badan Usaha</SelectItem>
-                          <SelectItem value="individual">Perorangan</SelectItem>
+                          <SelectItem value="corporate">Corporate</SelectItem>
+                          <SelectItem value="individual">Individual</SelectItem>
+                          <SelectItem value="government">Government</SelectItem>
+                          <SelectItem value="non_profit">Non-Profit</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
@@ -808,7 +881,7 @@ export default function EditClientPage() {
                             }}
                             onBlur={field.onBlur}
                             ref={field.ref}
-                            placeholder="0"
+                            placeholder="XX.XXX"
                           />
                         )}
                       />
@@ -874,7 +947,30 @@ export default function EditClientPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="business_type">Jenis Usaha *</Label>
-                    <Input id="business_type" {...register('business_type')} placeholder="Konstruksi" />
+                    <Controller
+                      control={control}
+                      name="business_type"
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih jenis usaha" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {businessTypeOptions.length > 0 ? (
+                              businessTypeOptions.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.name}>
+                                  {opt.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="__empty" disabled>
+                                Tidak ada data referensi
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="business_scale">Skala Bisnis *</Label>
@@ -1403,7 +1499,7 @@ export default function EditClientPage() {
                   <div>
                     <p className="font-medium">Gunakan Template Default</p>
                     <p className="text-sm text-muted-foreground">
-                      Otomatis menggunakan template berdasarkan jenis usaha: {watch('business_type') || 'Trading'}
+                      Otomatis menggunakan template berdasarkan jenis usaha: {watch('business_type') || '-'}
                     </p>
                     {watch('use_default_coa') && (
                       <div className="flex items-center gap-2 mt-2">
@@ -1435,11 +1531,11 @@ export default function EditClientPage() {
                         <SelectValue placeholder="Pilih template COA..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="trading">Trading COA Template</SelectItem>
-                        <SelectItem value="manufacturing">Manufacturing COA Template</SelectItem>
-                        <SelectItem value="services">Services COA Template</SelectItem>
-                        <SelectItem value="construction">Construction COA Template</SelectItem>
-                        <SelectItem value="retail">Retail COA Template</SelectItem>
+                        {coaTemplateOptions.map((opt) => (
+                          <SelectItem key={opt.key} value={opt.key}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

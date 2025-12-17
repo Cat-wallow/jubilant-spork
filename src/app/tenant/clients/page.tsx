@@ -1,12 +1,14 @@
+
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary } from '@/hooks/useClients';
+import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary, useTerminateClient } from '@/hooks/useClients';
 import { useAuth } from '@/contexts/AuthContext';
+import api from '@/lib/api';
 import { SummaryCards } from './components/SummaryCards';
 import { AdvancedFilters } from './components/AdvancedFilters';
 import { CreateClientModalUpdated } from './components/CreateClientModalUpdated';
@@ -38,6 +40,7 @@ import {
   Search,
   Eye,
   Building2,
+  Ban,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -192,19 +195,52 @@ export default function ClientsPage() {
   const { toast } = useToast();
   const createClientMutation = useCreateClient();
   const deleteClientMutation = useDeleteClient();
+  const terminateClientMutation = useTerminateClient();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
-  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [businessTypeFilter, setBusinessTypeFilter] = useState<string>('');
   const [pkpFilter, setPkpFilter] = useState<string>('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadBusinessTypes = async () => {
+      try {
+        const resp = await api.get('project/reference-types', {
+          params: { type: 'BUSINESS_TYPE' },
+        });
+
+        const data = resp?.data?.data ?? resp?.data ?? [];
+        const normalized = Array.isArray(data)
+          ? data
+              .map((item: any) => ({
+                id: String(item?.id ?? item?.name ?? ''),
+                name: String(item?.name ?? item?.description ?? item?.id ?? ''),
+              }))
+              .filter((x: any) => x.id && x.name)
+          : [];
+
+        if (!cancelled) setBusinessTypeOptions(normalized);
+      } catch {
+        if (!cancelled) setBusinessTypeOptions([]);
+      }
+    };
+
+    loadBusinessTypes();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const { data, isLoading, isFetching, error } = useClients({
     tenantId: tenant.id,
     search: debouncedSearchQuery,
     status: statusFilter,
-    type: typeFilter,
+    business_type: businessTypeFilter,
     pkp_status: pkpFilter,
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
@@ -242,16 +278,11 @@ export default function ClientsPage() {
         },
       },
       {
-        accessorKey: 'type',
+        accessorKey: 'business_type',
         header: 'Jenis Usaha',
         cell: ({ row }) => {
-          const type = row.getValue('type') as string;
-          const typeLabels = {
-            corporate: 'Konstruksi',
-            individual: 'Trading',
-            other: 'Manufaktur',
-          };
-          return typeLabels[type as keyof typeof typeLabels] || type;
+          const businessType = row.getValue('business_type') as string | null | undefined;
+          return businessType || '-';
         },
       },
       {
@@ -282,6 +313,45 @@ export default function ClientsPage() {
         cell: ({ row }) => (
           <span className="text-sm font-medium">{row.original.active_projects || 0}</span>
         ),
+      },
+      {
+        accessorKey: 'project_fiscal_year',
+        header: 'Masa Pajak / Volume',
+        cell: ({ row }) => {
+          const fy = row.original.project_fiscal_year;
+          const volRaw = row.original.project_volume as any;
+          const volNum = typeof volRaw === 'number' ? volRaw : volRaw ? Number(volRaw) : null;
+          const vol = volNum && !Number.isNaN(volNum)
+            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(volNum)
+            : '-';
+
+          return (
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{fy ? `FY ${fy}` : '-'}</span>
+              <span className="text-xs text-muted-foreground">{vol}</span>
+            </div>
+          );
+        },
+      },
+      {
+        id: 'work_period',
+        header: 'Periode Pengerjaan',
+        cell: ({ row }) => {
+          const start = row.original.project_start_date;
+          const end = row.original.project_end_date;
+          if (!start && !end) return <span className="text-sm text-muted-foreground">-</span>;
+
+          const startStr = start
+            ? new Date(start).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+            : '-';
+          const endStr = end
+            ? new Date(end).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+            : '-';
+
+          return (
+            <span className="text-sm">{startStr} - {endStr}</span>
+          );
+        },
       },
       {
         accessorKey: 'updated_at',
@@ -341,6 +411,36 @@ export default function ClientsPage() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                className="text-orange-600 cursor-pointer"
+                onClick={() => {
+                  if (confirm('Putus kerja sama akan menghentikan semua project client dan mengubah status client menjadi Non Aktif. Lanjutkan?')) {
+                    terminateClientMutation.mutate(
+                      { tenantId: tenant.id, id: row.original.id },
+                      {
+                        onSuccess: () => {
+                          toast({
+                            title: 'Berhasil',
+                            description: 'Kerja sama client berhasil diputus',
+                          });
+                        },
+                        onError: (error: any) => {
+                          const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
+                          toast({
+                            title: 'Gagal',
+                            description: errorMessage,
+                            variant: 'destructive',
+                          });
+                        },
+                      }
+                    );
+                  }
+                }}
+              >
+                <Ban className="mr-2 h-4 w-4" />
+                Putus Kerja Sama
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
                 onClick={() => {
                   if (confirm('Are you sure you want to delete this client?')) {
@@ -359,7 +459,7 @@ export default function ClientsPage() {
         ),
       },
     ],
-    [deleteClientMutation, tenant.id]
+    [deleteClientMutation, terminateClientMutation, tenant.id]
   );
 
   const clients = data?.items || [];
@@ -388,7 +488,7 @@ export default function ClientsPage() {
   const handleClearFilters = () => {
     setSearchQuery('');
     setStatusFilter('');
-    setTypeFilter('');
+    setBusinessTypeFilter('');
     setPkpFilter('');
   };
 
@@ -459,8 +559,9 @@ export default function ClientsPage() {
             onSearchQueryChange={setSearchQuery}
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
-            typeFilter={typeFilter}
-            onTypeFilterChange={setTypeFilter}
+            businessTypeFilter={businessTypeFilter}
+            onBusinessTypeFilterChange={setBusinessTypeFilter}
+            businessTypeOptions={businessTypeOptions}
             pkpFilter={pkpFilter}
             onPkpFilterChange={setPkpFilter}
             onClearFilters={handleClearFilters}
@@ -475,6 +576,7 @@ export default function ClientsPage() {
             columns={columns}
             isLoading={isLoading || isFetching}
             isError={!!error}
+            onRowClick={(row) => router.push(`/tenant/clients/${(row as any).original.id}`)}
           />
         </div>
       </div>
