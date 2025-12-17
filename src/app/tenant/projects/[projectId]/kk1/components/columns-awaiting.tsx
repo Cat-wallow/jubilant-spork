@@ -31,13 +31,6 @@ export const columnsAwaiting: ColumnDef<DocumentTransaction>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'jenis_dokumen',
-    header: ({ column }) => <DataTableColumnHeader className='text-nowrap' column={column} title="Jenis Dokumen" />,
-    cell: ({ row }) => {
-        return <span className="capitalize">{row.original.jenis_dokumen || '-'}</span>;
-    },
-  },
-  {
     accessorKey: 'nomor_dokumen',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nomor Dokumen" />,
     cell: ({ row }) => {
@@ -50,6 +43,13 @@ export const columnsAwaiting: ColumnDef<DocumentTransaction>[] = [
             </Link>
         );
     }
+  },
+  {
+    accessorKey: 'jenis_dokumen',
+    header: ({ column }) => <DataTableColumnHeader className='text-nowrap' column={column} title="Jenis Dokumen" />,
+    cell: ({ row }) => {
+        return <span className="capitalize">{row.original.jenis_dokumen || '-'}</span>;
+    },
   },
   {
     accessorKey: 'document_date',

@@ -234,6 +234,7 @@ export default function KK1AddPage() {
       toast.success("Transaction created successfully.");
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
       queryClient.invalidateQueries({ queryKey: ['documentsForKK1', projectId] });
+      router.push(`/tenant/projects/${projectId}/kk1`);
     },
     onError: (error: any) => {
       toast.error("Failed to create transaction.", {
@@ -271,6 +272,7 @@ export default function KK1AddPage() {
       toast.success("Transaction updated successfully.");
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
       queryClient.invalidateQueries({ queryKey: ['documentsForKK1', projectId] });
+      router.push(`/tenant/projects/${projectId}/kk1`);
     },
     onError: (error: any) => {
       toast.error("Failed to update transaction.", {

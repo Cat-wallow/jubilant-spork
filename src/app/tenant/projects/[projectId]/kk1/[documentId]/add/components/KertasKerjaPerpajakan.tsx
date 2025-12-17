@@ -97,6 +97,10 @@ export default function KertasKerjaPerpajakan({
 		);
 	};
 
+	const handleFileClick = (url: string) => {
+		window.open(url, "_blank");
+	};
+
 	return (
 		<Card className="flex-1 rounded-xl border p-5">
 			<div className="mb-5 flex items-center justify-between">
@@ -221,7 +225,8 @@ export default function KertasKerjaPerpajakan({
 						{taxProofFiles.map((file: any, fileIndex: number) => (
 							<div
 								key={file.id || fileIndex}
-								className="flex items-center justify-between rounded-md border p-2 bg-white"
+								onClick={() => handleFileClick(file.file_url)}
+								className="flex items-center justify-between cursor-pointer rounded-md border p-2 bg-white"
 							>
 								<div className="flex items-center gap-2">
 									<FileText className="h-4 w-4 text-blue-500" />
@@ -253,13 +258,17 @@ export default function KertasKerjaPerpajakan({
 						accept: {
 							"image/*": [],
 							"application/pdf": [],
+							"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [],
+							"text/csv": [],
+							"application/vnd.ms-excel": [],
 						},
 					}}
 					texts={{
 						title: "Klik atau drag & drop file di sini",
 						subtitle: "Upload bukti potong/setor pajak",
-						fileTypes: "PDF, JPG, PNG (Max 5MB)",
+						fileTypes: "PDF, JPG, PNG, XLSX, CSV (Max 5MB)",
 					}}
+
 				/>
 
 				{errors.tax_proof_files && isAnyTaxInputFilled && (
