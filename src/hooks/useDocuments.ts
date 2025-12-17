@@ -254,12 +254,7 @@ export const useUploadDocuments = () => {
       formData.append('tipe_dokumen', payload.tipeDokumen);
       formData.append('currentTenantId', tenantId);
       formData.append('currentUserId', userId);
-<<<<<<< HEAD
-
-=======
       if (payload.bundleId) formData.append('bundleId', payload.bundleId);
-      
->>>>>>> 1ad73411a21f1bbf23bc2a273e06b3ec9ee8e8f5
       if (payload.nomorDokumen) formData.append('nomor_dokumen', payload.nomorDokumen);
       if (payload.documentDate) formData.append('document_date', payload.documentDate);
       if (payload.jumlahLembar) formData.append('jumlah_lembar', payload.jumlahLembar.toString());
