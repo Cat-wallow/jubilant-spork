@@ -10,8 +10,7 @@ import{ format} from 'date-fns/format';
 import Link from 'next/link';
 import { Kk1ActionsMenu } from './Kk1ActionsMenu';
 
-
-export const columns: ColumnDef<DocumentTransaction>[] = [
+export const columnsApproved: ColumnDef<DocumentTransaction>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -39,7 +38,7 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
     cell: ({ row }) => {
       const trxNumber = row.original.transaction?.transaction_number;
 
-      if (!trxNumber) return null;
+      if (!trxNumber) return <span>-</span>;
 
       return (
         <Link href={`/tenant/projects/${row.original.project_id}/kk1/${row.original.id}/add`}>
@@ -54,7 +53,7 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
     accessorKey: 'transaction_date',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tanggal" />,
     cell: ({ row }) => {
-      // Use transaction date if available, otherwise document date
+      // Use transaction date
       const dateStr = row.original.transaction?.transaction_date || row.original.document_date;
       if (!dateStr) return <span>-</span>;
       try {
@@ -65,16 +64,14 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
     },
   },
   {
-    accessorKey: 'document_type',
-    header: ({ column }) => <DataTableColumnHeader className='text-nowrap' column={column} title="Jenis" />,
+    accessorKey: 'jenis_dokumen',
+    header: ({ column }) => <DataTableColumnHeader className='text-nowrap' column={column} title="Jenis Dokumen" />,
     cell: ({ row }) => {
         return <span className="capitalize">{row.original.jenis_dokumen || '-'}</span>;
     },
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: 'document_number',
+    accessorKey: 'nomor_dokumen',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nomor Dokumen" />,
     cell: ({ row }) => {
         return <span>{row.original.nomor_dokumen || '-'}</span>;
@@ -82,14 +79,14 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
   },
   {
     accessorKey: 'currency',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="currency" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Currency" />,
     cell: ({ row }) => {
-        return <span>{row.original.transaction?.currency || '-'}</span>;
+        return <span>{row.original.transaction?.currency || 'IDR'}</span>;
     }
   },
   {
     accessorKey: 'amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Jumlah" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
     cell: ({ row }) => {
       const amount = row.original.transaction?.amount;
       if (amount === undefined || amount === null) return <span>-</span>;
@@ -99,14 +96,6 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       }).format(amount);
-    }
-  },
-  {
-    accessorKey: 'description',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Deskripsi" />,
-    cell: ({ row }) => {
-        // Prefer transaction description, fallback to document description
-        return <span>{row.original.transaction?.description || row.original.description || row.original.original_filename}</span>
     }
   },
   {
@@ -123,18 +112,9 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
           statusColorClass = 'bg-[#D1FAE5] text-[#065F46] border-[#6EE7B7]';
           label = "Approved";
           break;
-        case TransactionStatus.SUBMITTED:
-          statusColorClass = 'bg-[#FEF3C7] text-[#92400E] border-[#FCD34D]';
-          label = "Reviewed";
-          break;
-        case TransactionStatus.IN_PROGRESS:
-          statusColorClass = 'bg-[#DBEAFE] text-[#1E40AF] border-[#93C5FD]';
-          label = "In Progress";
-          break;
-        case TransactionStatus.NOT_STARTED:
         default:
           statusColorClass = 'bg-gray-100 text-gray-800 border-gray-300';
-          label = "Pending"; // Or "Draft"
+          label = status.replace(/_/g, ' ');
           break;
       }
       return (
@@ -147,7 +127,6 @@ export const columns: ColumnDef<DocumentTransaction>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      // Pass the whole object, Kk1ActionsMenu needs to adapt
       return (
         <Kk1ActionsMenu data={row.original}/>
       );

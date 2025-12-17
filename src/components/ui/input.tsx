@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export interface InputProps
 	extends React.InputHTMLAttributes<HTMLInputElement> {
-	variant?: "idr" | "";
+	variant?: "idr" | "" | "usd";
 }
 
 const formatIDR = (value: number) => {
@@ -11,6 +11,14 @@ const formatIDR = (value: number) => {
 		style: "currency",
 		currency: "IDR",
 		minimumFractionDigits: 0,
+	}).format(value);
+};
+
+const formatUSD = (value: number) => {
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "USD",
+		minimumFractionDigits: 2,
 	}).format(value);
 };
 
@@ -28,30 +36,35 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 		// Sinkronisasi value dari luar (React Hook Form) → ke displayValue
 		React.useEffect(() => {
-			if (variant === "idr") {
+			if (variant === "idr" || variant === "usd") {
 				if (value === undefined || value === null || value === "") {
 					setDisplayValue("");
 				} else {
 					const numValue = typeof value === "string" ? Number(value) : value;
 					if (!isNaN(numValue) && numValue > 0) {
-						setDisplayValue(formatIDR(numValue));
+						setDisplayValue(
+							variant === "idr" ? formatIDR(numValue) : formatUSD(numValue),
+						);
 					}
 				}
 			}
 		}, [value, variant]);
 
-		// =============== IDR Variant ===============
-		if (variant === "idr") {
+		// =============== IDR OR USD Variant ===============
+		if (variant === "idr" || variant === "usd") {
 			const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 				const raw = onlyNumber(e.target.value);
 				const numValue = raw ? Number(raw) : 0;
 
-				// Tampilkan format IDR di input visual
-				setDisplayValue(raw ? formatIDR(numValue) : "");
+				setDisplayValue(
+					raw
+						? variant === "idr"
+							? formatIDR(numValue)
+							: formatUSD(numValue)
+						: "",
+				);
 
-				// Update hidden input value
 				if (hiddenInputRef.current) {
-					// Set value as NUMBER for React Hook Form
 					const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
 						window.HTMLInputElement.prototype,
 						"value",
@@ -61,11 +74,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						nativeInputValueSetter.call(hiddenInputRef.current, raw);
 					}
 
-					// Dispatch input event untuk trigger React Hook Form
 					const event = new Event("input", { bubbles: true });
 					hiddenInputRef.current.dispatchEvent(event);
 
-					// Trigger onChange dari React Hook Form jika ada
 					if (onChange) {
 						const syntheticEvent = {
 							...e,
@@ -80,7 +91,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 			return (
 				<>
-					{/* Hidden input untuk React Hook Form - ini yang di-register */}
+					{/* Hidden input (RHF) */}
 					<input
 						type="number"
 						ref={hiddenInputRef}
@@ -91,7 +102,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						aria-hidden="true"
 					/>
 
-					{/* Visible input untuk user */}
+					{/* Visible input */}
 					<input
 						type="text"
 						className={cn(
@@ -101,11 +112,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						value={displayValue}
 						onChange={handleChange}
 						{...props}
-						name={undefined} // Jangan pass name ke visible input
+						name={undefined}
 					/>
 				</>
 			);
-		}
+}
+
 
 		// =============== Default Variant ===============
 		return (

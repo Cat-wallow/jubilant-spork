@@ -43,12 +43,12 @@ export function Kk1ActionsMenu({ data }: Kk1ActionsMenuProps) {
   const revertMutation = useMutation({
     mutationFn: (id: string) => revertApproval(id),
     onSuccess: () => {
-      toast({ title: "Success", description: "Approval pulled successfully." });
+      toast.success("Approval pulled successfully.");
       setIsPullApprovalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["documentsForKK1", projectId] });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error("Failed to pull approval.");
     }
   });
 
