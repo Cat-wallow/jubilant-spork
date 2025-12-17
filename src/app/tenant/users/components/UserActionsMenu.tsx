@@ -44,6 +44,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { User } from '@/types/users';
 import { toast } from 'sonner';
 
+interface Role {
+  id: string;
+  name: string;
+  level?: number;
+}
+
 interface UserActionsMenuProps {
   tenantId: string;
   user: User;
