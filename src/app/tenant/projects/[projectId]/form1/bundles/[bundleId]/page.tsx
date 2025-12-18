@@ -33,13 +33,17 @@ export default function FormOneBundleDetailPage() {
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [files, setFiles] = useState<File[] | null>(null);
-  const [jenisDokumen, setJenisDokumen] = useState('');
   const [tipeDokumen, setTipeDokumen] = useState('');
+  const [jenisDokumen, setJenisDokumen] = useState('');
   const [nomorDokumen, setNomorDokumen] = useState('');
   const [documentDate, setDocumentDate] = useState('');
   const [jumlahLembar, setJumlahLembar] = useState<number>(1);
   const [docStatus, setDocStatus] = useState<'digital' | 'asli' | 'copy'>('digital');
-  const [description, setDescription] = useState('');
+  const [adminPicKlien, setAdminPicKlien] = useState('');
+  const [divisi, setDivisi] = useState('');
+  const [posisiDokumenAsli, setPosisiDokumenAsli] = useState('');
+  const [noUrutSortiran, setNoUrutSortiran] = useState('');
+  const [catatan, setCatatan] = useState('');
 
   const uploadMutation = useUploadDocuments();
 
@@ -70,13 +74,17 @@ export default function FormOneBundleDetailPage() {
 
   const resetUploadForm = () => {
     setFiles(null);
-    setJenisDokumen('');
     setTipeDokumen('');
+    setJenisDokumen('');
     setNomorDokumen('');
     setDocumentDate('');
     setJumlahLembar(1);
     setDocStatus('digital');
-    setDescription('');
+    setAdminPicKlien('');
+    setDivisi('');
+    setPosisiDokumenAsli('');
+    setNoUrutSortiran('');
+    setCatatan('');
   };
 
   const handleUpload = async () => {
@@ -88,8 +96,24 @@ export default function FormOneBundleDetailPage() {
       toast.error('Pilih file dokumen dulu.');
       return;
     }
-    if (!jenisDokumen.trim() || !tipeDokumen.trim()) {
-      toast.error('Jenis Dokumen dan Tipe Dokumen wajib diisi.');
+    if (!tipeDokumen.trim() || !jenisDokumen.trim()) {
+      toast.error('Tipe Dokumen dan Jenis Dokumen wajib diisi.');
+      return;
+    }
+    if (!nomorDokumen.trim() || !documentDate) {
+      toast.error('Nomor Dokumen dan Tanggal Dokumen wajib diisi.');
+      return;
+    }
+    if (!jumlahLembar || jumlahLembar < 1) {
+      toast.error('Jumlah lembar minimal 1.');
+      return;
+    }
+    if (!adminPicKlien.trim() || !divisi.trim() || !posisiDokumenAsli.trim()) {
+      toast.error('Informasi administrasi wajib diisi.');
+      return;
+    }
+    if (!catatan.trim()) {
+      toast.error('Catatan wajib diisi.');
       return;
     }
 
@@ -100,13 +124,17 @@ export default function FormOneBundleDetailPage() {
         userId,
         payload: {
           files,
-          jenisDokumen: jenisDokumen.trim(),
           tipeDokumen: tipeDokumen.trim(),
-          nomorDokumen: nomorDokumen.trim() || undefined,
-          documentDate: documentDate || undefined,
+          jenisDokumen: jenisDokumen.trim(),
+          nomorDokumen: nomorDokumen.trim(),
+          documentDate,
           jumlahLembar,
           status: docStatus,
-          description: description.trim() || undefined,
+          description: catatan.trim(),
+          adminPicKlien: adminPicKlien.trim(),
+          divisi: divisi.trim(),
+          posisiDokumenAsli: posisiDokumenAsli.trim(),
+          noUrutSortiran: noUrutSortiran.trim() || undefined,
           bundleId,
         },
       });
@@ -321,65 +349,140 @@ export default function FormOneBundleDetailPage() {
       }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Tambah Dokumen ke Bundle</DialogTitle>
-            <DialogDescription>Upload dokumen dan masukkan metadata minimal untuk Form 1.0</DialogDescription>
+            <DialogTitle>Tambah Dokumen Baru</DialogTitle>
+            <DialogDescription>Tambahkan dokumen baru ke dengan mengisi informasi di bawah ini</DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <Label>File Dokumen</Label>
-              <div className="mt-2">
-                <FileUploader
-                  value={files}
-                  onValueChange={setFiles}
-                  dropzoneOptions={{ multiple: true }}
-                  texts={{ title: 'Klik atau drag file', fileTypes: 'PDF/JPG/PNG' }}
-                />
-              </div>
-            </div>
+          <div className="space-y-4">
+            <Card className="border rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-base">Informasi Dokumen</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <Label>Tipe Dokumen</Label>
+                  <Select value={tipeDokumen} onValueChange={setTipeDokumen}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Tipe Dokumen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dokumen Transaksi">Dokumen Transaksi</SelectItem>
+                      <SelectItem value="Dokumen Pendukung Transaksi">Dokumen Pendukung Transaksi</SelectItem>
+                      <SelectItem value="Dokumen Komunikasi Bisnis">Dokumen Komunikasi Bisnis</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div>
-              <Label>Jenis Dokumen</Label>
-              <Input value={jenisDokumen} onChange={(e) => setJenisDokumen(e.target.value)} placeholder="Invoice / Sales Order / ..." />
-            </div>
-            <div>
-              <Label>Tipe Dokumen</Label>
-              <Input value={tipeDokumen} onChange={(e) => setTipeDokumen(e.target.value)} placeholder="Dokumen Transaksi / ..." />
-            </div>
-            <div>
-              <Label>Nomor Dokumen</Label>
-              <Input value={nomorDokumen} onChange={(e) => setNomorDokumen(e.target.value)} placeholder="PO-2023-..." />
-            </div>
-            <div>
-              <Label>Tanggal Dokumen</Label>
-              <Input type="date" value={documentDate} onChange={(e) => setDocumentDate(e.target.value)} />
-            </div>
-            <div>
-              <Label>Jumlah Lembar</Label>
-              <Input
-                type="number"
-                min={1}
-                value={jumlahLembar}
-                onChange={(e) => setJumlahLembar(Math.max(1, parseInt(e.target.value || '1', 10)))}
-              />
-            </div>
-            <div>
-              <Label>Status</Label>
-              <Select value={docStatus} onValueChange={(v) => setDocStatus(v as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Digital" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="digital">Digital</SelectItem>
-                  <SelectItem value="asli">Asli</SelectItem>
-                  <SelectItem value="copy">Copy</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="md:col-span-2">
-              <Label>Deskripsi (opsional)</Label>
-              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Keterangan tambahan..." />
-            </div>
+                <div className="md:col-span-2">
+                  <Label>Jenis Dokumen</Label>
+                  <Select value={jenisDokumen} onValueChange={setJenisDokumen}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Jenis Dokumen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Invoice">Invoice</SelectItem>
+                      <SelectItem value="Purchase Order">Purchase Order</SelectItem>
+                      <SelectItem value="Sales Order">Sales Order</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Nomor Dokumen *</Label>
+                  <Input value={nomorDokumen} onChange={(e) => setNomorDokumen(e.target.value)} placeholder="Masukan nomor" />
+                </div>
+                <div>
+                  <Label>Tanggal Dokumen *</Label>
+                  <Input type="date" value={documentDate} onChange={(e) => setDocumentDate(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Jumlah Lembar *</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={jumlahLembar}
+                    onChange={(e) => setJumlahLembar(Math.max(1, parseInt(e.target.value || '1', 10)))}
+                    placeholder="Masukan jumlah lembar"
+                  />
+                </div>
+                <div>
+                  <Label>Asli/Copy/Digital *</Label>
+                  <Select value={docStatus} onValueChange={(v) => setDocStatus(v as any)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih dokumen asal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="asli">Asli</SelectItem>
+                      <SelectItem value="copy">Copy</SelectItem>
+                      <SelectItem value="digital">Digital</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label>Lampiran Dokumen</Label>
+                  <div className="mt-2">
+                    <FileUploader
+                      value={files}
+                      onValueChange={setFiles}
+                      dropzoneOptions={{ multiple: true }}
+                      texts={{ title: 'Choose File', subtitle: '', fileTypes: 'JPG, PNG, PDF' }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-base">Informasi Administrasi</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Label>Admin (PIC) Klien *</Label>
+                  <Input
+                    value={adminPicKlien}
+                    onChange={(e) => setAdminPicKlien(e.target.value)}
+                    placeholder="Masukan nama admin/PIC dari Klien"
+                  />
+                </div>
+                <div>
+                  <Label>Divisi *</Label>
+                  <Input value={divisi} onChange={(e) => setDivisi(e.target.value)} placeholder="Divisi" />
+                </div>
+                <div>
+                  <Label>Posisi Dokumen Asli *</Label>
+                  <Input
+                    value={posisiDokumenAsli}
+                    onChange={(e) => setPosisiDokumenAsli(e.target.value)}
+                    placeholder="Lemari A-1, dll"
+                  />
+                </div>
+                <div>
+                  <Label>No Urut Sortiran dari Klien</Label>
+                  <Input
+                    value={noUrutSortiran}
+                    onChange={(e) => setNoUrutSortiran(e.target.value)}
+                    placeholder="Opsional - otomatis jika dikosongkan"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-base">Informasi Tambahan</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Label>Catatan *</Label>
+                <Input
+                  value={catatan}
+                  onChange={(e) => setCatatan(e.target.value)}
+                  placeholder="Deskripsi catatan"
+                  className="h-24"
+                />
+              </CardContent>
+            </Card>
           </div>
 
           <DialogFooter>
@@ -391,7 +494,7 @@ export default function FormOneBundleDetailPage() {
               disabled={uploadMutation.isPending}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {uploadMutation.isPending ? 'Mengupload...' : 'Tambah Dokumen'}
+              {uploadMutation.isPending ? 'Mengupload...' : 'Upload Dokumen'}
             </Button>
           </DialogFooter>
         </DialogContent>

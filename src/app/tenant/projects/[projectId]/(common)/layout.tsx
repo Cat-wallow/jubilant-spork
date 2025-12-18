@@ -3,10 +3,9 @@
 import { useParams, useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-
-const projectData = {
-	name: "Konsultasi Pajak PT Maju Bersama",
-};
+import { useQuery } from "@tanstack/react-query";
+import { getProjectById } from "@/services/project.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const projectTabs = [
 	{ label: "Ringkasan", path: "summary" },
@@ -32,13 +31,32 @@ export default function CommonProjectLayout({
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const { data: project, isLoading: isProjectLoading } = useQuery({
+		queryKey: ["project", projectId],
+		queryFn: () => getProjectById(projectId),
+		enabled: !!projectId,
+	});
+
 	const currentTab = pathname.split("/").pop() ?? "summary";
 
 	return (
 		<div className="flex w-full flex-col gap-6 justify-center px-2">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h1 className="font-dm text-[34px] font-bold">{projectData.name}</h1>
+				<div className="flex flex-col">
+					{isProjectLoading ? (
+						<Skeleton className="h-10 w-[420px]" />
+					) : (
+						<h1 className="font-dm text-[34px] font-bold">
+							{project?.name || `Project ${projectId}`}
+						</h1>
+					)}
+					{project?.code && (
+						<span className="font-dm text-[22px] text-muted-foreground">
+							{project.code}
+						</span>
+					)}
+				</div>
 			</div>
 
 			<Tabs

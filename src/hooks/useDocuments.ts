@@ -88,7 +88,7 @@ export interface DocumentsResponse {
 }
 
 export interface UploadDocumentPayload {
-  files: File[];
+  files?: File[];
   jenisDokumen: string;
   tipeDokumen: string;
   nomorDokumen?: string;
@@ -247,7 +247,7 @@ export const useUploadDocuments = () => {
     }) => {
       const formData = new FormData();
 
-      payload.files.forEach((file) => {
+      payload.files?.forEach((file) => {
         formData.append('files', file);
       });
       formData.append('jenis_dokumen', payload.jenisDokumen);
