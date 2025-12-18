@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import NavLink from "@/components/link/NavLink";
 import DashIcon from "@/components/icons/DashIcon";
 import RBAC from "@/components/rbac/RBAC";
+import type { IRoute } from "@/types/navigation";
 
 interface SubMenuItem {
 	name: string;
@@ -20,7 +21,7 @@ const subMenuItems: SubMenuItem[] = [
 	{ name: "Semua KK 5.0", path: "kk-5" },
 ];
 
-export const SidebarLinks = (props: { routes: RoutesType[]; isCollapsed?: boolean }): JSX.Element => {
+export const SidebarLinks = (props: { routes: IRoute[]; isCollapsed?: boolean }) => {
 	const pathname = usePathname();
 	const { routes, isCollapsed } = props;
 	const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(
@@ -49,7 +50,7 @@ export const SidebarLinks = (props: { routes: RoutesType[]; isCollapsed?: boolea
 		isExpanded,
 		hasCollapse,
 	}: {
-		route: RoutesType;
+		route: IRoute;
 		isActive: boolean;
 		isExpanded: boolean;
 		hasCollapse: boolean;
@@ -106,11 +107,11 @@ export const SidebarLinks = (props: { routes: RoutesType[]; isCollapsed?: boolea
 		</div>
 	);
 
-	const createLinks = (routes: RoutesType[]) => {
+	const createLinks = (routes: IRoute[]) => {
 		return routes.map((route, index) => {
 			const isActive = activeRoute(route.path);
 			const isExpanded = expandedMenus[route.path];
-			const hasCollapse = route.collapsible;
+			const hasCollapse = route.collapsible ?? route.collapse;
 
 			if (
 				route.layout === "/admin" ||

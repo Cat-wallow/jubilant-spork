@@ -1,19 +1,14 @@
-import { ComponentType, Element } from 'react';
+import type { ReactElement } from "react";
 
 export interface IRoute {
   name: string;
   layout: string;
-  icon: JSX.Element | string;
+  icon: ReactElement | string;
   items?: any;
   path: string;
   secondary?: boolean | undefined;
   collapse?: boolean | undefined;
+  collapsible?: boolean | undefined;
+  permission?: string | string[] | undefined;
 }
-interface RoutesType {
-  name: string;
-  layout: string;
-  icon: JSX.Element | string;
-  path: string;
-  secondary?: boolean | undefined;
-  collapse?: boolean | undefined;
-}
+export type RoutesType = IRoute;

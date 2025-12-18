@@ -4,9 +4,10 @@ import { useCallback } from "react";
 import { usePathname } from "next/navigation";
 import NavLink from "@/components/link/NavLink";
 import DashIcon from "@/components/icons/DashIcon";
+import type { IRoute } from "@/types/navigation";
 // chakra imports
 
-export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
+export const SidebarLinks = (props: { routes: IRoute[] }): React.ReactElement => {
 	// Chakra color mode
 	const pathname = usePathname();
 
@@ -20,7 +21,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
 		[pathname],
 	);
 
-	const createLinks = (routes: RoutesType[]) => {
+	const createLinks = (routes: IRoute[]) => {
 		return routes.map((route, index) => {
 			if (
 				route.layout === "/admin" ||

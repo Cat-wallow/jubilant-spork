@@ -2,6 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
+import { useDebounce } from "use-debounce";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,8 +21,14 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import RBAC from "@/components/rbac/RBAC";
 import { cn } from "@/lib/utils";
+import { createProjectTask, getProjectMembers } from "@/services/project.service";
 import {
 	ClipboardList,
 	PlayCircle,
@@ -26,6 +38,7 @@ import {
 	LayoutGrid,
 	Filter as FilterIcon,
 	CalendarDays,
+	ChevronDown,
 } from "lucide-react";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
@@ -44,6 +57,18 @@ interface Task {
 	updatedAt: string; // YYYY-MM-DD
 	badge?: "OVERDUE" | "BLOCKED";
 }
+
+const createTaskFormSchema = z.object({
+	projectId: z.string().min(1),
+	title: z.string().min(1, "Judul wajib diisi"),
+	description: z.string().optional(),
+	assignedUserId: z.string().uuid().optional(),
+	module: z.enum(["FORM_1", "KK_1", "KK_2", "KK_3", "KK_4", "KK_5"]),
+	priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
+	dueDate: z.date().optional(),
+});
+
+type CreateTaskFormValues = z.infer<typeof createTaskFormSchema>;
 
 const tabs = [
 	{ label: "Ringkasan", path: "summary" },
@@ -125,6 +150,36 @@ const dummyTasks: Task[] = [
 	},
 ];
 
+function formatProjectModuleLabel(module: string) {
+	const normalized = module.toUpperCase();
+	if (normalized === "FORM_1") return "Form 1.0";
+	if (normalized === "KK_1") return "KK 1.0";
+	if (normalized === "KK_2") return "KK 2.0";
+	if (normalized === "KK_3") return "KK 3.0";
+	if (normalized === "KK_4") return "KK 4.0";
+	if (normalized === "KK_5") return "KK 5.0";
+	return module;
+}
+
+function getInitials(name: string) {
+	const parts = name
+		.split(" ")
+		.map((p) => p.trim())
+		.filter(Boolean);
+	if (parts.length === 0) return "-";
+	if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+	return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function mapBackendStatusToUi(status: string): TaskStatus {
+	const normalized = status.toUpperCase();
+	if (normalized === "OPEN") return "TODO";
+	if (normalized === "IN_PROGRESS") return "IN_PROGRESS";
+	if (normalized === "ON_REVIEW") return "IN_REVIEW";
+	if (normalized === "FINISHED") return "DONE";
+	return "TODO";
+}
+
 function TasksPageContent() {
 	const params = useParams();
 	const router = useRouter();
@@ -132,6 +187,8 @@ function TasksPageContent() {
 	const projectId = params.projectId as string;
 
 	const currentTab = pathname?.split("/").pop() || "summary";
+
+	const queryClient = useQueryClient();
 
 	const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
 	const [moduleFilter, setModuleFilter] = useState<string>("all");
@@ -143,13 +200,96 @@ function TasksPageContent() {
 	const [selectedTasks, setSelectedTasks] = useState<Record<string, boolean>>(
 		{},
 	);
+	const [tasks, setTasks] = useState<Task[]>(dummyTasks);
+	const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+	const [assigneeSearch, setAssigneeSearch] = useState("");
+	const [debouncedAssigneeSearch] = useDebounce(assigneeSearch, 350);
 
 	const handleTabClick = (tabPath: string) => {
 		router.push(`/tenant/projects/${projectId}/${tabPath}`);
 	};
 
+	const form = useForm<CreateTaskFormValues>({
+		resolver: zodResolver(createTaskFormSchema),
+		defaultValues: {
+			projectId,
+			title: "",
+			description: "",
+			assignedUserId: undefined,
+			module: "FORM_1",
+			priority: "MEDIUM",
+			dueDate: undefined,
+		},
+	});
+
+	const { data: membersData, isLoading: isMembersLoading } = useQuery<Awaited<ReturnType<typeof getProjectMembers>>>({
+		queryKey: ["projectMembers", projectId, debouncedAssigneeSearch],
+		queryFn: () =>
+			getProjectMembers({
+				projectId,
+				page: 1,
+				pageSize: 20,
+				search: debouncedAssigneeSearch,
+			}),
+		enabled: isCreateTaskOpen,
+		placeholderData: keepPreviousData,
+		staleTime: 60 * 1000,
+	});
+
+	const members = membersData?.data?.members ?? [];
+	const selectedAssigneeId = form.watch("assignedUserId");
+	const selectedAssignee = members.find((m) => m.id === selectedAssigneeId);
+
+	const createTaskMutation = useMutation({
+		mutationFn: async (values: CreateTaskFormValues) => {
+			return createProjectTask(projectId, {
+				title: values.title,
+				description: values.description,
+				assigned_user_id: values.assignedUserId,
+				module: values.module,
+				priority: values.priority,
+				due_date: values.dueDate ? values.dueDate.toISOString() : undefined,
+			});
+		},
+		onSuccess: (created) => {
+			const moduleLabel = formatProjectModuleLabel(created.module);
+			const due = created.due_date
+				? new Date(created.due_date).toISOString().slice(0, 10)
+				: new Date().toISOString().slice(0, 10);
+			const updated = created.updated_at
+				? new Date(created.updated_at).toISOString().slice(0, 10)
+				: new Date().toISOString().slice(0, 10);
+			const assigneeName = selectedAssignee?.name ?? "Unassigned";
+
+			setTasks((prev) => [
+				{
+					id: created.id,
+					title: created.title,
+					module: moduleLabel,
+					assigneeInitials: getInitials(assigneeName),
+					assigneeName,
+					priority: created.priority,
+					status: mapBackendStatusToUi(created.status),
+					progress: created.progress ?? 0,
+					dueDate: due,
+					updatedAt: updated,
+				},
+				...prev,
+			]);
+
+			toast.success("Berhasil", { description: "Task berhasil dibuat." });
+			queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+			setIsCreateTaskOpen(false);
+			setAssigneeSearch("");
+			form.reset({ ...form.getValues(), title: "", description: "", assignedUserId: undefined, dueDate: undefined });
+		},
+		onError: () => {
+			toast.error("Gagal", { description: "Task gagal dibuat." });
+		},
+	});
+
 	const filteredTasks = useMemo(() => {
-		return dummyTasks.filter((task) => {
+		return tasks.filter((task) => {
 			if (
 				moduleFilter !== "all" &&
 				task.module.toLowerCase() !== moduleFilter.toLowerCase()
@@ -193,6 +333,7 @@ function TasksPageContent() {
 			return true;
 		});
 	}, [
+		tasks,
 		moduleFilter,
 		assigneeFilter,
 		priorityFilter,
@@ -243,9 +384,9 @@ function TasksPageContent() {
 		console.log("Bulk action", action, ids);
 	};
 
-	const uniqueModules = Array.from(new Set(dummyTasks.map((t) => t.module)));
+	const uniqueModules = Array.from(new Set(tasks.map((t) => t.module)));
 	const uniqueAssignees = Array.from(
-		new Set(dummyTasks.map((t) => t.assigneeName)),
+		new Set(tasks.map((t) => t.assigneeName)),
 	);
 
 	return (
@@ -328,10 +469,202 @@ function TasksPageContent() {
 						</p>
 					</div>
 					<div className="flex items-center gap-3">
-						<Button className="gap-2">
-							<PlusIcon />
-							Tambah Tugas
-						</Button>
+						<Dialog
+							open={isCreateTaskOpen}
+							onOpenChange={(open) => {
+								setIsCreateTaskOpen(open);
+								if (!open) {
+									setAssigneeSearch("");
+									form.reset({
+										projectId,
+										title: "",
+										description: "",
+										assignedUserId: undefined,
+										module: "FORM_1",
+										priority: "MEDIUM",
+										dueDate: undefined,
+									});
+								}
+							}}
+						>
+							<DialogTrigger asChild>
+								<Button className="gap-2">
+									<PlusIcon />
+									Tambah Tugas
+								</Button>
+							</DialogTrigger>
+							<DialogContent className="max-w-[680px]">
+								<DialogHeader>
+									<DialogTitle>Tambah Tugas</DialogTitle>
+								</DialogHeader>
+
+								<form
+									className="grid gap-4"
+									onSubmit={form.handleSubmit((values) =>
+										createTaskMutation.mutate(values),
+									)}
+								>
+									<input type="hidden" value={projectId} {...form.register("projectId")} />
+
+									<div className="grid gap-2">
+										<Label htmlFor="title">Title</Label>
+										<Input id="title" {...form.register("title")} />
+										{form.formState.errors.title?.message ? (
+											<p className="text-sm text-red-600">
+												{form.formState.errors.title.message}
+											</p>
+										) : null}
+									</div>
+
+									<div className="grid gap-2">
+										<Label htmlFor="description">Description</Label>
+										<Textarea
+											id="description"
+											rows={4}
+											{...form.register("description")}
+										/>
+									</div>
+
+									<div className="grid gap-2">
+										<Label>Assignee</Label>
+										<Popover>
+											<PopoverTrigger asChild>
+												<Button
+													type="button"
+													variant="outline"
+													className="w-full justify-between"
+												>
+													<span className="truncate">
+														{selectedAssignee?.name ?? "Pilih assignee"}
+													</span>
+													<ChevronDown className="h-4 w-4 opacity-50" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent align="start" className="w-[420px] p-3">
+												<div className="grid gap-2">
+													<Input
+														placeholder="Cari user..."
+														value={assigneeSearch}
+														onChange={(e) => setAssigneeSearch(e.target.value)}
+													/>
+
+													<div className="max-h-56 overflow-y-auto rounded-md border">
+														<Button
+															type="button"
+															variant="ghost"
+															className="w-full justify-start rounded-none"
+															onClick={() => form.setValue("assignedUserId", undefined)}
+														>
+															Unassigned
+														</Button>
+														{isMembersLoading ? (
+															<div className="p-3 text-sm text-muted-foreground">
+																Loading...
+															</div>
+														) : members.length === 0 ? (
+															<div className="p-3 text-sm text-muted-foreground">
+																User tidak ditemukan
+															</div>
+														) : (
+															members.map((m) => (
+																<Button
+																	key={m.id}
+																	type="button"
+																	variant="ghost"
+																	className="w-full justify-start rounded-none"
+																	onClick={() =>
+																		form.setValue("assignedUserId", m.id)
+																	}
+																>
+																	{m.name}
+																</Button>
+															))
+														)}
+													</div>
+												</div>
+											</PopoverContent>
+										</Popover>
+									</div>
+
+									<div className="grid grid-cols-2 gap-4">
+										<div className="grid gap-2">
+											<Label>Modul</Label>
+											<Controller
+												control={form.control}
+												name="module"
+												render={({ field }) => (
+													<Select
+														value={field.value}
+														onValueChange={field.onChange}
+													>
+														<SelectTrigger>
+															<SelectValue placeholder="Pilih modul" />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectItem value="FORM_1">Form 1.0</SelectItem>
+															<SelectItem value="KK_1">KK 1.0</SelectItem>
+															<SelectItem value="KK_2">KK 2.0</SelectItem>
+															<SelectItem value="KK_3">KK 3.0</SelectItem>
+															<SelectItem value="KK_4">KK 4.0</SelectItem>
+															<SelectItem value="KK_5">KK 5.0</SelectItem>
+														</SelectContent>
+													</Select>
+												)}
+											/>
+										</div>
+
+										<div className="grid gap-2">
+											<Label>Priority</Label>
+											<Controller
+												control={form.control}
+												name="priority"
+												render={({ field }) => (
+													<Select
+														value={field.value ?? ""}
+														onValueChange={(v) =>
+															field.onChange(v ? (v as any) : undefined)
+														}
+													>
+														<SelectTrigger>
+															<SelectValue placeholder="Pilih priority" />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectItem value="LOW">Low</SelectItem>
+															<SelectItem value="MEDIUM">Medium</SelectItem>
+															<SelectItem value="HIGH">High</SelectItem>
+														</SelectContent>
+													</Select>
+												)}
+											/>
+										</div>
+									</div>
+
+									<div className="grid gap-2">
+										<Label>Due date</Label>
+										<Controller
+											control={form.control}
+											name="dueDate"
+											render={({ field }) => (
+												<DatePicker
+													value={field.value}
+													onChange={field.onChange}
+													placeholder="Pilih tanggal jatuh tempo"
+												/>
+											)}
+										/>
+									</div>
+
+									<DialogFooter>
+										<Button
+											type="submit"
+											disabled={createTaskMutation.isPending}
+										>
+											{createTaskMutation.isPending ? "Menyimpan..." : "Simpan"}
+										</Button>
+									</DialogFooter>
+								</form>
+							</DialogContent>
+						</Dialog>
 						<div className="inline-flex rounded-[10px] bg-[#F4F7FE] p-1">
 							<Button
 								variant={viewMode === "list" ? "default" : "ghost"}

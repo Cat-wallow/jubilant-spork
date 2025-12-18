@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 function Card(props: {
   variant?: string;
   extra?: string;
-  children?: JSX.Element | any[];
+  children?: ReactNode;
   [x: string]: any;
 }) {
   const { variant, extra, children, ...rest } = props;

@@ -155,3 +155,48 @@ export const getProjectMembers = async (
 
 	return response.data;
 };
+
+export type ProjectTaskModule = "FORM_1" | "KK_1" | "KK_2" | "KK_3" | "KK_4" | "KK_5";
+export type ProjectTaskPriority = "LOW" | "MEDIUM" | "HIGH";
+
+export interface CreateProjectTaskPayload {
+	title: string;
+	description?: string;
+	assigned_user_id?: string;
+	module: ProjectTaskModule;
+	priority?: ProjectTaskPriority;
+	due_date?: string;
+}
+
+export interface ProjectTask {
+	id: string;
+	tenant_id: string;
+	project_id: string;
+	title: string;
+	description: string | null;
+	assigned_user_id: string | null;
+	priority: ProjectTaskPriority;
+	module: ProjectTaskModule;
+	status: string;
+	progress: number;
+	due_date: string | null;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+	updated_by: string | null;
+	deleted_at: string | null;
+	deleted_by: string | null;
+}
+
+export const createProjectTask = async (
+	projectId: string,
+	payload: CreateProjectTaskPayload,
+): Promise<ProjectTask> => {
+	const response = await api.post<{
+		success: boolean;
+		message: string;
+		data: ProjectTask;
+	}>(`/project/${projectId}/tasks`, payload);
+
+	return response.data.data;
+};

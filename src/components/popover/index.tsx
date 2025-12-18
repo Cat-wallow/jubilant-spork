@@ -1,5 +1,6 @@
 import { Popover, PopoverTrigger, PopoverContent } from '@chakra-ui/popover';
-const PopoverHorizon = (props: { extra: string; trigger: JSX.Element; content: JSX.Element }) => {
+import type { ReactElement } from "react";
+const PopoverHorizon = (props: { extra: string; trigger: ReactElement; content: ReactElement }) => {
   const { extra, trigger, content } = props;
   return (
     <Popover>

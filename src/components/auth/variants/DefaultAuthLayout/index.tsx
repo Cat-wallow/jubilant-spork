@@ -1,7 +1,8 @@
 import authImg from '/public/img/auth/auth.png';
 import NavLink from '@/components/link/NavLink';
 import Footer from '@/components/footer/FooterAuthDefault';
-function Default(props: { maincard: JSX.Element }) {
+import type { ReactNode } from "react";
+function Default(props: { maincard: ReactNode }) {
   const { maincard } = props;
   return (
     <div className="relative flex">

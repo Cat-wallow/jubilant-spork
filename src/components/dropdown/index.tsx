@@ -1,4 +1,5 @@
 import React from 'react';
+import type { ReactElement } from "react";
 
 function useOutsideAlerter(ref: any, setX: any): void {
   React.useEffect(() => {
@@ -21,8 +22,8 @@ function useOutsideAlerter(ref: any, setX: any): void {
 }
 
 const Dropdown = (props: {
-  button: JSX.Element;
-  children: JSX.Element;
+  button: ReactElement;
+  children: ReactElement;
   classNames: string;
   animation?: string;
 }) => {
