@@ -28,20 +28,20 @@ const formSchema = z.object({
 		.regex(
 			/^[a-z0-9-]+$/,
 			"Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung",
-		),
+	),
 	companyName: z.string().optional(),
 	tagline: z.string().optional(),
-	package: z.string().optional().default("Pro - Rp.2.500.000"),
-	storage: z.string().optional().default("10"),
-	projects: z.string().optional().default("10"),
-	maxUsers: z.string().optional().default("20"),
-	trialDays: z.string().optional().default("7"),
+	package: z.string().default("Pro - Rp.2.500.000"),
+	storage: z.string().default("10"),
+	projects: z.string().default("10"),
+	maxUsers: z.string().default("20"),
+	trialDays: z.string().default("7"),
 	logo: z.instanceof(File).nullable().optional(),
 	// primaryColor: z.string().optional(), // Removed from UI
 	// secondaryColor: z.string().optional(), // Removed from UI
-	timezone: z.string().optional().default("Asia/Jakarta (WIB)"),
-	language: z.string().optional().default("Indonesia"),
-	currency: z.string().optional().default("Rupiah (IDR)"),
+	timezone: z.string().default("Asia/Jakarta (WIB)"),
+	language: z.string().default("Indonesia"),
+	currency: z.string().default("Rupiah (IDR)"),
 	// PIC fields are now required for the second step of the process
 	picName: z.string().min(1, "Nama PIC wajib diisi"),
 	email: z.string().email("Format email tidak valid"),
@@ -50,14 +50,15 @@ const formSchema = z.object({
 	// billingCycle: z.string().optional(), // Not used in payload, removed from form
 });
 
-type NewTenantFormValues = z.infer<typeof formSchema>;
+export type NewTenantFormValues = z.input<typeof formSchema>;
+type NewTenantFormOutputValues = z.output<typeof formSchema>;
 
 function NewTenantPageContent() {
 	const router = useRouter();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const queryClient = useQueryClient();
 
-	const form = useForm<NewTenantFormValues>({
+	const form = useForm<NewTenantFormValues, any, NewTenantFormOutputValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			tenantName: "",
@@ -101,7 +102,7 @@ function NewTenantPageContent() {
 		},
 	});
 
-	const onSubmit = async (values: NewTenantFormValues) => {
+	const onSubmit = async (values: NewTenantFormOutputValues) => {
 		setIsSubmitting(true);
 		let logoUrl: string | undefined = undefined;
 

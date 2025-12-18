@@ -3,10 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
 import { UseFormReturn, Controller } from 'react-hook-form';
-import { NewTenantFormValues } from '../page'; // Assuming NewTenantFormValues is exported from page.tsx
 
 interface SecuritySectionProps {
-  form: UseFormReturn<NewTenantFormValues>;
+  form: UseFormReturn<any>;
 }
 
 export default function SecuritySection({ form }: SecuritySectionProps) {
@@ -23,14 +22,14 @@ export default function SecuritySection({ form }: SecuritySectionProps) {
           </div>
           <Controller
             control={form.control}
-            name="require2FA"
+            name={"require2FA" as any}
             render={({ field }) => (
               <Toggle
-                pressed={field.value}
+                pressed={!!field.value}
                 onPressedChange={field.onChange}
                 className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
               >
-                {field.value ? 'ON' : 'OFF'}
+                {!!field.value ? 'ON' : 'OFF'}
               </Toggle>
             )}
           />
@@ -44,7 +43,7 @@ export default function SecuritySection({ form }: SecuritySectionProps) {
               id="minPasswordLength"
               type="number"
               placeholder="8"
-              {...form.register('minPasswordLength')}
+              {...form.register('minPasswordLength' as any)}
             />
           </div>
 
@@ -54,7 +53,7 @@ export default function SecuritySection({ form }: SecuritySectionProps) {
               id="sessionTimeout"
               type="number"
               placeholder="10"
-              {...form.register('sessionTimeout')}
+              {...form.register('sessionTimeout' as any)}
             />
           </div>
         </div>

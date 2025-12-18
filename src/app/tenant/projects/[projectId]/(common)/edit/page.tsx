@@ -10,7 +10,11 @@ import ProjectSettingsTab from "../../new/components/ProjectSettingsTab";
 import Switch from "@/components/switch";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchema, ProjectFormValues } from "@/validators/project.schema";
+import {
+	projectSchema,
+	type ProjectFormInputValues,
+	type ProjectFormValues,
+} from "@/validators/project.schema";
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -28,7 +32,7 @@ function EditProjectPageContent() {
 		queryFn: () => getProjectById(projectId),
 	});
 
-	const methods = useForm<ProjectFormValues>({
+	const methods = useForm<ProjectFormInputValues, any, ProjectFormValues>({
 		resolver: zodResolver(projectSchema),
 		defaultValues: {
 			scopes: [],

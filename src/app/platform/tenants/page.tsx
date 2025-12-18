@@ -2,7 +2,7 @@
 
 import RBAC from "@/components/rbac/RBAC";
 import { getTenants } from "@/services/tenant.service";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
 	ColumnFiltersState,
 	getCoreRowModel,
@@ -62,7 +62,7 @@ function TenantsPageContent() {
 				sort as any,
 			);
 		},
-		keepPreviousData: true,
+		placeholderData: keepPreviousData,
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 

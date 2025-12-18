@@ -13,6 +13,9 @@ interface FileUploaderProps {
 	dropzoneOptions?: DropzoneOptions;
 	className?: string;
 	disabled?: boolean;
+	customValidator?: (
+		file: File,
+	) => Promise<{ code: string; message: string } | null> | { code: string; message: string } | null;
 	texts?: {
 		title?: string;
 		subtitle?: string;
@@ -30,6 +33,7 @@ export function FileUploader({
 	dropzoneOptions,
 	className,
 	disabled,
+	customValidator,
 	texts = {},
 	existingFileUrl,
 	onRemoveExisting,
@@ -58,53 +62,66 @@ export function FileUploader({
 	const onDrop = useCallback(
 		async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
 			const allErrors: FileRejection[] = [...fileRejections];
-			let validFiles: File[] = [];
+			const validFiles: File[] = [];
 
-			if (aspectRatio && acceptedFiles.length > 0) {
-				for (const file of acceptedFiles) {
-					const error = await new Promise<{
-						code: string;
-						message: string;
-					} | null>((resolve) => {
-						if (!file.type.startsWith("image/")) {
-							// This check is secondary; dropzone's `accept` option is primary
-							resolve(null);
-							return;
-						}
-						const objectUrl = URL.createObjectURL(file);
-						const img = new window.Image();
-						img.onload = () => {
-							URL.revokeObjectURL(objectUrl);
-							const actualRatio = img.width / img.height;
-							if (Math.abs(actualRatio - aspectRatio) > 0.01) {
-								resolve({
-									code: "invalid-aspect-ratio",
-									message:
-										texts.aspectRatioError ||
-										`Image aspect ratio must be ~${aspectRatio.toFixed(2)}`,
-								});
-							} else {
+			for (const file of acceptedFiles) {
+				const errors: Array<{ code: string; message: string }> = [];
+
+				if (aspectRatio) {
+					const error = await new Promise<{ code: string; message: string } | null>(
+						(resolve) => {
+							if (!file.type.startsWith("image/")) {
 								resolve(null);
+								return;
 							}
-						};
-						img.onerror = () => {
-							URL.revokeObjectURL(objectUrl);
-							resolve({
-								code: "image-load-error",
-								message: "Could not load image to validate.",
-							});
-						};
-						img.src = objectUrl;
-					});
 
-					if (error) {
-						allErrors.push({ file, errors: [error] });
-					} else {
-						validFiles.push(file);
+							const objectUrl = URL.createObjectURL(file);
+							const img = new window.Image();
+							img.onload = () => {
+								URL.revokeObjectURL(objectUrl);
+								const actualRatio = img.width / img.height;
+								if (Math.abs(actualRatio - aspectRatio) > 0.01) {
+									resolve({
+										code: "invalid-aspect-ratio",
+										message:
+											texts.aspectRatioError ||
+											`Image aspect ratio must be ~${aspectRatio.toFixed(2)}`,
+									});
+								} else {
+									resolve(null);
+								}
+							};
+							img.onerror = () => {
+								URL.revokeObjectURL(objectUrl);
+								resolve({
+									code: "image-load-error",
+									message: "Could not load image to validate.",
+								});
+							};
+							img.src = objectUrl;
+						},
+					);
+
+					if (error) errors.push(error);
+				}
+
+				if (customValidator) {
+					try {
+						const result = await customValidator(file);
+						if (result) errors.push(result);
+					} catch {
+						errors.push({
+							code: "custom-validator-error",
+							message: "File validation failed.",
+						});
 					}
 				}
-			} else {
-				validFiles = acceptedFiles;
+
+				if (errors.length > 0) {
+					allErrors.push({ file, errors });
+				} else {
+					validFiles.push(file);
+				}
 			}
 
 			setInternalErrors(allErrors);
@@ -115,7 +132,7 @@ export function FileUploader({
 				onValueChange(validFiles);
 			}
 		},
-		[aspectRatio, onValueChange, texts.aspectRatioError],
+		[aspectRatio, customValidator, onValueChange, texts.aspectRatioError],
 	);
 
 	const handleRemove = (e: React.MouseEvent<HTMLButtonElement>) => {

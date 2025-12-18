@@ -9,6 +9,9 @@ export interface Project {
 	name: string;
 	status: string;
 	progress: number;
+	client_id?: string;
+	pmo_id?: string;
+	ketua_tim_id?: string;
 	clients?: {
 		id: string;
 		name: string;

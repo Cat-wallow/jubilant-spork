@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
 	ColumnFiltersState,
 	getCoreRowModel,
@@ -9,7 +9,7 @@ import {
 	useReactTable,
 	VisibilityState,
 } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 
 import { DataTableToolbar } from "./components/data-table-toolbar";
@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 function TeamPageContent() {
 	const params = useParams();
 	const projectId = params.projectId as string;
+	const router = useRouter();
 
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
@@ -65,7 +66,7 @@ function TeamPageContent() {
 				sort: sort as any,
 			});
 		},
-		keepPreviousData: true,
+		placeholderData: keepPreviousData,
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 
