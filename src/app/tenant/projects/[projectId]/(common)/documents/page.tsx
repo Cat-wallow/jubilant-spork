@@ -170,9 +170,14 @@ export default function DocumentsPage() {
 	const [selectedAssignee, setSelectedAssignee] = useState("all");
 	const [selectedStatus, setSelectedStatus] = useState("all");
 	const [currentPage, setCurrentPage] = useState(1);
+	const [uploadedFiles, setUploadedFiles] = useState<File[] | null>(null);
 
 	const handleFileUpload = (uploadedFiles: File[]) => {
 		console.log("Files uploaded:", uploadedFiles);
+	};
+
+	const handleFileChange = (files: File[] | null) => {
+		setUploadedFiles(files);
 	};
 
 	const handleToggleVisibility = (id: string) => {
@@ -219,7 +224,10 @@ export default function DocumentsPage() {
 			{/* Document Folders Grid */}
 			<DocumentFolderGrid folders={documentFolders} />
 
-			<FileUploader />
+			<FileUploader
+				value={uploadedFiles}
+				onValueChange={handleFileChange}
+			/>
 
 			{/* Document List Section */}
 			<Card className="flex flex-col gap-5 rounded-[20px]  px-10 py-6">

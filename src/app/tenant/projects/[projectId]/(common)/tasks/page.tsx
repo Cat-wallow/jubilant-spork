@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import { useDebounce } from "use-debounce";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +21,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +29,17 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import RBAC from "@/components/rbac/RBAC";
 import { cn } from "@/lib/utils";
-import { createProjectTask, getProjectMembers } from "@/services/project.service";
+import {
+	createProjectTask,
+	getProjectMembers,
+	getProjectTasks,
+	updateProjectTask,
+	updateProjectTaskProgress,
+	deleteProjectTask,
+	type ProjectTaskModule,
+	type ProjectTaskPriority,
+	type ProjectMember,
+} from "@/services/project.service";
 import {
 	ClipboardList,
 	PlayCircle,
@@ -47,7 +58,10 @@ type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 interface Task {
 	id: string;
 	title: string;
+	description: string;
 	module: string;
+	rawModule: string;
+	assigneeId?: string;
 	assigneeInitials: string;
 	assigneeName: string;
 	priority: TaskPriority;
@@ -62,7 +76,7 @@ const createTaskFormSchema = z.object({
 	projectId: z.string().min(1),
 	title: z.string().min(1, "Judul wajib diisi"),
 	description: z.string().optional(),
-	assignedUserId: z.string().uuid().optional(),
+	assignedUserId: z.string().optional(),
 	module: z.enum(["FORM_1", "KK_1", "KK_2", "KK_3", "KK_4", "KK_5"]),
 	priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
 	dueDate: z.date().optional(),
@@ -83,71 +97,6 @@ const tabs = [
 	{ label: "Billing", path: "billing" },
 	{ label: "Report", path: "report" },
 	{ label: "Settings", path: "settings" },
-];
-
-const dummyTasks: Task[] = [
-	{
-		id: "1",
-		title: "Upload bukti transaksi bulan Desember",
-		module: "Form 1.0",
-		assigneeInitials: "KR",
-		assigneeName: "Karsara",
-		priority: "MEDIUM",
-		status: "TODO",
-		progress: 10,
-		badge: "OVERDUE",
-		dueDate: "2024-10-10",
-		updatedAt: "2024-10-10",
-	},
-	{
-		id: "2",
-		title: "Upload bukti transaksi bulan Desember",
-		module: "KK 1.0",
-		assigneeInitials: "KR",
-		assigneeName: "Karsara",
-		priority: "HIGH",
-		status: "IN_PROGRESS",
-		progress: 45,
-		dueDate: "2024-10-10",
-		updatedAt: "2024-10-10",
-	},
-	{
-		id: "3",
-		title: "Review draft KK 2.0",
-		module: "KK 2.0",
-		assigneeInitials: "ST",
-		assigneeName: "Sony Tandara",
-		priority: "MEDIUM",
-		status: "IN_REVIEW",
-		progress: 75,
-		dueDate: "2024-10-10",
-		updatedAt: "2024-10-09",
-	},
-	{
-		id: "4",
-		title: "Finalisasi kalkulasi pajak",
-		module: "KK 3.0",
-		assigneeInitials: "DK",
-		assigneeName: "Dewi Kartika",
-		priority: "LOW",
-		status: "IN_PROGRESS",
-		progress: 60,
-		badge: "BLOCKED",
-		dueDate: "2024-10-12",
-		updatedAt: "2024-10-10",
-	},
-	{
-		id: "5",
-		title: "Cek kelengkapan dokumen minimal",
-		module: "Form 1.0",
-		assigneeInitials: "AM",
-		assigneeName: "Amara",
-		priority: "MEDIUM",
-		status: "DONE",
-		progress: 100,
-		dueDate: "2024-10-05",
-		updatedAt: "2024-10-06",
-	},
 ];
 
 function formatProjectModuleLabel(module: string) {
@@ -200,10 +149,65 @@ function TasksPageContent() {
 	const [selectedTasks, setSelectedTasks] = useState<Record<string, boolean>>(
 		{},
 	);
-	const [tasks, setTasks] = useState<Task[]>(dummyTasks);
 	const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [assigneeSearch, setAssigneeSearch] = useState("");
 	const [debouncedAssigneeSearch] = useDebounce(assigneeSearch, 350);
+	const [isAssigneePopoverOpen, setIsAssigneePopoverOpen] = useState(false);
+	const [manualAssignee, setManualAssignee] = useState<ProjectMember | null>(null);
+
+	const { data: tasksData, isLoading: isTasksLoading } = useQuery({
+		queryKey: ["projectTasks", projectId],
+		queryFn: () =>
+			getProjectTasks({
+				projectId,
+				page: 1,
+				pageSize: 100,
+			}),
+	});
+
+	const tasks: Task[] = useMemo(() => {
+		if (!tasksData?.data?.tasks) return [];
+		return tasksData.data.tasks.map((t) => {
+			const moduleLabel = formatProjectModuleLabel(t.module);
+			const assigneeName =
+				t.users_project_tasks_assigned_user_idTousers?.name ?? "Unassigned";
+			const assigneeInitials = getInitials(assigneeName);
+			const status = mapBackendStatusToUi(t.status);
+			const due = t.due_date
+				? new Date(t.due_date).toISOString().slice(0, 10)
+				: "";
+			const updated = t.updated_at
+				? new Date(t.updated_at).toISOString().slice(0, 10)
+				: "";
+
+			let badge: "OVERDUE" | "BLOCKED" | undefined = undefined;
+			if (
+				t.due_date &&
+				new Date(t.due_date) < new Date() &&
+				status !== "DONE"
+			) {
+				badge = "OVERDUE";
+			}
+
+			return {
+				id: t.id,
+				title: t.title,
+				description: t.description || "",
+				module: moduleLabel,
+				rawModule: t.module.toUpperCase(),
+				assigneeId: t.assigned_user_id || undefined,
+				assigneeInitials,
+				assigneeName,
+				priority: t.priority as TaskPriority,
+				status,
+				progress: t.progress,
+				dueDate: due,
+				updatedAt: updated,
+				badge,
+			};
+		});
+	}, [tasksData]);
 
 	const handleTabClick = (tabPath: string) => {
 		router.push(`/tenant/projects/${projectId}/${tabPath}`);
@@ -231,60 +235,50 @@ function TasksPageContent() {
 				pageSize: 20,
 				search: debouncedAssigneeSearch,
 			}),
-		enabled: isCreateTaskOpen,
+		enabled: isCreateTaskOpen || !!selectedTask,
 		placeholderData: keepPreviousData,
 		staleTime: 60 * 1000,
 	});
 
 	const members = membersData?.data?.members ?? [];
 	const selectedAssigneeId = form.watch("assignedUserId");
-	const selectedAssignee = members.find((m) => m.id === selectedAssigneeId);
+	const selectedAssignee = members.find((m) => m.userId === selectedAssigneeId);
 
 	const createTaskMutation = useMutation({
 		mutationFn: async (values: CreateTaskFormValues) => {
-			return createProjectTask(projectId, {
-				title: values.title,
-				description: values.description,
-				assigned_user_id: values.assignedUserId,
-				module: values.module,
-				priority: values.priority,
-				due_date: values.dueDate ? values.dueDate.toISOString() : undefined,
-			});
+			try {
+				const result = await createProjectTask(projectId, {
+					title: values.title,
+					description: values.description,
+					assigned_user_id: values.assignedUserId,
+					module: values.module,
+					priority: values.priority,
+					due_date: values.dueDate ? values.dueDate.toISOString() : undefined,
+				});
+				return result;
+			} catch (error) {
+				console.error("MutationFn Error:", error);
+				throw error;
+			}
 		},
 		onSuccess: (created) => {
-			const moduleLabel = formatProjectModuleLabel(created.module);
-			const due = created.due_date
-				? new Date(created.due_date).toISOString().slice(0, 10)
-				: new Date().toISOString().slice(0, 10);
-			const updated = created.updated_at
-				? new Date(created.updated_at).toISOString().slice(0, 10)
-				: new Date().toISOString().slice(0, 10);
-			const assigneeName = selectedAssignee?.name ?? "Unassigned";
-
-			setTasks((prev) => [
-				{
-					id: created.id,
-					title: created.title,
-					module: moduleLabel,
-					assigneeInitials: getInitials(assigneeName),
-					assigneeName,
-					priority: created.priority,
-					status: mapBackendStatusToUi(created.status),
-					progress: created.progress ?? 0,
-					dueDate: due,
-					updatedAt: updated,
-				},
-				...prev,
-			]);
-
 			toast.success("Berhasil", { description: "Task berhasil dibuat." });
 			queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
 			setIsCreateTaskOpen(false);
 			setAssigneeSearch("");
-			form.reset({ ...form.getValues(), title: "", description: "", assignedUserId: undefined, dueDate: undefined });
+			setManualAssignee(null);
+			form.reset({
+				...form.getValues(),
+				title: "",
+				description: "",
+				assignedUserId: undefined,
+				dueDate: undefined,
+			});
 		},
-		onError: () => {
-			toast.error("Gagal", { description: "Task gagal dibuat." });
+		onError: (error) => {
+			console.error("Create task failed:", error);
+			const message = (error as any)?.response?.data?.message || (error as Error).message || "Terjadi kesalahan";
+			toast.error("Gagal", { description: `Task gagal dibuat: ${message}` });
 		},
 	});
 
@@ -475,6 +469,7 @@ function TasksPageContent() {
 								setIsCreateTaskOpen(open);
 								if (!open) {
 									setAssigneeSearch("");
+									setManualAssignee(null);
 									form.reset({
 										projectId,
 										title: "",
@@ -527,7 +522,7 @@ function TasksPageContent() {
 
 									<div className="grid gap-2">
 										<Label>Assignee</Label>
-										<Popover>
+										<Popover open={isAssigneePopoverOpen} onOpenChange={setIsAssigneePopoverOpen}>
 											<PopoverTrigger asChild>
 												<Button
 													type="button"
@@ -553,7 +548,10 @@ function TasksPageContent() {
 															type="button"
 															variant="ghost"
 															className="w-full justify-start rounded-none"
-															onClick={() => form.setValue("assignedUserId", undefined)}
+															onClick={() => {
+																form.setValue("assignedUserId", undefined);
+																setIsAssigneePopoverOpen(false);
+															}}
 														>
 															Unassigned
 														</Button>
@@ -572,9 +570,11 @@ function TasksPageContent() {
 																	type="button"
 																	variant="ghost"
 																	className="w-full justify-start rounded-none"
-																	onClick={() =>
-																		form.setValue("assignedUserId", m.id)
-																	}
+																	onClick={() => {
+																		form.setValue("assignedUserId", m.userId);
+																		setManualAssignee(m);
+																		setIsAssigneePopoverOpen(false);
+																	}}
 																>
 																	{m.name}
 																</Button>
@@ -816,11 +816,19 @@ function TasksPageContent() {
 						onToggleAll={toggleSelectAll}
 						onToggleOne={toggleSelect}
 						selectedTasks={selectedTasks}
+						onTaskClick={(task) => setSelectedTask(task)}
 					/>
 				) : (
-					<KanbanView tasks={filteredTasks} />
+					<KanbanView tasks={filteredTasks} onTaskClick={(task) => setSelectedTask(task)} />
 				)}
 			</Card>
+
+			<TaskDetailDialog
+				task={selectedTask}
+				isOpen={!!selectedTask}
+				onOpenChange={(open) => !open && setSelectedTask(null)}
+				projectId={projectId}
+			/>
 		</div>
 	);
 }
@@ -831,12 +839,14 @@ function TaskTableView({
 	onToggleAll,
 	onToggleOne,
 	selectedTasks,
+	onTaskClick,
 }: {
 	tasks: Task[];
 	allSelected: boolean;
 	onToggleAll: (checked: boolean) => void;
 	onToggleOne: (id: string, checked: boolean) => void;
 	selectedTasks: Record<string, boolean>;
+	onTaskClick: (task: Task) => void;
 }) {
 	return (
 		<div className="mt-4 space-y-2">
@@ -860,12 +870,14 @@ function TaskTableView({
 				{tasks.map((task) => (
 					<div
 						key={task.id}
-						className="grid grid-cols-[minmax(0,3fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_minmax(0,1.2fr)_minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1.2fr)] items-center gap-3 rounded-[10px] px-2 py-2 hover:bg-[#F9FAFB]"
+						className="grid grid-cols-[minmax(0,3fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_minmax(0,1.2fr)_minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1.2fr)] items-center gap-3 rounded-[10px] px-2 py-2 cursor-pointer transition-colors hover:bg-transparent"
+						onClick={() => onTaskClick(task)}
 					>
 						<div className="flex items-center gap-3">
 							<Checkbox
 								checked={Boolean(selectedTasks[task.id])}
 								onCheckedChange={(v) => onToggleOne(task.id, Boolean(v))}
+								onClick={(e) => e.stopPropagation()}
 							/>
 							<div className="flex flex-col">
 								<span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
@@ -931,7 +943,7 @@ function TaskTableView({
 	);
 }
 
-function KanbanView({ tasks }: { tasks: Task[] }) {
+function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: Task) => void }) {
 	const columns: { key: TaskStatus; title: string }[] = [
 		{ key: "TODO", title: "To-Do" },
 		{ key: "IN_PROGRESS", title: "In-Progress" },
@@ -960,7 +972,8 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
 							.map((task) => (
 								<div
 									key={task.id}
-									className="flex flex-col gap-2 rounded-[14px] border border-[#E2E8F0] bg-white p-3 shadow-sm"
+									className="flex flex-col gap-2 rounded-[14px] border border-[#E2E8F0] bg-white p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+									onClick={() => onTaskClick(task)}
 								>
 									<div className="flex items-start justify-between gap-2">
 										<div className="flex-1">
@@ -1079,6 +1092,399 @@ function StatusBadge({ status }: { status: TaskStatus }) {
 
 function PlusIcon() {
 	return <span className="text-xl leading-none">+</span>;
+}
+
+function TaskDetailDialog({
+	task,
+	isOpen,
+	onOpenChange,
+	projectId,
+}: {
+	task: Task | null;
+	isOpen: boolean;
+	onOpenChange: (open: boolean) => void;
+	projectId: string;
+}) {
+	const queryClient = useQueryClient();
+	const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+	const [isAssigneeOpen, setIsAssigneeOpen] = useState(false);
+	const [assigneeSearch, setAssigneeSearch] = useState("");
+	const [debouncedAssigneeSearch] = useDebounce(assigneeSearch, 350);
+	const [manualAssignee, setManualAssignee] = useState<ProjectMember | null>(null);
+
+	const form = useForm<CreateTaskFormValues>({
+		resolver: zodResolver(createTaskFormSchema),
+		defaultValues: {
+			projectId,
+			title: "",
+			description: "",
+			assignedUserId: undefined,
+			module: "FORM_1",
+			priority: "MEDIUM",
+			dueDate: undefined,
+		},
+	});
+
+	// Reset form when task changes
+	useEffect(() => {
+		if (task) {
+			form.reset({
+				projectId,
+				title: task.title,
+				description: task.description,
+				assignedUserId: task.assigneeId,
+				module: task.rawModule as any,
+				priority: task.priority,
+				dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+			});
+
+			if (task.assigneeId) {
+				setManualAssignee({
+					userId: task.assigneeId,
+					name: task.assigneeName,
+					id: "dummy",
+					avatar: "",
+					role: "",
+					modules: [],
+				});
+			} else {
+				setManualAssignee(null);
+			}
+		}
+	}, [task, form, projectId]);
+
+	const { data: membersData, isLoading: isMembersLoading } = useQuery<Awaited<ReturnType<typeof getProjectMembers>>>({
+		queryKey: ["projectMembers", projectId, debouncedAssigneeSearch],
+		queryFn: () =>
+			getProjectMembers({
+				projectId,
+				page: 1,
+				pageSize: 20,
+				search: debouncedAssigneeSearch,
+			}),
+		enabled: isOpen,
+		staleTime: 60 * 1000,
+	});
+
+	const members = membersData?.data?.members ?? [];
+	const selectedAssigneeId = form.watch("assignedUserId");
+	const selectedAssignee =
+		members.find((m) => m.userId === selectedAssigneeId) ||
+		(manualAssignee?.userId === selectedAssigneeId ? manualAssignee : undefined);
+
+	const updateMutation = useMutation({
+		mutationFn: async (values: CreateTaskFormValues) => {
+			if (!task) return;
+			await updateProjectTask(projectId, task.id, {
+				title: values.title,
+				description: values.description,
+				assigned_user_id: values.assignedUserId,
+				module: values.module,
+				priority: values.priority,
+				due_date: values.dueDate ? values.dueDate.toISOString() : undefined,
+			});
+		},
+		onSuccess: () => {
+			toast.success("Berhasil", { description: "Task berhasil diupdate." });
+			queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+			onOpenChange(false);
+		},
+		onError: (error) => {
+			toast.error("Gagal", { description: "Gagal mengupdate task." });
+		},
+	});
+
+	const [progress, setProgress] = useState(0);
+	useMemo(() => {
+		if (task) setProgress(task.progress);
+	}, [task]);
+
+	const updateProgressMutation = useMutation({
+		mutationFn: async () => {
+			if (!task) return;
+			await updateProjectTaskProgress(projectId, task.id, progress);
+		},
+		onSuccess: () => {
+			toast.success("Berhasil", { description: "Progress berhasil diupdate." });
+			queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+		},
+		onError: () => {
+			toast.error("Gagal", { description: "Gagal mengupdate progress." });
+		},
+	});
+
+	const deleteMutation = useMutation({
+		mutationFn: async () => {
+			if (!task) return;
+			await deleteProjectTask(projectId, task.id);
+		},
+		onSuccess: () => {
+			toast.success("Berhasil", { description: "Task berhasil dihapus." });
+			queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+			setIsDeleteConfirmOpen(false);
+			onOpenChange(false);
+		},
+		onError: () => {
+			toast.error("Gagal", { description: "Gagal menghapus task." });
+		},
+	});
+
+	if (!task) return null;
+
+	if (isDeleteConfirmOpen) {
+		return (
+			<Dialog open={isOpen} onOpenChange={onOpenChange}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Konfirmasi Hapus Task</DialogTitle>
+					</DialogHeader>
+					<div className="py-4">
+						<p>Apakah anda yakin ingin menghapus task ini?</p>
+					</div>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+							Batal
+						</Button>
+						<Button
+							variant="destructive"
+							onClick={() => deleteMutation.mutate()}
+							disabled={deleteMutation.isPending}
+						>
+							{deleteMutation.isPending ? "Menghapus..." : "Hapus"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		);
+	}
+
+	return (
+		<Dialog open={isOpen} onOpenChange={onOpenChange}>
+			<DialogContent className="max-w-[700px] max-h-[90vh] overflow-y-auto">
+				<DialogHeader>
+					<DialogTitle>Edit Task</DialogTitle>
+				</DialogHeader>
+
+				<form
+					className="grid gap-6"
+					onSubmit={form.handleSubmit((values) => updateMutation.mutate(values))}
+				>
+					<div className="grid gap-4 border-b pb-4">
+						<h3 className="font-semibold">Informasi Utama</h3>
+						<div className="grid gap-2">
+							<Label htmlFor="edit-title">Title</Label>
+							<Input id="edit-title" {...form.register("title")} />
+							{form.formState.errors.title?.message && (
+								<p className="text-sm text-red-600">
+									{form.formState.errors.title.message}
+								</p>
+							)}
+						</div>
+
+						<div className="grid gap-2">
+							<Label htmlFor="edit-description">Description</Label>
+							<Textarea
+								id="edit-description"
+								rows={3}
+								{...form.register("description")}
+							/>
+						</div>
+					</div>
+
+					<div className="grid gap-4 border-b pb-4">
+						<h3 className="font-semibold">Detail</h3>
+						<div className="grid grid-cols-2 gap-4">
+							<div className="grid gap-2">
+								<Label>Modul</Label>
+								<Controller
+									control={form.control}
+									name="module"
+									render={({ field }) => (
+										<Select value={field.value} onValueChange={field.onChange}>
+											<SelectTrigger>
+												<SelectValue placeholder="Pilih modul" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="FORM_1">Form 1.0</SelectItem>
+												<SelectItem value="KK_1">KK 1.0</SelectItem>
+												<SelectItem value="KK_2">KK 2.0</SelectItem>
+												<SelectItem value="KK_3">KK 3.0</SelectItem>
+												<SelectItem value="KK_4">KK 4.0</SelectItem>
+												<SelectItem value="KK_5">KK 5.0</SelectItem>
+											</SelectContent>
+										</Select>
+									)}
+								/>
+							</div>
+							<div className="grid gap-2">
+								<Label>Priority</Label>
+								<Controller
+									control={form.control}
+									name="priority"
+									render={({ field }) => (
+										<Select
+											value={field.value ?? ""}
+											onValueChange={(v) =>
+												field.onChange(v ? (v as any) : undefined)
+											}
+										>
+											<SelectTrigger>
+												<SelectValue placeholder="Pilih priority" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="LOW">Low</SelectItem>
+												<SelectItem value="MEDIUM">Medium</SelectItem>
+												<SelectItem value="HIGH">High</SelectItem>
+											</SelectContent>
+										</Select>
+									)}
+								/>
+							</div>
+						</div>
+
+						<div className="grid grid-cols-2 gap-4">
+							<div className="grid gap-2">
+								<Label>Assignee</Label>
+								<Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
+									<PopoverTrigger asChild>
+										<Button
+											type="button"
+											variant="outline"
+											className="w-full justify-between"
+										>
+											<span className="truncate">
+												{selectedAssignee?.name ?? "Pilih assignee"}
+											</span>
+											<ChevronDown className="h-4 w-4 opacity-50" />
+										</Button>
+									</PopoverTrigger>
+									<PopoverContent align="start" className="w-[420px] p-3">
+										<div className="grid gap-2">
+											<Input
+												placeholder="Cari user..."
+												value={assigneeSearch}
+												onChange={(e) => setAssigneeSearch(e.target.value)}
+											/>
+
+											<div className="max-h-56 overflow-y-auto rounded-md border">
+												<Button
+													type="button"
+													variant="ghost"
+													className="w-full justify-start rounded-none"
+													onClick={() => {
+														form.setValue("assignedUserId", undefined);
+														setManualAssignee(null);
+														setIsAssigneeOpen(false);
+													}}
+												>
+													Unassigned
+												</Button>
+												{isMembersLoading ? (
+													<div className="p-3 text-sm text-muted-foreground">
+														Loading...
+													</div>
+												) : members.length === 0 ? (
+													<div className="p-3 text-sm text-muted-foreground">
+														User tidak ditemukan
+													</div>
+												) : (
+													members.map((m) => (
+														<Button
+															key={m.id}
+															type="button"
+															variant="ghost"
+															className="w-full justify-start rounded-none"
+															onClick={() => {
+																form.setValue("assignedUserId", m.userId);
+																setManualAssignee(m);
+																setIsAssigneeOpen(false);
+															}}
+														>
+															{m.name}
+														</Button>
+													))
+												)}
+											</div>
+										</div>
+									</PopoverContent>
+								</Popover>
+							</div>
+
+							<div className="grid gap-2">
+								<Label>Due date</Label>
+								<Controller
+									control={form.control}
+									name="dueDate"
+									render={({ field }) => (
+										<DatePicker
+											value={field.value}
+											onChange={field.onChange}
+											placeholder="Pilih tanggal jatuh tempo"
+										/>
+									)}
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="grid gap-4 border-b pb-4">
+						<h3 className="font-semibold">Progress</h3>
+						<div className="grid gap-4">
+							<div className="grid gap-2">
+								<Label>Progress (%)</Label>
+								<div className="flex items-center gap-4">
+									<Slider
+										value={[progress]}
+										max={100}
+										step={1}
+										onValueChange={(vals) => setProgress(vals[0])}
+										className="flex-1"
+									/>
+									<div className="w-20">
+										<Input
+											type="number"
+											min={0}
+											max={100}
+											value={progress}
+											onChange={(e) => {
+												let val = parseInt(e.target.value);
+												if (isNaN(val)) val = 0;
+												if (val < 0) val = 0;
+												if (val > 100) val = 100;
+												setProgress(val);
+											}}
+										/>
+									</div>
+								</div>
+							</div>
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={() => updateProgressMutation.mutate()}
+								disabled={updateProgressMutation.isPending}
+								className="w-full"
+							>
+								{updateProgressMutation.isPending ? "Updating..." : "Update Progress"}
+							</Button>
+						</div>
+					</div>
+
+					<DialogFooter className="flex items-center justify-between sm:justify-between">
+						<Button
+							type="button"
+							variant="destructive"
+							onClick={() => setIsDeleteConfirmOpen(true)}
+						>
+							Hapus Task
+						</Button>
+						<Button type="submit" disabled={updateMutation.isPending}>
+							{updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
+	);
 }
 
 export default function TasksPage() {

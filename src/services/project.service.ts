@@ -52,6 +52,7 @@ export interface PaginatedProjectsResponse {
 // Define ProjectMember types
 export interface ProjectMember {
 	id: string;
+	userId: string;
 	name: string;
 	avatar: string;
 	role: string;
@@ -111,6 +112,97 @@ export const getProjectById = async (id: string): Promise<Project> => {
 		`/project/${id}`,
 	);
 	return response.data.data;
+};
+
+export interface UpdateProjectTaskPayload {
+	title?: string;
+	description?: string;
+	assigned_user_id?: string;
+	module?: ProjectTaskModule;
+	priority?: ProjectTaskPriority;
+	due_date?: string;
+	status?: string;
+}
+
+export const updateProjectTask = async (
+	projectId: string,
+	taskId: string,
+	payload: UpdateProjectTaskPayload,
+): Promise<ProjectTask> => {
+	const response = await api.put<{
+		success: boolean;
+		message: string;
+		data: ProjectTask;
+	}>(`/project/${projectId}/tasks/${taskId}`, payload);
+
+	return response.data.data;
+};
+
+export const updateProjectTaskProgress = async (
+	projectId: string,
+	taskId: string,
+	progress: number,
+): Promise<ProjectTask> => {
+	const response = await api.patch<{
+		success: boolean;
+		message: string;
+		data: ProjectTask;
+	}>(`/project/${projectId}/tasks/${taskId}/progress`, { progress });
+
+	return response.data.data;
+};
+
+export const deleteProjectTask = async (
+	projectId: string,
+	taskId: string,
+): Promise<void> => {
+	await api.delete(`/project/${projectId}/tasks/${taskId}`);
+};
+
+export interface GetProjectTasksParams {
+	projectId: string;
+	page: number;
+	pageSize: number;
+	search?: string;
+	module?: string;
+	assigneeId?: string;
+	priority?: string;
+	status?: string;
+	due?: string;
+}
+
+export interface GetProjectTasksResponse {
+	success: boolean;
+	data: {
+		tasks: (ProjectTask & {
+			users_project_tasks_assigned_user_idTousers?: {
+				id: string;
+				name: string;
+			} | null;
+		})[];
+		total: number;
+	};
+}
+
+export const getProjectTasks = async (
+	params: GetProjectTasksParams,
+): Promise<GetProjectTasksResponse> => {
+	const query = queryString.stringify({
+		page: params.page,
+		pageSize: params.pageSize,
+		search: params.search,
+		module: params.module,
+		assigneeId: params.assigneeId,
+		priority: params.priority,
+		status: params.status,
+		due: params.due,
+	});
+
+	const response = await api.get<GetProjectTasksResponse>(
+		`/project/${params.projectId}/tasks?${query}`,
+	);
+
+	return response.data;
 };
 
 export const updateProject = async (

@@ -75,9 +75,14 @@ export default function FilePage() {
 	const [selectedModule, setSelectedModule] = useState("all");
 	const [selectedAssignee, setSelectedAssignee] = useState("all");
 	const [selectedStatus, setSelectedStatus] = useState("all");
+	const [uploadedFiles, setUploadedFiles] = useState<File[] | null>(null);
 
 	const handleFileUpload = (uploadedFiles: File[]) => {
 		console.log("Files uploaded:", uploadedFiles);
+	};
+
+	const handleFileChange = (files: File[] | null) => {
+		setUploadedFiles(files);
 	};
 
 	const handleToggleVisibility = (id: string) => {
@@ -124,7 +129,7 @@ export default function FilePage() {
 			</div>
 
 			{/* Upload Area */}
-			<FileUploader />
+			<FileUploader value={uploadedFiles} onValueChange={handleFileChange} />
 
 			{/* Filters */}
 			<FileFilters

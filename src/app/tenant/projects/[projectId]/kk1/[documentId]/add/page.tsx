@@ -99,7 +99,7 @@ const submitSchema = draftSchema.extend({
   // Tax proof logic: if any tax field filled, proof is required
   const taxes = data.transaction_taxes || {};
   const isAnyTaxFilled = Object.values(taxes).some(
-    val => val !== undefined && val !== null && val !== 0 && val !== ''
+    val => val !== undefined && val !== null && val !== 0
   );
 
   if (isAnyTaxFilled && (!data.tax_proof_files || data.tax_proof_files.length === 0)) {
@@ -120,7 +120,7 @@ export default function KK1AddPage() {
   const { projectId, documentId } = params as { projectId: string, documentId: string };
 
   // Use draftSchema for the form (allows saving draft at any state)
-  const methods = useForm({
+  const methods = useForm<DraftFormSchema>({
     // resolver: zodResolver(draftSchema),
     defaultValues: {
       currency: "IDR",
@@ -161,7 +161,7 @@ export default function KK1AddPage() {
 
   const { data: coaData, isLoading: isLoadingCoa } = useQuery({
     queryKey: ['chartOfAccounts'],
-    queryFn: () => getReferenceTypes({ type: 'CHART_OF_ACCOUNTS' }),
+    queryFn: () => getReferenceTypes('CHART_OF_ACCOUNTS'),
     staleTime: Infinity,
   });
 
