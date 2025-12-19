@@ -162,6 +162,29 @@ export const useTerminateClient = () => {
 	});
 };
 
+export const useActivateClient = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ tenantId, id }: { tenantId: string; id: string }) => {
+			const response = await api.post(`/client-wp/api/clients/${id}/activate`, {}, {
+				headers: {
+					"X-Tenant-Id": tenantId,
+				},
+			});
+			return response.data;
+		},
+		onSuccess: (_, variables) => {
+			queryClient.invalidateQueries({
+				queryKey: ["clients", variables.tenantId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["clients-compliance", variables.tenantId],
+			});
+		},
+	});
+};
+
 export const useTenantComplianceSummary = (tenantId: string) => {
 	return useQuery<TenantComplianceSummary>({
 		queryKey: ["clients-compliance", tenantId],

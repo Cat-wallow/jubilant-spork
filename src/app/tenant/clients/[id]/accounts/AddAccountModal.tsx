@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,11 +17,12 @@ import {
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateCoa, AccountType, NormalBalance } from '@/hooks/useClientCoa';
+import api from '@/lib/api';
 
 const formSchema = z.object({
-  account_number: z.string().min(1, 'Nomor akun wajib diisi'),
+  account_number: z.string().min(1, 'Nomor akun wajib diisi').regex(/^\d+$/, 'Nomor akun harus berupa angka'),
   account_name: z.string().min(1, 'Nama akun wajib diisi'),
-  account_type: z.enum(['Asset', 'Liability', 'Equity', 'Revenue', 'Expense'] as const),
+  account_type: z.string().min(1, 'Tipe akun wajib dipilih'),
   normal_balance: z.enum(['debit', 'credit'] as const).optional(),
   description: z.string().optional(),
 });
@@ -43,17 +44,54 @@ export function AddAccountModal({
 }: AddAccountModalProps) {
   const { toast } = useToast();
   const createCoaMutation = useCreateCoa();
+  const [accountTypeOptions, setAccountTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       account_number: '',
       account_name: '',
-      account_type: 'Asset',
+      account_type: '',
       normal_balance: 'debit',
       description: '',
     },
   });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAccountTypes = async () => {
+      try {
+        const resp = await api.get('project/reference-types', {
+          params: { type: 'TIPE_AKUN' },
+        });
+
+        const data = resp?.data?.data ?? resp?.data ?? [];
+
+        const normalized = Array.isArray(data)
+          ? data
+              .map((item: any) => ({
+                id: String(item?.id ?? item?.name ?? ''),
+                name: String(item?.name ?? item?.description ?? item?.id ?? ''),
+              }))
+              .filter((x: any) => x.id && x.name)
+          : [];
+
+        if (!cancelled) setAccountTypeOptions(normalized);
+      } catch (error) {
+        console.error('Failed to load account types:', error);
+        if (!cancelled) setAccountTypeOptions([]);
+      }
+    };
+
+    if (open) {
+      loadAccountTypes();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -63,7 +101,7 @@ export function AddAccountModal({
         data: {
           account_number: values.account_number,
           account_name: values.account_name,
-          account_type: values.account_type,
+          account_type: values.account_type as AccountType,
           normal_balance: values.normal_balance,
           description: values.description,
           is_active: true,
@@ -100,6 +138,10 @@ export function AddAccountModal({
               id="account_number"
               {...form.register('account_number')}
               placeholder="Contoh: 1100"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                form.setValue('account_number', value);
+              }}
             />
             {form.formState.errors.account_number && (
               <p className="text-sm text-red-500">{form.formState.errors.account_number.message}</p>
@@ -121,20 +163,29 @@ export function AddAccountModal({
           <div className="grid gap-2">
             <Label htmlFor="account_type">Tipe Akun</Label>
             <Select
-              onValueChange={(value) => form.setValue('account_type', value as AccountType)}
+              onValueChange={(value) => form.setValue('account_type', value)}
               defaultValue={form.getValues('account_type')}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Pilih tipe akun" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Asset">Asset</SelectItem>
-                <SelectItem value="Liability">Liability</SelectItem>
-                <SelectItem value="Equity">Equity</SelectItem>
-                <SelectItem value="Revenue">Revenue</SelectItem>
-                <SelectItem value="Expense">Expense</SelectItem>
+                {accountTypeOptions.length > 0 ? (
+                  accountTypeOptions.map((opt) => (
+                    <SelectItem key={opt.id} value={opt.name}>
+                      {opt.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="p-2 text-sm text-muted-foreground text-center">
+                    Memuat tipe akun...
+                  </div>
+                )}
               </SelectContent>
             </Select>
+            {form.formState.errors.account_type && (
+              <p className="text-sm text-red-500">{form.formState.errors.account_type.message}</p>
+            )}
           </div>
 
           <div className="grid gap-2">

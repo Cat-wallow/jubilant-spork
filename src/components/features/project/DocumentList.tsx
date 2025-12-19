@@ -99,6 +99,11 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
     queryFn: () => getReferenceTypes('JENIS_DOKUMEN'),
   });
 
+  const { data: tipeDocumentTypes } = useQuery({
+    queryKey: ['reference-types', 'TIPE_DOKUMEN'],
+    queryFn: () => getReferenceTypes('TIPE_DOKUMEN'),
+  });
+
   const pagedDocs = useMemo(() => {
     const items = data?.items ?? [];
     if (items.length === 0) return items;
@@ -525,7 +530,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-6 py-4 md:grid-cols-2">
+          <div className="space-y-4 py-4">
             <Card className="border rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base">Informasi Dokumen</CardTitle>
@@ -549,11 +554,22 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                 </div>
                 <div>
                   <Label>Tipe Dokumen *</Label>
-                  <Input 
-                    value={tipeDokumen} 
-                    onChange={(e) => setTipeDokumen(e.target.value)}
-                    placeholder="Contoh: Invoice, Faktur, dll" 
-                  />
+                  <Select value={tipeDokumen} onValueChange={setTipeDokumen}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih tipe dokumen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {tipeDocumentTypes && tipeDocumentTypes.length > 0 ? (
+                        tipeDocumentTypes.map((type: any) => (
+                          <SelectItem key={type.id} value={type.name}>
+                            {type.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-muted-foreground">Memuat data...</div>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>Jenis Dokumen *</Label>
@@ -733,7 +749,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
               </CardContent>
             </Card>
 
-            <Card className="border rounded-2xl md:col-span-2">
+            <Card className="border rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base">Informasi Tambahan</CardTitle>
               </CardHeader>

@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { getReferenceTypes } from '@/services/reference-type.service';
 import { useDocuments, useUploadDocuments, useUpdateWorkflow } from '@/hooks/useDocuments';
+import { useBundle } from '@/hooks/useBundles';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,6 +124,8 @@ export default function FormOneBundleDetailPage() {
     }
   };
 
+  const { data: bundle } = useBundle(tenantId, projectId, bundleId);
+
   const { data, isLoading, error } = useDocuments(
     tenantId,
     projectId,
@@ -139,6 +142,11 @@ export default function FormOneBundleDetailPage() {
   const { data: documentTypes } = useQuery({
     queryKey: ['reference-types', 'JENIS_DOKUMEN'],
     queryFn: () => getReferenceTypes('JENIS_DOKUMEN'),
+  });
+
+  const { data: tipeDocumentTypes } = useQuery({
+    queryKey: ['reference-types', 'TIPE_DOKUMEN'],
+    queryFn: () => getReferenceTypes('TIPE_DOKUMEN'),
   });
 
   const pagedDocs = useMemo(() => {
@@ -235,7 +243,7 @@ export default function FormOneBundleDetailPage() {
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">
             Form 1.0 - Lembar Pengendalian Arus Dokumen
           </h1>
-          <p className="text-sm text-muted-foreground">{`Detail bundle ${bundleId}`}</p>
+          <p className="text-sm text-muted-foreground">Detail bundle <strong>{bundle?.name || bundleId}</strong></p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -494,9 +502,15 @@ export default function FormOneBundleDetailPage() {
                       <SelectValue placeholder="Pilih Tipe Dokumen" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Dokumen Transaksi">Dokumen Transaksi</SelectItem>
-                      <SelectItem value="Dokumen Pendukung Transaksi">Dokumen Pendukung Transaksi</SelectItem>
-                      <SelectItem value="Dokumen Komunikasi Bisnis">Dokumen Komunikasi Bisnis</SelectItem>
+                      {tipeDocumentTypes && tipeDocumentTypes.length > 0 ? (
+                        tipeDocumentTypes.map((type: any) => (
+                          <SelectItem key={type.id} value={type.name}>
+                            {type.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                         <div className="p-2 text-sm text-muted-foreground">Memuat data...</div>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

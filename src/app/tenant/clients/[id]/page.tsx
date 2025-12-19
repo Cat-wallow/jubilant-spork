@@ -444,6 +444,7 @@ export default function ClientDetailPage() {
                 <Button
                   className="bg-blue-600 hover:bg-blue-700 gap-2"
                   onClick={() => router.push(`/tenant/projects/new?clientId=${id}`)}
+                  disabled={client.status !== 'active'}
                 >
                   <Plus className="h-4 w-4" />
                   Tambah Project
@@ -458,6 +459,7 @@ export default function ClientDetailPage() {
                   <Button
                     className="mt-4 bg-blue-600 hover:bg-blue-700 gap-2"
                     onClick={() => router.push(`/tenant/projects/new?clientId=${id}`)}
+                    disabled={client.status !== 'active'}
                   >
                     <Plus className="h-4 w-4" />
                     Buat Project Pertama
