@@ -83,8 +83,8 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
   };
 
   const handleCoaChange = (value: string, lineId: string) => {
-    const selectedCoa = coaOptions.find(coa => coa.code === value);
-    setJournalLines(journalLines.map(line =>
+    const selectedCoa = coaOptions?.find(coa => coa.code === value);
+    setJournalLines(journalLines?.map(line =>
       line.id === lineId ? { ...line, account_code: value, account_name: selectedCoa?.name || "" } : line
     ));
   };
@@ -111,7 +111,7 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
       <div className="grid grid-cols-2 gap-6 mb-5">
         {/* Checklist Items */}
         <div className="flex flex-col gap-4">
-          {checklistItems.map((item, index) => (
+          {checklistItems?.map((item, index) => (
             <div
               key={index}
               className="flex items-center justify-between rounded-[10px] border border-[rgba(0,0,0,0.10)] px-3 py-3"
@@ -255,7 +255,7 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
             </TableRow>
           </TableHeader>
           <TableBody>
-            {journalLines.map((line, index) => (
+            {journalLines?.map((line, index) => (
               <TableRow key={line.id} className="border-b border-[rgba(0,0,0,0.10)]">
                 <TableCell className="text-center">{index + 1}</TableCell>
                 <TableCell>
@@ -264,7 +264,7 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
                       <SelectValue placeholder="Pilih COA" />
                     </SelectTrigger>
                     <SelectContent>
-                      {coaOptions.map(coa => (
+                      {coaOptions?.map(coa => (
                         <SelectItem key={coa.id} value={coa.code}>{coa.code} - {coa.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -276,7 +276,7 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
                     type="number"
                     value={line.debit}
                     variant="idr"
-                    onChange={(e) => setJournalLines(journalLines.map(l => l.id === line.id ? { ...l, debit: parseFloat(e.target.value) || 0 } : l))}
+                    onChange={(e) => setJournalLines(journalLines?.map(l => l.id === line.id ? { ...l, debit: parseFloat(e.target.value) || 0 } : l))}
                     className="h-9 text-right"
                   />
                 </TableCell>
@@ -285,14 +285,14 @@ export default function VouchingChecklist({ coaOptions }: VouchingChecklistProps
                     type="number"
                     value={line.credit}
                     variant="idr"
-                    onChange={(e) => setJournalLines(journalLines.map(l => l.id === line.id ? { ...l, credit: parseFloat(e.target.value) || 0 } : l))}
+                    onChange={(e) => setJournalLines(journalLines?.map(l => l.id === line.id ? { ...l, credit: parseFloat(e.target.value) || 0 } : l))}
                     className="h-9 text-right"
                   />
                 </TableCell>
                 <TableCell>
                   <Input
                     value={line.description}
-                    onChange={(e) => setJournalLines(journalLines.map(l => l.id === line.id ? { ...l, description: e.target.value } : l))}
+                    onChange={(e) => setJournalLines(journalLines?.map(l => l.id === line.id ? { ...l, description: e.target.value } : l))}
                     className="h-9"
                   />
                 </TableCell>

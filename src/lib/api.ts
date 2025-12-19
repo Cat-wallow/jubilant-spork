@@ -2,6 +2,22 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './tokenManager';
 
+const logFormData = (formData: FormData) => {
+  console.log('[FORM DATA]');
+  for (const [key, value] of formData.entries()) {
+    if (value instanceof File) {
+      console.log(`${key}:`, {
+        name: value.name,
+        type: value.type,
+        size: value.size,
+      });
+    } else {
+      console.log(`${key}:`, value);
+    }
+  }
+};
+
+
 const api = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_GATEWAY_URL ||
@@ -21,6 +37,22 @@ api.interceptors.request.use(
     if (token && !shouldSkipAuth) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
+    // 🔍 DEBUG REQUEST
+    console.log('[API REQUEST]');
+    console.log('URL:', config.baseURL + config.url);
+    console.log('Method:', config.method);
+    console.log('Headers:', config.headers);
+    console.log('Params:', config.params);
+    console.log('Body:', config.data); // ⬅️ INI YANG KAMU CARI
+
+    if (config.data instanceof FormData) {
+      logFormData(config.data); // ✅ BONGKAR ISINYA
+    } else {
+      console.log('[REQUEST BODY]', config.data);
+    }
+
+
 
     // X-Tenant-Id header will be set globally by setTenantIdHeader function called from AuthContext
     return config;
@@ -115,7 +147,7 @@ api.interceptors.response.use(
 
         // Update defaults
         api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-        
+
         // Update original request
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
 

@@ -87,6 +87,10 @@ export default function TabelBarangJasa({
     });
   }, [watchedItems, setValue]);
 
+  useEffect(() => {
+    setValue('calculated_tagihan_exclude_pajak', tagihanExcludePajak);
+  }, [tagihanExcludePajak, setValue]);
+
   return (
     <Card className="flex flex-col  border rounded-3xl p-5 gap-4">
       <div>
@@ -127,7 +131,7 @@ export default function TabelBarangJasa({
 
           <Separator className="mb-2.5" />
 
-          {fields.map((field, index) => (
+          {fields?.map((field, index) => (
             <div key={field.id} className="mb-4 flex items-start gap-2 px-1">
               <div className=" max-w-36 flex flex-col gap-1">
                   <Input

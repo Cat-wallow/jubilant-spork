@@ -18,30 +18,38 @@ interface InformasiObjekPajakProps {
 	jenisTransaksiOptions: { id: string; name: string; type: string }[];
 	subjekLawanOptions: { id: string; name: string; type: string }[];
 	tipePkpOptions: { id: string; name: string; type: string }[];
+	billTypeOptions: { id: string; name: string; type: string }[]; // Added
 }
 
 export default function InformasiObjekPajak({
 	jenisTransaksiOptions,
 	subjekLawanOptions,
 	tipePkpOptions,
+	billTypeOptions, // Added
 }: InformasiObjekPajakProps) {
 	const { control, register, watch } = useFormContext();
 
 	const categoryValue = watch("category");
 	const counterpartyTypeValue = watch("counterparty_type");
 	const vendorPkpStatusValue = watch("vendor_pkp_status");
+	const billTypeValue = watch("bill_type"); // Added
 
 	const selectedCategoryName = useMemo(() => {
-		return jenisTransaksiOptions.find((o) => o.id === categoryValue)?.name;
+		return jenisTransaksiOptions?.find((o) => o.id === categoryValue)?.name;
 	}, [jenisTransaksiOptions, categoryValue]);
 
 	const selectedCounterpartyTypeName = useMemo(() => {
-		return subjekLawanOptions.find((o) => o.id === counterpartyTypeValue)?.name;
+		return subjekLawanOptions?.find((o) => o.id === counterpartyTypeValue)?.name;
 	}, [subjekLawanOptions, counterpartyTypeValue]);
 
 	const selectedVendorPkpStatusName = useMemo(() => {
-		return tipePkpOptions.find((o) => o.id === vendorPkpStatusValue)?.name;
+		return tipePkpOptions?.find((o) => o.id === vendorPkpStatusValue)?.name;
 	}, [tipePkpOptions, vendorPkpStatusValue]);
+
+	const selectedBillTypeName = useMemo(() => { // Added
+		return billTypeOptions?.find((o) => o.id === billTypeValue)?.name;
+	}, [billTypeOptions, billTypeValue]);
+
 
 	return (
 		<Card className="rounded-[20px] border p-5">
@@ -67,7 +75,7 @@ export default function InformasiObjekPajak({
 										</SelectValue>
 									</SelectTrigger>
 									<SelectContent>
-										{jenisTransaksiOptions.map((option) => (
+										{jenisTransaksiOptions?.map((option) => (
 											<SelectItem key={option.id} value={option.id}>
 												{option.name}
 											</SelectItem>
@@ -94,7 +102,7 @@ export default function InformasiObjekPajak({
 										</SelectValue>
 									</SelectTrigger>
 									<SelectContent>
-										{subjekLawanOptions.map((option) => (
+										{subjekLawanOptions?.map((option) => (
 											<SelectItem key={option.id} value={option.id}>
 												{option.name}
 											</SelectItem>
@@ -121,7 +129,7 @@ export default function InformasiObjekPajak({
 										</SelectValue>
 									</SelectTrigger>
 									<SelectContent>
-										{tipePkpOptions.map((option) => (
+										{tipePkpOptions?.map((option) => (
 											<SelectItem key={option.id} value={option.id}>
 												{option.name}
 											</SelectItem>
@@ -134,6 +142,34 @@ export default function InformasiObjekPajak({
 				</div>
 
 				<div className="flex flex-col gap-4">
+          {/* New Bill Type Select */}
+          <div className="flex flex-col gap-[5px]">
+						<Label htmlFor="bill_type">Tipe Tagihan</Label>
+						<Controller
+							control={control}
+							name="bill_type"
+							render={({ field }) => (
+								<Select
+									onValueChange={field.onChange}
+									value={field.value || ""}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="Pilih tipe tagihan">
+											{selectedBillTypeName || "Pilih tipe tagihan"}
+										</SelectValue>
+									</SelectTrigger>
+									<SelectContent>
+										{billTypeOptions?.map((option) => (
+											<SelectItem key={option.id} value={option.id}>
+												{option.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							)}
+						/>
+					</div>
+
 					<div className="flex flex-col gap-[5px]">
 						<Label htmlFor="vendor_npwp">NPWP</Label>
 						<Input

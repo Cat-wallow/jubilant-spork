@@ -57,9 +57,6 @@ export function FileTable({
 				</div>
 
 				<div className="flex w-[120px] items-center gap-[7px]">
-					<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
-						Total Comments
-					</span>
 					<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
 				</div>
 
@@ -102,12 +99,6 @@ export function FileTable({
 						<div className="flex w-[120px] flex-col gap-2.5">
 							<span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
 								{file.type}
-							</span>
-						</div>
-
-						<div className="flex w-[120px] flex-col gap-2.5">
-							<span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
-								{file.comments}
 							</span>
 						</div>
 

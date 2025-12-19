@@ -42,7 +42,7 @@ export const columnsApproved: ColumnDef<DocumentTransaction>[] = [
 
       return (
         <Link href={`/tenant/projects/${row.original.project_id}/kk1/${row.original.id}/add`}>
-          <span className="font-medium hover:underline text-blue-600">
+          <span className="font-medium hover:underline ">
             {trxNumber}
           </span>
         </Link>

@@ -33,7 +33,7 @@ export default function InformasiAdministrasi() {
       </CardTitle>
       {documentDetails ? (
         <div className="flex flex-col gap-2.5">
-          {identitasData.map((item, index) => (
+          {identitasData?.map((item, index) => (
             <div
               key={index}
               className="flex items-center justify-between text-sm "

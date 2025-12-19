@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { FileText, RefreshCcw } from "lucide-react";
 
 import {
   ColumnFiltersState,
@@ -15,7 +15,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 
 import { getDocumentsForKK1 } from "@/services/document.service";
@@ -23,7 +23,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { columnsAwaiting } from "./components/columns-awaiting";
 import { columnsApproved } from "./components/columns-approved";
-import { TransactionStatus } from "@/types/transaction"; 
+import { TransactionStatus } from "@/types/transaction";
 
 interface DocumentWithTransaction {
   id: string;
@@ -57,7 +57,7 @@ export default function KK1Page() {
   const [debouncedSearchAwaiting] = useDebounce(searchQueryAwaiting, 400);
 
   // --- QUERY FOR "DOCUMENTS AWAITING TRANSACTION" TABLE (isApproved: false) ---
-  const { data: dataAwaiting, isLoading: isLoadingAwaiting, isError: isErrorAwaiting } = useQuery({
+  const { data: dataAwaiting, isLoading: isLoadingAwaiting, isError: isErrorAwaiting, refetch: refetchAwaiting } = useQuery({
     queryKey: ["documentsForKK1", projectId, "awaiting", paginationAwaiting, sortingAwaiting, debouncedSearchAwaiting, filterDocumentStatusAwaiting],
     queryFn: () => {
       const sortDescriptor = sortingAwaiting[0];
@@ -66,12 +66,12 @@ export default function KK1Page() {
         limit: paginationAwaiting.pageSize,
         search: debouncedSearchAwaiting,
         documentStatus: filterDocumentStatusAwaiting === "all" ? undefined : filterDocumentStatusAwaiting,
-        isApproved: 'false', 
+        isApproved: 'false',
         sortBy: sortDescriptor?.id,
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
       });
     },
-    staleTime: 1000 * 60 * 5, 
+    staleTime: 1000 * 60 * 5,
   });
 
   const documentsAwaiting = (dataAwaiting?.data?.documents || []) as DocumentWithTransaction[];
@@ -112,7 +112,7 @@ export default function KK1Page() {
   const [debouncedSearchApproved] = useDebounce(searchQueryApproved, 400);
 
   // --- QUERY FOR "APPROVED TRANSACTIONS" TABLE (isApproved: true) ---
-  const { data: dataApproved, isLoading: isLoadingApproved, isError: isErrorApproved } = useQuery({
+  const { data: dataApproved, isLoading: isLoadingApproved, isError: isErrorApproved, refetch: refetchApproved } = useQuery({
     queryKey: ["documentsForKK1", projectId, "approved", paginationApproved, sortingApproved, debouncedSearchApproved, filterDocumentStatusApproved],
     queryFn: () => {
       const sortDescriptor = sortingApproved[0];
@@ -121,7 +121,7 @@ export default function KK1Page() {
         limit: paginationApproved.pageSize,
         search: debouncedSearchApproved,
         documentStatus: filterDocumentStatusApproved === "all" ? undefined : filterDocumentStatusApproved,
-        isApproved: 'true', 
+        isApproved: 'true',
         sortBy: sortDescriptor?.id,
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
       });
@@ -161,7 +161,17 @@ export default function KK1Page() {
   const totalValue =
     documentsAwaiting.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0) +
     documentsApproved.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0);
-  const pendingTransactionsCount = dataAwaiting?.data?.total || 0; 
+  const pendingTransactionsCount = dataAwaiting?.data?.total || 0;
+
+  const queryClient = useQueryClient();
+
+  const handleSynchronize = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["documentsForKK1", projectId],
+      refetchType: "active",
+    });
+  };
+
 
   return (
     <div className="flex w-full flex-col gap-7 overflow-x-hidden">
@@ -229,11 +239,19 @@ export default function KK1Page() {
 
       {/* TABLE: DOCUMENTS AWAITING TRANSACTION CREATION */}
       <Card className="rounded-[20px] border p-5">
-        <CardHeader className="p-0 pb-5">
+        <CardHeader className="p-0 pb-5 flex flex-row justify-between">
+          <div>
           <CardTitle className="text-[22px] font-bold">Dokumen Menunggu Transaksi</CardTitle>
           <p className="text-sm ">
             Daftar dokumen yang belum memiliki pencatatan transaksi
           </p>
+          </div>
+          <Button className="mt-4 gap-2"  onClick={() => {
+            handleSynchronize();
+          }}>
+          <RefreshCcw className="w-4 h-4"/>
+            Synchronize
+          </Button>
         </CardHeader>
         <CardContent className="p-0">
           <DataTableToolbar
@@ -245,12 +263,12 @@ export default function KK1Page() {
             customFilters={[
               {
                 key: "type",
-                label: "Jenis Dokumen", 
-                value: "all", 
+                label: "Jenis Dokumen",
+                value: "all",
                 options: [
                   { label: "All Type", value: "all" },
                 ],
-                onChange: () => {}, 
+                onChange: () => {},
               },
             ]}
           />

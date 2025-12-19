@@ -31,7 +31,7 @@ export default function IdentitasDokumen() {
 			<CardTitle className="mb-5 text-xl  ">Identitas Dokumen</CardTitle>
 			{documentDetails ? (
 				<div className="flex flex-col gap-2.5">
-					{identitasData.map((item, index) => (
+					{identitasData?.map((item, index) => (
 						<div
 							key={index}
 							className="flex items-center justify-between text-sm "
@@ -44,7 +44,7 @@ export default function IdentitasDokumen() {
 			) : (
 				<Skeleton>
 					<div className="flex flex-col gap-2.5">
-						{identitasData.map((item, index) => (
+						{identitasData?.map((item, index) => (
 							<div
 								key={index}
 								className="flex items-center justify-between text-sm"

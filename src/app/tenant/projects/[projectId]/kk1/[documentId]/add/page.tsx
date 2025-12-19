@@ -61,15 +61,24 @@ const draftSchema = z.object({
 
   transaction_items: z.array(itemSchema).optional(),
 
+  calculated_tagihan_exclude_pajak: z.coerce.number().min(0).optional(),
+
   // Untuk transaction_taxes
   transaction_taxes: z.object({
     tax_deposit: z.coerce.number().min(0).optional(),
+    tax_deposit_percentage: z.coerce.number().min(0).max(100).optional(),
     ppn: z.coerce.number().min(0).optional(),
+    ppn_percentage: z.coerce.number().min(0).max(100).optional(),
     pph_21: z.coerce.number().min(0).optional(),
+    pph_21_percentage: z.coerce.number().min(0).max(100).optional(),
     pph_23: z.coerce.number().min(0).optional(),
+    pph_23_percentage: z.coerce.number().min(0).max(100).optional(),
     pph_4_2: z.coerce.number().min(0).optional(),
+    pph_4_2_percentage: z.coerce.number().min(0).max(100).optional(),
     pph_credit: z.coerce.number().min(0).optional(),
+    pph_credit_percentage: z.coerce.number().min(0).max(100).optional(),
     other_pph: z.coerce.number().min(0).optional(),
+    other_pph_percentage: z.coerce.number().min(0).max(100).optional(),
   }).optional(),
 
   tax_proof_files: z.array(
@@ -127,14 +136,22 @@ export default function KK1AddPage() {
       transaction_items: [
         { description: "", quantity: 0, satuan: "", unit_price: 0, total_amount: 0, ppn: 0, p2pph: 0 }
       ],
+      calculated_tagihan_exclude_pajak: 0,
       transaction_taxes: {
         tax_deposit: 0,
+        tax_deposit_percentage: 0,
         ppn: 0,
+        ppn_percentage: 0,
         pph_21: 0,
+        pph_21_percentage: 0,
         pph_23: 0,
+        pph_23_percentage: 0,
         pph_4_2: 0,
+        pph_4_2_percentage: 0,
         pph_credit: 0,
+        pph_credit_percentage: 0,
         other_pph: 0,
+        other_pph_percentage: 0,
       },
       status: TransactionStatus.IN_PROGRESS,
     },
@@ -167,20 +184,32 @@ export default function KK1AddPage() {
 
   useEffect(() => {
     if (existingTransaction) {
+        const taxFields = [
+            "tax_deposit", "ppn", "pph_21", "pph_23",
+            "pph_4_2", "pph_credit", "other_pph"
+        ];
+        const initialTransactionTaxes = existingTransaction.transaction_taxes || {};
+        const calculatedExcludePajak = existingTransaction.calculated_tagihan_exclude_pajak || 0;
+
+        const newTransactionTaxes: any = { ...initialTransactionTaxes };
+
+        taxFields.forEach(field => {
+            const amount = initialTransactionTaxes[field];
+            if (amount !== undefined && calculatedExcludePajak !== 0) {
+                const percentage = (amount / calculatedExcludePajak) * 100;
+                newTransactionTaxes[`${field}_percentage`] = !isNaN(percentage) && percentage >= 0 ? percentage : 0;
+            } else {
+                newTransactionTaxes[`${field}_percentage`] = 0;
+            }
+        });
+
       reset({
         ...existingTransaction,
         transaction_items: existingTransaction.transaction_items?.length
           ? existingTransaction.transaction_items
           : [{ description: "", quantity: 0, satuan: "", unit_price: 0, total_amount: 0, ppn: 0, p2pph: 0 }],
-        transaction_taxes: existingTransaction.transaction_taxes || {
-          tax_deposit: 0,
-          ppn: 0,
-          pph_21: 0,
-          pph_23: 0,
-          pph_4_2: 0,
-          pph_credit: 0,
-          other_pph: 0,
-        },
+        calculated_tagihan_exclude_pajak: calculatedExcludePajak,
+        transaction_taxes: newTransactionTaxes,
         tax_proof_files: existingTransaction.transaction_taxes?.attachment_url
           ? [{ id: `existing-attachment-${Date.now()}`, file_name: "Attachment", file_url: existingTransaction.transaction_taxes.attachment_url }]
           : [],
@@ -357,6 +386,8 @@ export default function KK1AddPage() {
   const subjekLawanOptions = refTypesData?.data?.filter((rt: any) => rt.type === 'SUBJEK_LAWAN') || [];
   const tipePkpOptions = refTypesData?.data?.filter((rt: any) => rt.type === 'TIPE_PKP') || [];
   const taxTypeOptions = refTypesData?.data?.filter((rt: any) => rt.type === 'TAX_TYPE') || [];
+  const billTypeOptions = refTypesData?.data?.filter((rt: any) => rt.type === 'TAGIHAN') || [];
+
   const coaOptions = coaData?.data?.map((coa: any) => ({
     id: coa.id,
     code: coa.name,
@@ -389,6 +420,7 @@ export default function KK1AddPage() {
               <InformasiAdministrasi />
             </div>
             <InformasiObjekPajak
+              billTypeOptions={billTypeOptions}
               jenisTransaksiOptions={jenisTransaksiOptions}
               subjekLawanOptions={subjekLawanOptions}
               tipePkpOptions={tipePkpOptions}
