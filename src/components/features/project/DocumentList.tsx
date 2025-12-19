@@ -1,12 +1,10 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/contexts/AuthContext';
 import { getReferenceTypes } from '@/services/reference-type.service';
-import { useDocuments, useUploadDocuments, useUpdateWorkflow } from '@/hooks/useDocuments';
+import { useDocuments, useUploadDocuments, useUpdateWorkflow, useUpdateDocument } from '@/hooks/useDocuments';
+import { useBundles } from '@/hooks/useBundles';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileUploader } from '@/components/shared/FileUploader';
-import { ArrowLeft, Download, Plus, CalendarIcon, CheckCircle2, Circle, Eye, FileText } from 'lucide-react';
+import { ArrowLeft, Download, Plus, CalendarIcon, CheckCircle2, Circle, Eye, FileText, Search, Filter, FolderInput } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -40,15 +38,13 @@ const WORKFLOW_STEPS = [
   { key: 'beritaAcara', label: 'Berita Acara' },
 ];
 
-export default function FormOneBundleDetailPage() {
-  const params = useParams();
-  const { tenant, user } = useAuth();
+interface DocumentListProps {
+  projectId: string;
+  tenantId: string;
+  userId: string;
+}
 
-  const projectId = params.projectId as string;
-  const bundleId = params.bundleId as string;
-  const tenantId = tenant?.id || '';
-  const userId = user?.id || '';
-
+export function DocumentList({ projectId, tenantId, userId }: DocumentListProps) {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 500);
   const [statusFilter, setStatusFilter] = useState<'all' | 'digital' | 'asli' | 'copy'>('all');
@@ -68,14 +64,52 @@ export default function FormOneBundleDetailPage() {
   const [posisiDokumenAsli, setPosisiDokumenAsli] = useState('');
   const [noUrutSortiran, setNoUrutSortiran] = useState('');
   const [catatan, setCatatan] = useState('');
+  const [selectedBundleId, setSelectedBundleId] = useState<string>('none');
 
   const uploadMutation = useUploadDocuments();
   const updateWorkflowMutation = useUpdateWorkflow();
+  const updateDocumentMutation = useUpdateDocument();
 
   const [isWorkflowDialogOpen, setIsWorkflowDialogOpen] = useState(false);
   const [selectedWorkflowDoc, setSelectedWorkflowDoc] = useState<any>(null);
   const [selectedWorkflowStep, setSelectedWorkflowStep] = useState<string>('');
   const [workflowDate, setWorkflowDate] = useState<Date | undefined>(new Date());
+
+  const [isAssignBundleOpen, setIsAssignBundleOpen] = useState(false);
+  const [selectedDocForBundle, setSelectedDocForBundle] = useState<any>(null);
+  const [bundleToAssign, setBundleToAssign] = useState<string>('none');
+
+  const { data, isLoading } = useDocuments(
+    tenantId,
+    projectId,
+    {
+      search: debouncedSearch || undefined,
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      page: 1, // We might want to implement proper server-side pagination later
+      pageSize: 100, // Fetch more for now since we do client-side slice for display
+    },
+    { enabled: !!tenantId && !!projectId },
+  );
+
+  const { data: bundlesResponse } = useBundles(tenantId, projectId);
+  const bundles = useMemo(() => bundlesResponse?.items ?? [], [bundlesResponse]);
+
+  const { data: documentTypes } = useQuery({
+    queryKey: ['reference-types', 'JENIS_DOKUMEN'],
+    queryFn: () => getReferenceTypes('JENIS_DOKUMEN'),
+  });
+
+  const pagedDocs = useMemo(() => {
+    const items = data?.items ?? [];
+    if (items.length === 0) return items;
+    const start = (page - 1) * pageSize;
+    return items.slice(start, start + pageSize);
+  }, [data?.items, page, pageSize]);
+
+  const totalDocs = data?.stats?.total ?? (data?.items?.length ?? 0);
+  const digitalDocs = data?.stats?.digital ?? 0;
+  const asliDocs = data?.stats?.asli ?? 0;
+  const copyDocs = data?.stats?.copy ?? 0;
 
   const isStepClickable = (doc: any, stepKey: string) => {
     const stepIndex = WORKFLOW_STEPS.findIndex(s => s.key === stepKey);
@@ -123,36 +157,6 @@ export default function FormOneBundleDetailPage() {
     }
   };
 
-  const { data, isLoading, error } = useDocuments(
-    tenantId,
-    projectId,
-    {
-      bundleId,
-      search: debouncedSearch || undefined,
-      status: statusFilter === 'all' ? undefined : statusFilter,
-      page: 1,
-      pageSize,
-    },
-    { enabled: !!tenantId && !!projectId && !!bundleId },
-  );
-
-  const { data: documentTypes } = useQuery({
-    queryKey: ['reference-types', 'JENIS_DOKUMEN'],
-    queryFn: () => getReferenceTypes('JENIS_DOKUMEN'),
-  });
-
-  const pagedDocs = useMemo(() => {
-    const items = data?.items ?? [];
-    if (items.length === 0) return items;
-    const start = (page - 1) * pageSize;
-    return items.slice(start, start + pageSize);
-  }, [data?.items, page, pageSize]);
-
-  const totalDocs = data?.stats?.total ?? (data?.items?.length ?? 0);
-  const digitalDocs = data?.stats?.digital ?? 0;
-  const asliDocs = data?.stats?.asli ?? 0;
-  const copyDocs = data?.stats?.copy ?? 0;
-
   const resetUploadForm = () => {
     setFiles(null);
     setTipeDokumen('');
@@ -166,6 +170,7 @@ export default function FormOneBundleDetailPage() {
     setPosisiDokumenAsli('');
     setNoUrutSortiran('');
     setCatatan('');
+    setSelectedBundleId('none');
   };
 
   const handleUpload = async () => {
@@ -216,10 +221,10 @@ export default function FormOneBundleDetailPage() {
           divisi: divisi.trim(),
           posisiDokumenAsli: posisiDokumenAsli.trim(),
           noUrutSortiran: noUrutSortiran.trim() || undefined,
-          bundleId,
+          bundleId: selectedBundleId === 'none' ? undefined : selectedBundleId,
         },
       });
-      toast.success('Dokumen berhasil ditambahkan ke bundle');
+      toast.success('Dokumen berhasil ditambahkan');
       setIsUploadOpen(false);
       resetUploadForm();
     } catch (err: any) {
@@ -228,36 +233,36 @@ export default function FormOneBundleDetailPage() {
     }
   };
 
-  return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">
-            Form 1.0 - Lembar Pengendalian Arus Dokumen
-          </h1>
-          <p className="text-sm text-muted-foreground">{`Detail bundle ${bundleId}`}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => toast.info('Export XLSX belum tersedia')}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Export XLSX
-          </Button>
-          <Button onClick={() => setIsUploadOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Dokumen
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={`/tenant/projects/${projectId}/form1`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Link>
-          </Button>
-        </div>
-      </div>
+  const handleAssignBundle = async () => {
+    if (!selectedDocForBundle) return;
+    
+    try {
+      await updateDocumentMutation.mutateAsync({
+        tenantId,
+        projectId,
+        documentId: selectedDocForBundle.id,
+        payload: {
+          bundleId: bundleToAssign === 'none' ? null : bundleToAssign
+        }
+      });
+      toast.success('Bundle berhasil diupdate');
+      setIsAssignBundleOpen(false);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Gagal update bundle';
+      toast.error(msg);
+    }
+  };
 
+  const openAssignBundle = (doc: any) => {
+    setSelectedDocForBundle(doc);
+    // Try to find if doc has bundleId, otherwise 'none'
+    // Assuming doc might have bundleId property if backend returns it
+    setBundleToAssign((doc as any).bundleId || 'none');
+    setIsAssignBundleOpen(true);
+  };
+
+  return (
+    <div className="space-y-6">
       {/* Metric cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="border-none bg-blue-50/70 dark:bg-blue-950/30">
@@ -291,224 +296,273 @@ export default function FormOneBundleDetailPage() {
         <CardHeader>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle className="text-sm font-semibold">Daftar Dokumen</CardTitle>
-              <p className="text-xs text-muted-foreground">Kelola dokumen di dalam bundle</p>
+              <CardTitle className="text-base font-semibold">Daftar Dokumen</CardTitle>
+              <p className="text-xs text-muted-foreground">Kelola dokumen proyek</p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => toast.info('Export XLSX belum tersedia')}>
                 <Download className="mr-2 h-4 w-4" />
                 Export XLSX
               </Button>
-              <Button variant="outline" size="sm" onClick={() => toast.info('Export PDF belum tersedia')}>
-                <Download className="mr-2 h-4 w-4" />
-                Export PDF
+              <Button onClick={() => setIsUploadOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white" size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah Dokumen
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {!tenantId || !userId ? (
-            <p className="text-sm text-red-500">Session tidak valid. Silakan login ulang.</p>
-          ) : isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : error || !data ? (
-            <p className="text-sm text-red-500">
-              {(error as any)?.response?.data?.message || (error as any)?.message || "Gagal memuat dokumen bundle."}
-            </p>
-          ) : (
-            <>
-              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-2">
-                  <Select value={pageSize.toString()} onValueChange={(v) => setPageSize(parseInt(v, 10))}>
-                    <SelectTrigger className="w-[90px]">
-                      <SelectValue placeholder="20" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="20">20</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="relative w-full md:w-[360px]">
-                    <Input
-                      value={search}
-                      onChange={(e) => {
-                        setSearch(e.target.value);
-                        setPage(1);
-                      }}
-                      placeholder="Cari dokumen..."
-                    />
-                  </div>
-                </div>
+        <CardContent className="space-y-4">
+          {/* Toolbar */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              <Select
+                value={String(pageSize)}
+                onValueChange={(val) => {
+                  const size = parseInt(val, 10) || 10;
+                  setPageSize(size);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
 
-                <div className="flex items-center gap-2">
-                  <Select value={statusFilter} onValueChange={(v) => {
-                    setStatusFilter(v as any);
-                    setPage(1);
-                  }}>
-                    <SelectTrigger className="w-[160px]">
-                      <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="digital">Digital</SelectItem>
-                      <SelectItem value="asli">Asli</SelectItem>
-                      <SelectItem value="copy">Copy</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="relative w-full md:w-[200px]">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Cari dokumen..."
+                  className="pl-8"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               </div>
 
-              {data.items.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Belum ada dokumen yang cocok dengan filter.</p>
-              ) : (
-                <>
-                  <div className="rounded-md border overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="min-w-[200px]">Identitas Dokumen</TableHead>
-                          {WORKFLOW_STEPS.map((step) => (
-                            <TableHead key={step.key} className="text-center min-w-[120px] whitespace-nowrap">{step.label}</TableHead>
-                          ))}
-                          <TableHead className="text-right min-w-[100px]">Aksi</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {pagedDocs.map((doc) => (
-                          <TableRow key={doc.id}>
-                            <TableCell>
-                              <Link href={`/tenant/projects/${projectId}/form1/documents/${doc.id}`} className="block p-1 -m-1">
-                                <div className="flex flex-col gap-1">
-                                  <span className="font-medium text-blue-600 dark:text-blue-400">{doc.jenisDokumen}</span>
-                                  <span className="text-xs text-muted-foreground">{doc.tipeDokumen}</span>
-                                  <span className="text-xs text-muted-foreground">{doc.nomorDokumen || '-'}</span>
-                                  <span className="text-xs text-muted-foreground">{doc.documentDate ? format(new Date(doc.documentDate), 'dd/MM/yyyy') : '-'}</span>
-                                </div>
-                              </Link>
-                            </TableCell>
-                            {WORKFLOW_STEPS.map((step) => {
-                              const isDone = doc[step.key]?.status === true;
-                              const clickable = !isDone && isStepClickable(doc, step.key);
-                              
-                              return (
-                                <TableCell key={step.key} className="text-center p-2">
-                                  <div 
-                                    className={cn(
-                                      "inline-flex justify-center items-center p-2 rounded-full transition-all",
-                                      clickable && "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-110",
-                                      !clickable && !isDone && "opacity-30 cursor-not-allowed"
-                                    )}
-                                    onClick={() => clickable && handleWorkflowClick(doc, step.key)}
-                                    title={isDone ? `Selesai oleh ${doc[step.key]?.by || '-'} pada ${doc[step.key]?.date ? format(new Date(doc[step.key]?.date), 'dd/MM/yyyy') : '-'}` : (clickable ? "Klik untuk update status" : "Selesaikan tahap sebelumnya")}
-                                  >
-                                    {isDone ? (
-                                      <CheckCircle2 className="h-6 w-6 text-green-600 fill-green-50" />
-                                    ) : (
-                                      <Circle className="h-6 w-6 text-slate-300" />
-                                    )}
-                                  </div>
-                                  {isDone && (
-                                    <div className="flex flex-col items-center mt-1">
-                                      {doc[step.key]?.byName && (
-                                        <div className="text-[10px] font-medium text-slate-700 dark:text-slate-300 max-w-[100px] truncate text-center">
-                                          {doc[step.key]?.byName}
-                                        </div>
-                                      )}
-                                      {doc[step.key]?.date && (
-                                        <div className="text-[10px] text-muted-foreground">
-                                          {format(new Date(doc[step.key]?.date), 'dd/MM')}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </TableCell>
-                              );
-                            })}
-                            <TableCell className="text-right">
-                              <Button asChild size="sm" variant="outline">
-                                <Link href={`/tenant/projects/${projectId}/form1/documents/${doc.id}`}>Detail</Link>
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+              <Select
+                value={statusFilter}
+                onValueChange={(val) => setStatusFilter(val as any)}
+              >
+                <SelectTrigger className="w-[130px]">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Status" />
                   </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="digital">Digital</SelectItem>
+                  <SelectItem value="asli">Asli</SelectItem>
+                  <SelectItem value="copy">Copy</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="text-xs text-muted-foreground">
-                      {`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, data.items.length)} of ${data.items.length}`}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page <= 1}
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      >
-                        Previous
-                      </Button>
-                      <div className="text-sm">{page}</div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page * pageSize >= data.items.length}
-                        onClick={() => setPage((p) => p + 1)}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </>
-          )}
+          <div className="rounded-md border overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-slate-50 dark:bg-slate-900">
+                  <TableRow>
+                    <TableHead className="w-[200px] whitespace-nowrap">Nama File / Dokumen</TableHead>
+                    <TableHead className="whitespace-nowrap">Bundle</TableHead>
+                    <TableHead className="whitespace-nowrap">Tanggal</TableHead>
+                    <TableHead className="whitespace-nowrap">Status</TableHead>
+                    <TableHead className="whitespace-nowrap text-center">Action</TableHead>
+                    {WORKFLOW_STEPS.map((step) => (
+                      <TableHead key={step.key} className="whitespace-nowrap text-center min-w-[100px]">
+                        {step.label}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                        {WORKFLOW_STEPS.map((s) => (
+                          <TableCell key={s.key}><Skeleton className="h-4 w-4 mx-auto" /></TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : pagedDocs.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5 + WORKFLOW_STEPS.length} className="h-24 text-center">
+                        Tidak ada dokumen ditemukan.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    pagedDocs.map((doc) => (
+                      <TableRow key={doc.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <span className="font-medium truncate max-w-[200px]" title={doc.originalFilename}>
+                              {doc.originalFilename}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {doc.jenisDokumen} • {doc.tipeDokumen}
+                            </span>
+                            {doc.nomorDokumen && (
+                              <span className="text-xs text-blue-600">
+                                {doc.nomorDokumen}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                           {/* Display bundle name if we can map it, or allow assigning */}
+                           <div className="flex items-center gap-2">
+                             <span className="text-sm text-muted-foreground">
+                               {bundles.find(b => b.id === (doc as any).bundleId)?.name || ((doc as any).bundleId ? 'Bundle Assigned' : '-')}
+                             </span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {doc.documentDate ? format(new Date(doc.documentDate), 'dd/MM/yyyy') : '-'}
+                        </TableCell>
+                        <TableCell>
+                          <span className={cn(
+                            "px-2 py-1 rounded-full text-xs font-medium capitalize",
+                            doc.status === 'asli' && "bg-emerald-100 text-emerald-800",
+                            doc.status === 'copy' && "bg-amber-100 text-amber-800",
+                            doc.status === 'digital' && "bg-blue-100 text-blue-800"
+                          )}>
+                            {doc.status}
+                          </span>
+                        </TableCell>
+                        
+                        <TableCell className="text-center">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openAssignBundle(doc)}
+                            title="Atur Bundle"
+                          >
+                            <FolderInput className="h-4 w-4 text-blue-600" />
+                          </Button>
+                        </TableCell>
+
+                        {/* Workflow Steps Columns */}
+                        {WORKFLOW_STEPS.map((step) => {
+                           const stepData = (doc as any)[step.key];
+                           const isDone = stepData?.status === true;
+                           
+                           return (
+                             <TableCell key={step.key} className="text-center p-2">
+                               <div 
+                                 className={cn(
+                                   "flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-110",
+                                   isDone ? "opacity-100" : "opacity-30 hover:opacity-100"
+                                 )}
+                                 onClick={() => handleWorkflowClick(doc, step.key)}
+                               >
+                                 {isDone ? (
+                                   <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                                 ) : (
+                                   <Circle className="h-5 w-5 text-slate-300" />
+                                 )}
+                                 {isDone && stepData.date && (
+                                   <span className="text-[10px] text-muted-foreground mt-1">
+                                     {format(new Date(stepData.date), 'dd/MM')}
+                                   </span>
+                                 )}
+                               </div>
+                             </TableCell>
+                           );
+                        })}
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+          
+          {/* Pagination */}
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="text-sm text-muted-foreground">
+               Showing {pagedDocs.length > 0 ? (page - 1) * pageSize + 1 : 0} to {Math.min((page - 1) * pageSize + pagedDocs.length, totalDocs)} of {totalDocs} entries
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(page + 1)}
+                disabled={pagedDocs.length < pageSize}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      <Dialog open={isUploadOpen} onOpenChange={(open) => {
-        setIsUploadOpen(open);
-        if (!open) resetUploadForm();
-      }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      {/* Upload Dialog */}
+      <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Tambah Dokumen Baru</DialogTitle>
-            <DialogDescription>Tambahkan dokumen baru dengan mengisi informasi di bawah ini</DialogDescription>
+            <DialogDescription>
+              Upload dokumen baru ke dalam proyek. Anda dapat memilih bundle nanti.
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="grid gap-6 py-4 md:grid-cols-2">
             <Card className="border rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base">Informasi Dokumen</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <Label>Tipe Dokumen</Label>
-                  <Select value={tipeDokumen} onValueChange={setTipeDokumen}>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Bundle (Opsional)</Label>
+                  <Select value={selectedBundleId} onValueChange={setSelectedBundleId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih Tipe Dokumen" />
+                      <SelectValue placeholder="Pilih Bundle (Opsional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Dokumen Transaksi">Dokumen Transaksi</SelectItem>
-                      <SelectItem value="Dokumen Pendukung Transaksi">Dokumen Pendukung Transaksi</SelectItem>
-                      <SelectItem value="Dokumen Komunikasi Bisnis">Dokumen Komunikasi Bisnis</SelectItem>
+                      <SelectItem value="none">Tanpa Bundle</SelectItem>
+                      {bundles.map((b) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="md:col-span-2">
-                  <Label>Jenis Dokumen</Label>
-                  <Select value={jenisDokumen} onValueChange={setJenisDokumen}>
+                <div>
+                  <Label>Tipe Dokumen *</Label>
+                  <Input 
+                    value={tipeDokumen} 
+                    onChange={(e) => setTipeDokumen(e.target.value)}
+                    placeholder="Contoh: Invoice, Faktur, dll" 
+                  />
+                </div>
+                <div>
+                  <Label>Jenis Dokumen *</Label>
+                   <Select value={jenisDokumen} onValueChange={setJenisDokumen}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih Jenis Dokumen" />
+                      <SelectValue placeholder="Pilih jenis dokumen" />
                     </SelectTrigger>
                     <SelectContent>
-                      {documentTypes && Array.isArray(documentTypes) && documentTypes.length > 0 ? (
+                      {documentTypes && documentTypes.length > 0 ? (
                         documentTypes.map((type: any) => (
                           <SelectItem key={type.id} value={type.name}>
                             {type.name}
@@ -516,20 +570,25 @@ export default function FormOneBundleDetailPage() {
                         ))
                       ) : (
                         <>
-                          <SelectItem value="Invoice">Invoice</SelectItem>
-                          <SelectItem value="Purchase Order">Purchase Order</SelectItem>
-                          <SelectItem value="Sales Order">Sales Order</SelectItem>
+                           <SelectItem value="Invoice">Invoice</SelectItem>
+                           <SelectItem value="Faktur Pajak">Faktur Pajak</SelectItem>
+                           <SelectItem value="Bukti Potong">Bukti Potong</SelectItem>
+                           <SelectItem value="Rekening Koran">Rekening Koran</SelectItem>
+                           <SelectItem value="Lainnya">Lainnya</SelectItem>
                         </>
                       )}
                     </SelectContent>
                   </Select>
                 </div>
-
                 <div>
                   <Label>Nomor Dokumen *</Label>
-                  <Input value={nomorDokumen} onChange={(e) => setNomorDokumen(e.target.value)} placeholder="Masukan nomor" />
+                  <Input 
+                    value={nomorDokumen} 
+                    onChange={(e) => setNomorDokumen(e.target.value)}
+                    placeholder="Nomor dokumen" 
+                  />
                 </div>
-                <div className="flex flex-col gap-2">
+                <div>
                   <Label>Tanggal Dokumen *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -542,7 +601,7 @@ export default function FormOneBundleDetailPage() {
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {documentDate ? (
-                          format(documentDate, 'dd MMMM yyyy', { locale: id })
+                          format(documentDate, 'dd/MM/yyyy', { locale: id })
                         ) : (
                           <span>Pilih tanggal</span>
                         )}
@@ -674,7 +733,7 @@ export default function FormOneBundleDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border rounded-2xl">
+            <Card className="border rounded-2xl md:col-span-2">
               <CardHeader>
                 <CardTitle className="text-base">Informasi Tambahan</CardTitle>
               </CardHeader>
@@ -704,7 +763,8 @@ export default function FormOneBundleDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
+      
+      {/* Workflow Dialog */}
       <Dialog open={isWorkflowDialogOpen} onOpenChange={setIsWorkflowDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -724,7 +784,7 @@ export default function FormOneBundleDetailPage() {
                  <div className="space-y-3">
                    <Label className="text-base">Nama</Label>
                    <Input 
-                     value={user?.name || 'User'} 
+                     value={userId} // TODO: Replace with actual user name
                      readOnly 
                      className="bg-background text-foreground opacity-100 h-11"
                    />
@@ -773,6 +833,54 @@ export default function FormOneBundleDetailPage() {
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               {updateWorkflowMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Bundle Dialog */}
+      <Dialog open={isAssignBundleOpen} onOpenChange={setIsAssignBundleOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Atur Bundle Dokumen</DialogTitle>
+            <DialogDescription>
+              Pilih bundle untuk dokumen ini.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+             <div className="space-y-2">
+                <Label>Dokumen</Label>
+                <div className="text-sm font-medium">{selectedDocForBundle?.originalFilename}</div>
+             </div>
+             <div className="space-y-2">
+                <Label>Bundle</Label>
+                <Select value={bundleToAssign} onValueChange={setBundleToAssign}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Bundle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa Bundle</SelectItem>
+                    {bundles.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+             </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAssignBundleOpen(false)}>
+              Batal
+            </Button>
+            <Button 
+              onClick={handleAssignBundle} 
+              disabled={updateDocumentMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {updateDocumentMutation.isPending ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>
         </DialogContent>

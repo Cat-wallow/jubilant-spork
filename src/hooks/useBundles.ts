@@ -13,6 +13,7 @@ export interface DocumentBundle {
   status: BundleStatus;
   assignee: string | null;
   lastUpdate: string;
+  bundleType?: string;
 }
 
 export interface BundlesResponse {

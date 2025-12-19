@@ -232,6 +232,44 @@ export const useUpdateWorkflow = () => {
 };
 
 /**
+ * Hook to update a document
+ */
+export const useUpdateDocument = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      documentId,
+      payload,
+    }: {
+      tenantId: string;
+      projectId: string;
+      documentId: string;
+      payload: UpdateDocumentPayload & { bundleId?: string | null };
+    }) => {
+      const { data } = await api.patch<Document>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
+        {
+          ...payload,
+          currentTenantId: tenantId,
+        }
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['documents', variables.tenantId, variables.projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['document', variables.tenantId, variables.projectId, variables.documentId],
+      });
+    },
+  });
+};
+
+/**
  * Hook to fetch a single document
  */
 export const useDocument = (tenantId: string, projectId: string, documentId: string) => {
@@ -390,43 +428,7 @@ export const useCreateDocumentComment = () => {
   });
 };
 
-/**
- * Hook to update document metadata
- */
-export const useUpdateDocument = () => {
-  const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      tenantId,
-      projectId,
-      documentId,
-      payload,
-    }: {
-      tenantId: string;
-      projectId: string;
-      documentId: string;
-      payload: UpdateDocumentPayload;
-    }) => {
-      const { data } = await api.patch<Document>(
-        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
-        {
-          ...payload,
-          currentTenantId: tenantId,
-        }
-      );
-      return data;
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['documents', variables.tenantId, variables.projectId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['document', variables.tenantId, variables.projectId, variables.documentId],
-      });
-    },
-  });
-};
 
 /**
  * Hook to delete a document (soft delete)
