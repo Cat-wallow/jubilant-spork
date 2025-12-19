@@ -66,4 +66,5 @@ export const projectSchema = z.object({
     });
 });
 
-export type ProjectFormValues = z.infer<typeof projectSchema>;
+export type ProjectFormInputValues = z.input<typeof projectSchema>;
+export type ProjectFormValues = z.output<typeof projectSchema>;

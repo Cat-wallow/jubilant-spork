@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import {
 	ColumnFiltersState,
@@ -66,7 +66,7 @@ export default function ProjectsTab() {
 				tenantId, // Pass tenantId for admin context
 			);
 		},
-		keepPreviousData: true,
+		placeholderData: keepPreviousData,
 		staleTime: 5 * 60 * 1000,
 		enabled: !!tenantId, // Only run if tenantId is available
 	});

@@ -32,56 +32,7 @@ interface ProjectTableProps {
   setTypeFilter: (value: string) => void;
 }
 
-const dummyProjects = [
-  {
-    id: 1,
-    code: 'PRJ-25-MS.001',
-    name: 'Konsultan Pajak PT Maju Bersama',
-    client: 'PT. MAJU SUKSES',
-    period: 'Jan 2024',
-    modules: ['KK1', 'KK2', 'KK3', 'KK4', 'KK5'],
-    status: 'Selesai',
-    progress: 75.5,
-    daysOverdue: 8,
-    contact: 'Tim Solo',
-  },
-  {
-    id: 2,
-    code: 'PRJ-25-MS.002',
-    name: 'Konsultan Pajak PT Maju Bersama',
-    client: 'PT. MAJU SUKSES',
-    period: 'Jan 2024',
-    modules: ['KK1', 'KK2', 'KK3', 'KK4', 'KK5'],
-    status: 'In Progress',
-    progress: 75.5,
-    daysOverdue: 8,
-    contact: 'Tim Solo',
-  },
-  {
-    id: 3,
-    code: 'PRJ-25-MS.003',
-    name: 'Konsultan Pajak PT Maju Bersama',
-    client: 'PT. MAJU SUKSES',
-    period: 'Jan 2024',
-    modules: ['KK1', 'KK2', 'KK3', 'KK4', 'KK5'],
-    status: 'Overdue',
-    progress: 75.5,
-    daysOverdue: 8,
-    contact: 'Tim Solo',
-  },
-  {
-    id: 4,
-    code: 'PRJ-25-MS.004',
-    name: 'Konsultan Pajak PT Maju Bersama',
-    client: 'PT. MAJU SUKSES',
-    period: 'Jan 2024',
-    modules: ['KK1', 'KK2', 'KK3', 'KK4', 'KK5'],
-    status: 'Overdue',
-    progress: 75.5,
-    daysOverdue: 8,
-    contact: 'Tim Solo',
-  },
-];
+const dummyProjects: any[] = [];
 
 export default function ProjectTable({
   searchQuery,

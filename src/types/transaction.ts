@@ -17,10 +17,33 @@ export interface Transaction {
   currency?: string;
   vendor_name?: string;
   vendor_npwp?: string;
+  bill_type_name?: string;
   category?: string;
   account_code?: string;
+  counterparty_type?: string;
+  vendor_pkp_status?: string;
+  general_notes?: string;
   tax_type?: string;
   tax_amount?: number;
+  transaction_taxes?: {
+    tax_deposit?: number;
+    ppn?: number;
+    pph_21?: number;
+    pph_23?: number;
+    pph_4_2?: number;
+    pph_credit?: number;
+    other_pph?: number;
+    attachment_url?: string;
+  };
+  transaction_items?: Array<{
+    description?: string;
+    quantity?: number;
+    satuan?: string;
+    unit_price?: number;
+    total_amount?: number;
+    ppn?: number;
+    p2pph?: number;
+  }>;
   has_documents?: boolean;
   document_warning?: boolean;
   created_by: string;
@@ -89,8 +112,8 @@ export interface Document {
 }
 
 export interface DocumentTransaction extends Document {
-  transaction_documents: Transaction[];
-  transaction: string;
+  transaction_documents?: Transaction[];
+  transaction?: Transaction | null;
 }
 
 
@@ -99,5 +122,6 @@ export interface TransactionResponse {
     message: string;
     data: {
       documents: DocumentTransaction[];
+      total: number;
     }
 }

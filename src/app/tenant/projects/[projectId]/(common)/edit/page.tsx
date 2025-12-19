@@ -5,12 +5,16 @@ import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Save } from "lucide-react";
-import DetailProjectTab from "../../new/components/DetailProjectTab";
-import ProjectSettingsTab from "../../new/components/ProjectSettingsTab";
+import DetailProjectTab from "../../../new/components/DetailProjectTab";
+import ProjectSettingsTab from "../../../new/components/ProjectSettingsTab";
 import Switch from "@/components/switch";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchema, ProjectFormValues } from "@/validators/project.schema";
+import {
+	projectSchema,
+	type ProjectFormInputValues,
+	type ProjectFormValues,
+} from "@/validators/project.schema";
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -28,7 +32,7 @@ function EditProjectPageContent() {
 		queryFn: () => getProjectById(projectId),
 	});
 
-	const methods = useForm<ProjectFormValues>({
+	const methods = useForm<ProjectFormInputValues, any, ProjectFormValues>({
 		resolver: zodResolver(projectSchema),
 		defaultValues: {
 			scopes: [],
@@ -71,13 +75,11 @@ function EditProjectPageContent() {
             // Handle nested objects from backend response
             const clientId = project.client_id || project.clients?.id;
             const pmoId = project.pmo_id || project.users_projects_pmo_idTousers?.id;
-            const ketuaTimId = project.ketua_tim_id || project.users_projects_ketua_tim_idTousers?.id;
 
 			methods.reset({
 				name: project.name,
 				client_id: clientId,
 				pmo_id: pmoId,
-				ketua_tim_id: ketuaTimId,
 				contract_code: project.code,
 				contract_basis: project.contract_basis || undefined,
 				contract_date: project.contract_date

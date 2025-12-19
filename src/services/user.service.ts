@@ -1,5 +1,9 @@
-import api from '@/lib/api';
-import { User, InviteUserPayload } from '@/types/user';
+import api from "@/lib/api";
+
+export type InviteUserPayload = {
+	email: string;
+	role_id: string;
+};
 
 /**
  * Invites a new user to a specific tenant.

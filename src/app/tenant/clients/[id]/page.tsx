@@ -465,7 +465,19 @@ export default function ClientDetailPage() {
                 </CardContent>
               </Card>
             ) : activeProjects.map((project: any) => (
-              <Card key={project.id} className="overflow-hidden">
+              <Card
+                key={project.id}
+                className="overflow-hidden cursor-pointer transition-colors hover:bg-slate-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-slate-900/40"
+                role="button"
+                tabIndex={0}
+                onClick={() => router.push(`/tenant/projects/${project.id}/summary`)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    router.push(`/tenant/projects/${project.id}/summary`);
+                  }
+                }}
+              >
                 <CardContent className="p-6">
                   <div className="flex flex-col gap-6">
                     {/* Top Row: ID and Name */}
@@ -509,7 +521,15 @@ export default function ClientDetailPage() {
                         </div>
                         <div className="flex gap-4 items-center">
                           <Progress value={project.progress} className="h-2 bg-blue-100 dark:bg-blue-950" />
-                          <Button variant="outline" size="sm" className="gap-2 whitespace-nowrap">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 whitespace-nowrap"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/tenant/projects/${project.id}/summary`);
+                            }}
+                          >
                             <Eye className="h-3 w-3" />
                             View
                           </Button>

@@ -8,11 +8,24 @@ import api from '@/lib/api';
 export interface WorkflowStep {
   status: boolean;
   by: string | null;
+  byName?: string | null;
   date: string | null;
   source?: string | null;
 }
 
-export type WorkflowStepKey = 'pengiriman' | 'penerimaan' | 'digitalisasi' | 'pendeskripsian';
+export type WorkflowStepKey =
+  | 'asalDokumen'
+  | 'pengiriman'
+  | 'penerimaan'
+  | 'digitalisasi'
+  | 'pendeskripsian'
+  | 'foldering'
+  | 'entryData'
+  | 'telaahPajak'
+  | 'telaahPembukuan'
+  | 'pengarsipan'
+  | 'pengembalian'
+  | 'beritaAcara';
 
 export interface Document {
   id: string;
@@ -35,6 +48,13 @@ export interface Document {
   penerimaan: WorkflowStep;
   digitalisasi: WorkflowStep;
   pendeskripsian: WorkflowStep;
+  foldering: WorkflowStep;
+  entryData: WorkflowStep;
+  telaahPajak: WorkflowStep;
+  telaahPembukuan: WorkflowStep;
+  pengarsipan: WorkflowStep;
+  pengembalian: WorkflowStep;
+  beritaAcara: WorkflowStep;
 
   // File Info
   originalFilename: string;
@@ -88,7 +108,7 @@ export interface DocumentsResponse {
 }
 
 export interface UploadDocumentPayload {
-  files: File[];
+  files?: File[];
   jenisDokumen: string;
   tipeDokumen: string;
   nomorDokumen?: string;
@@ -212,6 +232,44 @@ export const useUpdateWorkflow = () => {
 };
 
 /**
+ * Hook to update a document
+ */
+export const useUpdateDocument = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      documentId,
+      payload,
+    }: {
+      tenantId: string;
+      projectId: string;
+      documentId: string;
+      payload: UpdateDocumentPayload & { bundleId?: string | null };
+    }) => {
+      const { data } = await api.patch<Document>(
+        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
+        {
+          ...payload,
+          currentTenantId: tenantId,
+        }
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['documents', variables.tenantId, variables.projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['document', variables.tenantId, variables.projectId, variables.documentId],
+      });
+    },
+  });
+};
+
+/**
  * Hook to fetch a single document
  */
 export const useDocument = (tenantId: string, projectId: string, documentId: string) => {
@@ -219,7 +277,7 @@ export const useDocument = (tenantId: string, projectId: string, documentId: str
     queryKey: ['document', tenantId, projectId, documentId],
     queryFn: async () => {
       const { data } = await api.get<Document>(
-        `/document/api/v1/project/${projectId}/documents/${documentId}?currentTenantId=${tenantId}`
+        `/document/api/v1/projects/${projectId}/documents/${documentId}?currentTenantId=${tenantId}`
       );
       return data;
     },
@@ -247,19 +305,14 @@ export const useUploadDocuments = () => {
     }) => {
       const formData = new FormData();
 
-      payload.files.forEach((file) => {
+      payload.files?.forEach((file) => {
         formData.append('files', file);
       });
       formData.append('jenis_dokumen', payload.jenisDokumen);
       formData.append('tipe_dokumen', payload.tipeDokumen);
       formData.append('currentTenantId', tenantId);
       formData.append('currentUserId', userId);
-<<<<<<< HEAD
-
-=======
       if (payload.bundleId) formData.append('bundleId', payload.bundleId);
-      
->>>>>>> 1ad73411a21f1bbf23bc2a273e06b3ec9ee8e8f5
       if (payload.nomorDokumen) formData.append('nomor_dokumen', payload.nomorDokumen);
       if (payload.documentDate) formData.append('document_date', payload.documentDate);
       if (payload.jumlahLembar) formData.append('jumlah_lembar', payload.jumlahLembar.toString());
@@ -375,43 +428,7 @@ export const useCreateDocumentComment = () => {
   });
 };
 
-/**
- * Hook to update document metadata
- */
-export const useUpdateDocument = () => {
-  const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      tenantId,
-      projectId,
-      documentId,
-      payload,
-    }: {
-      tenantId: string;
-      projectId: string;
-      documentId: string;
-      payload: UpdateDocumentPayload;
-    }) => {
-      const { data } = await api.patch<Document>(
-        `/document/api/v1/project/${projectId}/documents/${documentId}`,
-        {
-          ...payload,
-          currentTenantId: tenantId,
-        }
-      );
-      return data;
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['documents', variables.tenantId, variables.projectId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['document', variables.tenantId, variables.projectId, variables.documentId],
-      });
-    },
-  });
-};
 
 /**
  * Hook to delete a document (soft delete)
@@ -430,7 +447,7 @@ export const useDeleteDocument = () => {
       documentId: string;
     }) => {
       const { data } = await api.delete(
-        `/document/api/v1/project/${projectId}/documents/${documentId}`,
+        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
         {
           data: { currentTenantId: tenantId },
         }

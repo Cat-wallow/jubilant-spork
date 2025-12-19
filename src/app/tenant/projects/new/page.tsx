@@ -10,7 +10,11 @@ import ProjectSettingsTab from "./components/ProjectSettingsTab";
 import Switch from "@/components/switch";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchema, ProjectFormValues } from "@/validators/project.schema";
+import {
+	projectSchema,
+	type ProjectFormInputValues,
+	type ProjectFormValues,
+} from "@/validators/project.schema";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,7 +26,7 @@ function NewProjectPageContent() {
 	const queryClient = useQueryClient();
 	const searchParams = useSearchParams();
 
-	const methods = useForm<ProjectFormValues>({
+	const methods = useForm<ProjectFormInputValues, any, ProjectFormValues>({
 		resolver: zodResolver(projectSchema),
 		defaultValues: {
 			scopes: [],

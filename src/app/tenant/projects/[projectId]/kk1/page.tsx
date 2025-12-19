@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, RefreshCcw } from "lucide-react";
@@ -15,7 +15,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 
 import { getDocumentsForKK1 } from "@/services/document.service";
@@ -23,24 +23,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { columnsAwaiting } from "./components/columns-awaiting";
 import { columnsApproved } from "./components/columns-approved";
-import { TransactionStatus } from "@/types/transaction";
-
-interface DocumentWithTransaction {
-  id: string;
-  original_filename: string;
-  nomor_dokumen: string;
-  document_date: string;
-  // ... other document fields
-  transaction?: {
-    id: string;
-    transaction_number: string;
-    description: string;
-    amount: number;
-    currency: string;
-    status: TransactionStatus;
-    // ... other transaction fields
-  } | null;
-}
+import type { DocumentTransaction } from "@/types/transaction";
 
 export default function KK1Page() {
   const params = useParams();
@@ -74,8 +57,9 @@ export default function KK1Page() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const documentsAwaiting = (dataAwaiting?.data?.documents || []) as DocumentWithTransaction[];
-  const pageCountAwaiting = Math.ceil((dataAwaiting?.data?.total || 0) / paginationAwaiting.pageSize);
+  const documentsAwaiting: DocumentTransaction[] = dataAwaiting?.data?.documents || [];
+  const totalAwaiting = dataAwaiting?.data?.total ?? 0;
+  const pageCountAwaiting = Math.ceil(totalAwaiting / paginationAwaiting.pageSize);
 
   const tableAwaiting = useReactTable({
     data: documentsAwaiting,
@@ -126,11 +110,12 @@ export default function KK1Page() {
         sortOrder: sortDescriptor?.desc ? "desc" : "asc",
       });
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
-  const documentsApproved = (dataApproved?.data?.documents || []) as DocumentWithTransaction[];
-  const pageCountApproved = Math.ceil((dataApproved?.data?.total || 0) / paginationApproved.pageSize);
+  const documentsApproved: DocumentTransaction[] = dataApproved?.data?.documents || [];
+  const totalApproved = dataApproved?.data?.total ?? 0;
+  const pageCountApproved = Math.ceil(totalApproved / paginationApproved.pageSize);
 
   const tableApproved = useReactTable({
     data: documentsApproved,
@@ -157,7 +142,7 @@ export default function KK1Page() {
   });
 
   // Calculate totals from fetched data
-  const totalRecorded = (dataApproved?.data?.total || 0);
+  const totalRecorded = totalApproved;
   const totalValue =
     documentsAwaiting.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0) +
     documentsApproved.reduce((sum, doc) => sum + Number(doc.transaction?.amount || 0), 0);

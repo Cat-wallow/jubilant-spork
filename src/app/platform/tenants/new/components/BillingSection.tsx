@@ -10,10 +10,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { UseFormReturn, Controller } from 'react-hook-form';
-import { NewTenantFormValues } from '../page'; // Assuming NewTenantFormValues is exported from page.tsx
 
 interface BillingSectionProps {
-  form: UseFormReturn<NewTenantFormValues>;
+  form: UseFormReturn<any>;
 }
 
 export default function BillingSection({ form }: BillingSectionProps) {
@@ -27,9 +26,9 @@ export default function BillingSection({ form }: BillingSectionProps) {
           <Label htmlFor="billingCycle">Siklus Penagihan</Label>
           <Controller
             control={form.control}
-            name="billingCycle"
+            name={"billingCycle" as any}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value || ""}>
                 <SelectTrigger id="billingCycle">
                   <SelectValue placeholder="Pilih siklus" />
                 </SelectTrigger>
@@ -58,14 +57,14 @@ export default function BillingSection({ form }: BillingSectionProps) {
           </div>
           <Controller
             control={form.control}
-            name="autoInactive"
+            name={"autoInactive" as any}
             render={({ field }) => (
               <Toggle
-                pressed={field.value}
+                pressed={!!field.value}
                 onPressedChange={field.onChange}
                 className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
               >
-                {field.value ? 'ON' : 'OFF'}
+                {!!field.value ? 'ON' : 'OFF'}
               </Toggle>
             )}
           />

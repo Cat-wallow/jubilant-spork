@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { getProjectById } from "@/services/project.service";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	TrendingUp,
 	CheckCircle2,
@@ -19,14 +22,13 @@ import { cn } from "@/lib/utils";
 // Dummy data
 const projectData = {
 	id: "1",
-	name: "Konsultasi Pajak PT Maju Bersama",
-	code: "PRJ-2025-02-001",
-	client: "PT Maju Mundur Bersama",
+	name: "",
+	code: "",
+	client: "",
 	startDate: "2024-02-20",
 	deadline: "2024-02-22",
 	breadcrumb: "Project > Detail Project",
-	description:
-		"Konsultasi pajak komprehensif untuk PT Maju Bersama periode Januari 2024, meliputi penyusunan laporan keuangan, kalkulasi pajak, dan optimasi tax planning.",
+	description: "",
 	stats: {
 		progress: 90.2,
 		progressChange: "+2%",
@@ -190,6 +192,17 @@ export default function ProjectSummaryPage() {
 	const params = useParams();
 	const projectId = params.projectId as string;
 
+	const { data: project, isLoading: isProjectLoading } = useQuery({
+		queryKey: ["project", projectId],
+		queryFn: () => getProjectById(projectId),
+		enabled: !!projectId,
+	});
+
+	const projectCode = project?.code || projectId;
+	const projectName = project?.name || "-";
+	const clientName = project?.clients?.name || "-";
+	const projectDescription = project?.notes || "-";
+
 	return (
 		<div className="flex w-full flex-col gap-[30px] ">
 			{/* Stats Cards */}
@@ -322,7 +335,13 @@ export default function ProjectSummaryPage() {
 									Project ID:
 								</span>
 								<span className="text-sm font-medium text-muted-foreground">
-									{projectData.code}
+								{isProjectLoading ? (
+									<Skeleton asChild className="h-4 w-[140px]">
+										<span />
+									</Skeleton>
+								) : (
+									projectCode
+								)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -330,7 +349,13 @@ export default function ProjectSummaryPage() {
 									Project Name:
 								</span>
 								<span className="text-sm font-medium text-muted-foreground">
-									Project Akuntansi dan Pajak
+								{isProjectLoading ? (
+									<Skeleton asChild className="h-4 w-[200px]">
+										<span />
+									</Skeleton>
+								) : (
+									projectName
+								)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -338,7 +363,13 @@ export default function ProjectSummaryPage() {
 									Client Name:
 								</span>
 								<span className="text-sm font-medium text-muted-foreground">
-									{projectData.client}
+								{isProjectLoading ? (
+									<Skeleton asChild className="h-4 w-[180px]">
+										<span />
+									</Skeleton>
+								) : (
+									clientName
+								)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -360,8 +391,14 @@ export default function ProjectSummaryPage() {
 									Description
 								</span>
 								<p className="text-xs leading-4 text-primary">
-									{projectData.description}
-								</p>
+								{isProjectLoading ? (
+									<Skeleton asChild className="h-4 w-full">
+										<span className="block" />
+									</Skeleton>
+								) : (
+									projectDescription
+								)}
+							</p>
 							</div>
 						</CardContent>
 					</Card>

@@ -2,7 +2,7 @@
 
 import RBAC from "@/components/rbac/RBAC";
 import { getProjects } from "@/services/project.service";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
 	ColumnFiltersState,
 	getCoreRowModel,
@@ -62,7 +62,7 @@ function ProjectsPageContent() {
                 undefined // tenantId not needed for tenant view
 			);
 		},
-		keepPreviousData: true,
+		placeholderData: keepPreviousData,
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 

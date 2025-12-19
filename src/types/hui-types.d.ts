@@ -9,9 +9,10 @@ declare global {
   interface RoutesType {
     name: string;
     layout: string;
-    icon: JSX.Element | string;
+    icon: import("react").ReactElement | string;
     path: string;
     secondary?: boolean | undefined;
     collapsible?: boolean | undefined;
+    permission?: string | string[] | undefined;
   }
 }

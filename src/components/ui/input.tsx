@@ -40,8 +40,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				if (value === undefined || value === null || value === "") {
 					setDisplayValue("");
 				} else {
-					const numValue = typeof value === "string" ? Number(value) : value;
-					if (!isNaN(numValue) && numValue > 0) {
+					const numValue =
+						typeof value === "number"
+							? value
+							: typeof value === "string"
+								? Number(value)
+								: NaN;
+					if (Number.isFinite(numValue) && numValue > 0) {
 						setDisplayValue(
 							variant === "idr" ? formatIDR(numValue) : formatUSD(numValue),
 						);
@@ -96,7 +101,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						type="number"
 						ref={hiddenInputRef}
 						name={name}
-						defaultValue={value || ""}
+						defaultValue={
+							typeof value === "string" || typeof value === "number" ? value : ""
+						}
 						style={{ display: "none" }}
 						tabIndex={-1}
 						aria-hidden="true"

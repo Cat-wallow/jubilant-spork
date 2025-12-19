@@ -9,6 +9,9 @@ export interface Project {
 	name: string;
 	status: string;
 	progress: number;
+	client_id?: string;
+	pmo_id?: string;
+	ketua_tim_id?: string;
 	clients?: {
 		id: string;
 		name: string;
@@ -49,6 +52,7 @@ export interface PaginatedProjectsResponse {
 // Define ProjectMember types
 export interface ProjectMember {
 	id: string;
+	userId: string;
 	name: string;
 	avatar: string;
 	role: string;
@@ -110,6 +114,97 @@ export const getProjectById = async (id: string): Promise<Project> => {
 	return response.data.data;
 };
 
+export interface UpdateProjectTaskPayload {
+	title?: string;
+	description?: string;
+	assigned_user_id?: string;
+	module?: ProjectTaskModule;
+	priority?: ProjectTaskPriority;
+	due_date?: string;
+	status?: string;
+}
+
+export const updateProjectTask = async (
+	projectId: string,
+	taskId: string,
+	payload: UpdateProjectTaskPayload,
+): Promise<ProjectTask> => {
+	const response = await api.put<{
+		success: boolean;
+		message: string;
+		data: ProjectTask;
+	}>(`/project/${projectId}/tasks/${taskId}`, payload);
+
+	return response.data.data;
+};
+
+export const updateProjectTaskProgress = async (
+	projectId: string,
+	taskId: string,
+	progress: number,
+): Promise<ProjectTask> => {
+	const response = await api.patch<{
+		success: boolean;
+		message: string;
+		data: ProjectTask;
+	}>(`/project/${projectId}/tasks/${taskId}/progress`, { progress });
+
+	return response.data.data;
+};
+
+export const deleteProjectTask = async (
+	projectId: string,
+	taskId: string,
+): Promise<void> => {
+	await api.delete(`/project/${projectId}/tasks/${taskId}`);
+};
+
+export interface GetProjectTasksParams {
+	projectId: string;
+	page: number;
+	pageSize: number;
+	search?: string;
+	module?: string;
+	assigneeId?: string;
+	priority?: string;
+	status?: string;
+	due?: string;
+}
+
+export interface GetProjectTasksResponse {
+	success: boolean;
+	data: {
+		tasks: (ProjectTask & {
+			users_project_tasks_assigned_user_idTousers?: {
+				id: string;
+				name: string;
+			} | null;
+		})[];
+		total: number;
+	};
+}
+
+export const getProjectTasks = async (
+	params: GetProjectTasksParams,
+): Promise<GetProjectTasksResponse> => {
+	const query = queryString.stringify({
+		page: params.page,
+		pageSize: params.pageSize,
+		search: params.search,
+		module: params.module,
+		assigneeId: params.assigneeId,
+		priority: params.priority,
+		status: params.status,
+		due: params.due,
+	});
+
+	const response = await api.get<GetProjectTasksResponse>(
+		`/project/${params.projectId}/tasks?${query}`,
+	);
+
+	return response.data;
+};
+
 export const updateProject = async (
 	id: string,
 	payload: any,
@@ -154,4 +249,49 @@ export const getProjectMembers = async (
 	);
 
 	return response.data;
+};
+
+export type ProjectTaskModule = "FORM_1" | "KK_1" | "KK_2" | "KK_3" | "KK_4" | "KK_5";
+export type ProjectTaskPriority = "LOW" | "MEDIUM" | "HIGH";
+
+export interface CreateProjectTaskPayload {
+	title: string;
+	description?: string;
+	assigned_user_id?: string;
+	module: ProjectTaskModule;
+	priority?: ProjectTaskPriority;
+	due_date?: string;
+}
+
+export interface ProjectTask {
+	id: string;
+	tenant_id: string;
+	project_id: string;
+	title: string;
+	description: string | null;
+	assigned_user_id: string | null;
+	priority: ProjectTaskPriority;
+	module: ProjectTaskModule;
+	status: string;
+	progress: number;
+	due_date: string | null;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+	updated_by: string | null;
+	deleted_at: string | null;
+	deleted_by: string | null;
+}
+
+export const createProjectTask = async (
+	projectId: string,
+	payload: CreateProjectTaskPayload,
+): Promise<ProjectTask> => {
+	const response = await api.post<{
+		success: boolean;
+		message: string;
+		data: ProjectTask;
+	}>(`/project/${projectId}/tasks`, payload);
+
+	return response.data.data;
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Invitation } from 'types/invitation';
-import { useAcceptInvitation, useRejectInvitation } from 'hooks/useInvitations';
+import { Invitation } from '@/types/invitation';
+import { useAcceptInvitation, useRejectInvitation } from '@/hooks/useInvitations';
 
 // Helper function to format date
 const formatDate = (dateString: string) => {

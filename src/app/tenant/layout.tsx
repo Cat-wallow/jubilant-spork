@@ -15,6 +15,9 @@ import RBAC from "@/components/rbac/RBAC";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Sheet } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getProjectById } from "@/services/project.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const projectModules = [
 	{
@@ -56,6 +59,12 @@ export default function Admin({ children }: { children: ReactNode }) {
 	const params = useParams();
 	const projectId = params?.projectId as string;
 
+	const { data: project, isLoading: isProjectLoading } = useQuery({
+		queryKey: ["project", projectId],
+		queryFn: () => getProjectById(projectId),
+		enabled: !!projectId,
+	});
+
 	if (isWindowAvailable()) document.documentElement.dir = "ltr";
 
 	// Check if we are in a project detail route
@@ -79,19 +88,31 @@ export default function Admin({ children }: { children: ReactNode }) {
 				{showProjectModuleSidebar && (
 					<div className="fixed left-[80px] items-start hidden md:flex top-0 z-40  h-full w-[290px] flex-col gap-[26px]  pb-10 shadow-md transition-all duration-175 bg-card">
 						{/* Project Info */}
-						<div className="flex flex-col justify-start items-center  px-5 ">
-							<div className="flex h-24   flex-col justify-center">
-								<h3 className="font-dm text-sm font-bold leading-6  text-primary">
-									Konsultasi Pajak PT Maju Bersama
-								</h3>
-								<p className="text-sm font-normal leading-[140%] text-primary">
-									PRJ-25-MS.001
-								</p>
-							</div>
-							<div
-								className={`h-[2px] bg-gray-300 dark:bg-white/30 w-[250px]`}
-							/>
+						<div className="flex flex-col justify-start items-start px-5 ">
+						<div className="flex h-24 w-full flex-col justify-center text-left">
+							<h3 className="font-dm text-sm font-bold leading-6  text-primary">
+								{isProjectLoading ? (
+									<Skeleton asChild className="h-4 w-[220px]">
+										<span />
+									</Skeleton>
+								) : (
+									project?.name || `Project ${projectId}`
+								)}
+							</h3>
+							<p className="text-sm font-normal leading-[140%] text-primary">
+								{isProjectLoading ? (
+									<Skeleton asChild className="h-4 w-[120px]">
+										<span />
+									</Skeleton>
+								) : (
+									project?.code || projectId
+								)}
+							</p>
 						</div>
+						<div
+							className={`h-[2px] bg-gray-300 dark:bg-white/30 w-[250px]`}
+						/>
+					</div>
 
 						<div className="flex flex-col  gap-5 px-5">
 							{projectModules.map((module) => {
