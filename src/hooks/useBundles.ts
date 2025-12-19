@@ -77,6 +77,37 @@ export const useBundles = (
   });
 };
 
+export const useDeleteBundle = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tenantId,
+      projectId,
+      bundleId,
+      userId,
+    }: {
+      tenantId: string;
+      projectId: string;
+      bundleId: string;
+      userId: string;
+    }) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append('currentTenantId', tenantId);
+      searchParams.append('currentUserId', userId);
+
+      await api.delete(
+        `/document/api/v1/projects/${projectId}/bundles/${bundleId}?${searchParams.toString()}`
+      );
+    },
+    onSuccess: (_, { tenantId, projectId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['bundles', tenantId, projectId],
+      });
+    },
+  });
+};
+
 export const useCreateBundle = () => {
   const queryClient = useQueryClient();
 

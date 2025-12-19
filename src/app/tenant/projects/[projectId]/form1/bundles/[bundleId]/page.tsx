@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDocuments, useUploadDocuments, useUpdateWorkflow } from '@/hooks/useDocuments';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,7 @@ export default function FormOneBundleDetailPage() {
   const userId = user?.id || '';
 
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 500);
   const [statusFilter, setStatusFilter] = useState<'all' | 'digital' | 'asli' | 'copy'>('all');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -124,7 +126,7 @@ export default function FormOneBundleDetailPage() {
     projectId,
     {
       bundleId,
-      search: search || undefined,
+      search: debouncedSearch || undefined,
       status: statusFilter === 'all' ? undefined : statusFilter,
       page: 1,
       pageSize,
@@ -310,8 +312,6 @@ export default function FormOneBundleDetailPage() {
             <p className="text-sm text-red-500">
               {(error as any)?.response?.data?.message || (error as any)?.message || "Gagal memuat dokumen bundle."}
             </p>
-          ) : data.items.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada dokumen di bundle ini.</p>
           ) : (
             <>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -356,92 +356,109 @@ export default function FormOneBundleDetailPage() {
                 </div>
               </div>
 
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="min-w-[200px]">Identitas Dokumen</TableHead>
-                      {WORKFLOW_STEPS.map((step) => (
-                        <TableHead key={step.key} className="text-center min-w-[120px] whitespace-nowrap">{step.label}</TableHead>
-                      ))}
-                      <TableHead className="text-right min-w-[100px]">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pagedDocs.map((doc) => (
-                      <TableRow key={doc.id}>
-                        <TableCell>
-                          <div className="flex flex-col gap-1">
-                            <span className="font-medium">{doc.jenisDokumen}</span>
-                            <span className="text-xs text-muted-foreground">{doc.tipeDokumen}</span>
-                            <span className="text-xs text-muted-foreground">{doc.nomorDokumen || '-'}</span>
-                            <span className="text-xs text-muted-foreground">{doc.documentDate ? format(new Date(doc.documentDate), 'dd/MM/yyyy') : '-'}</span>
-                          </div>
-                        </TableCell>
-                        {WORKFLOW_STEPS.map((step) => {
-                          const isDone = doc[step.key]?.status === true;
-                          const clickable = !isDone && isStepClickable(doc, step.key);
-                          
-                          return (
-                            <TableCell key={step.key} className="text-center p-2">
-                              <div 
-                                className={cn(
-                                  "inline-flex justify-center items-center p-2 rounded-full transition-all",
-                                  clickable && "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-110",
-                                  !clickable && !isDone && "opacity-30 cursor-not-allowed"
-                                )}
-                                onClick={() => clickable && handleWorkflowClick(doc, step.key)}
-                                title={isDone ? `Selesai oleh ${doc[step.key]?.by || '-'} pada ${doc[step.key]?.date ? format(new Date(doc[step.key]?.date), 'dd/MM/yyyy') : '-'}` : (clickable ? "Klik untuk update status" : "Selesaikan tahap sebelumnya")}
-                              >
-                                {isDone ? (
-                                  <CheckCircle2 className="h-6 w-6 text-green-600 fill-green-50" />
-                                ) : (
-                                  <Circle className="h-6 w-6 text-slate-300" />
-                                )}
-                              </div>
-                              {isDone && doc[step.key]?.date && (
-                                <div className="text-[10px] text-muted-foreground mt-1">
-                                  {format(new Date(doc[step.key]?.date), 'dd/MM')}
+              {data.items.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Belum ada dokumen yang cocok dengan filter.</p>
+              ) : (
+                <>
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="min-w-[200px]">Identitas Dokumen</TableHead>
+                          {WORKFLOW_STEPS.map((step) => (
+                            <TableHead key={step.key} className="text-center min-w-[120px] whitespace-nowrap">{step.label}</TableHead>
+                          ))}
+                          <TableHead className="text-right min-w-[100px]">Aksi</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pagedDocs.map((doc) => (
+                          <TableRow key={doc.id}>
+                            <TableCell>
+                              <Link href={`/tenant/projects/${projectId}/form1/documents/${doc.id}`} className="block p-1 -m-1">
+                                <div className="flex flex-col gap-1">
+                                  <span className="font-medium text-blue-600 dark:text-blue-400">{doc.jenisDokumen}</span>
+                                  <span className="text-xs text-muted-foreground">{doc.tipeDokumen}</span>
+                                  <span className="text-xs text-muted-foreground">{doc.nomorDokumen || '-'}</span>
+                                  <span className="text-xs text-muted-foreground">{doc.documentDate ? format(new Date(doc.documentDate), 'dd/MM/yyyy') : '-'}</span>
                                 </div>
-                              )}
+                              </Link>
                             </TableCell>
-                          );
-                        })}
-                        <TableCell className="text-right">
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/tenant/projects/${projectId}/form1/documents/${doc.id}`}>Detail</Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                            {WORKFLOW_STEPS.map((step) => {
+                              const isDone = doc[step.key]?.status === true;
+                              const clickable = !isDone && isStepClickable(doc, step.key);
+                              
+                              return (
+                                <TableCell key={step.key} className="text-center p-2">
+                                  <div 
+                                    className={cn(
+                                      "inline-flex justify-center items-center p-2 rounded-full transition-all",
+                                      clickable && "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-110",
+                                      !clickable && !isDone && "opacity-30 cursor-not-allowed"
+                                    )}
+                                    onClick={() => clickable && handleWorkflowClick(doc, step.key)}
+                                    title={isDone ? `Selesai oleh ${doc[step.key]?.by || '-'} pada ${doc[step.key]?.date ? format(new Date(doc[step.key]?.date), 'dd/MM/yyyy') : '-'}` : (clickable ? "Klik untuk update status" : "Selesaikan tahap sebelumnya")}
+                                  >
+                                    {isDone ? (
+                                      <CheckCircle2 className="h-6 w-6 text-green-600 fill-green-50" />
+                                    ) : (
+                                      <Circle className="h-6 w-6 text-slate-300" />
+                                    )}
+                                  </div>
+                                  {isDone && (
+                                    <div className="flex flex-col items-center mt-1">
+                                      {doc[step.key]?.byName && (
+                                        <div className="text-[10px] font-medium text-slate-700 dark:text-slate-300 max-w-[100px] truncate text-center">
+                                          {doc[step.key]?.byName}
+                                        </div>
+                                      )}
+                                      {doc[step.key]?.date && (
+                                        <div className="text-[10px] text-muted-foreground">
+                                          {format(new Date(doc[step.key]?.date), 'dd/MM')}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </TableCell>
+                              );
+                            })}
+                            <TableCell className="text-right">
+                              <Button asChild size="sm" variant="outline">
+                                <Link href={`/tenant/projects/${projectId}/form1/documents/${doc.id}`}>Detail</Link>
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <div className="text-xs text-muted-foreground">
-                  {`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, data.items.length)} of ${data.items.length}`}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  >
-                    Previous
-                  </Button>
-                  <div className="text-sm">{page}</div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page * pageSize >= data.items.length}
-                    onClick={() => setPage((p) => p + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="text-xs text-muted-foreground">
+                      {`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, data.items.length)} of ${data.items.length}`}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page <= 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      >
+                        Previous
+                      </Button>
+                      <div className="text-sm">{page}</div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page * pageSize >= data.items.length}
+                        onClick={() => setPage((p) => p + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
         </CardContent>
@@ -630,7 +647,7 @@ export default function FormOneBundleDetailPage() {
       </Dialog>
 
       <Dialog open={isWorkflowDialogOpen} onOpenChange={setIsWorkflowDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Konfirmasi Update Progress Dokumen</DialogTitle>
             <DialogDescription>
@@ -639,29 +656,29 @@ export default function FormOneBundleDetailPage() {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            <Card className="border-none shadow-none">
-               <h3 className="font-semibold mb-4 text-lg">
+            <Card className="p-6 bg-slate-50 dark:bg-slate-900 border">
+               <h3 className="font-semibold mb-6 text-xl">
                  {WORKFLOW_STEPS.find(s => s.key === selectedWorkflowStep)?.label}
                </h3>
                
-               <div className="grid grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                   <Label>Nama</Label>
+               <div className="grid grid-cols-2 gap-6">
+                 <div className="space-y-3">
+                   <Label className="text-base">Nama</Label>
                    <Input 
                      value={user?.name || 'User'} 
                      readOnly 
-                     className="bg-slate-50"
+                     className="bg-background text-foreground opacity-100 h-11"
                    />
                  </div>
                  
-                 <div className="space-y-2">
-                   <Label>Tanggal *</Label>
+                 <div className="space-y-3">
+                   <Label className="text-base">Tanggal *</Label>
                    <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal',
+                          'w-full justify-start text-left font-normal h-11',
                           !workflowDate && 'text-muted-foreground',
                         )}
                       >

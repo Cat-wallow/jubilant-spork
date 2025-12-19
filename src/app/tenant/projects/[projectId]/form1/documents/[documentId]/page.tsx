@@ -60,7 +60,7 @@ const renderTimelineStep = (label: string, step?: WorkflowStep) => {
         <div className="text-sm font-medium text-slate-900 dark:text-slate-50">{label}</div>
         {isDone && (
           <div className="mt-0.5 text-xs text-muted-foreground dark:text-slate-300">
-            <div>{step?.by || '-'}</div>
+            <div>{step?.byName || step?.by || '-'}</div>
             {step?.date && <div>{formatDate(step.date)}</div>}
             {step?.source && (
               <div className="text-[11px] italic text-slate-500 dark:text-slate-300">{step.source}</div>
@@ -95,13 +95,27 @@ export default function DocumentDetailPage() {
   );
   const createCommentMutation = useCreateDocumentComment();
   const [commentText, setCommentText] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleBack = () => {
     router.back();
   };
 
+  const downloadUrl = tenantId && projectId && documentId 
+    ? `${process.env.NEXT_PUBLIC_API_URL}/document/api/v1/projects/${projectId}/documents/${documentId}/download?currentTenantId=${tenantId}`
+    : '';
+
   const handleDownload = () => {
-    toast.info('Download dokumen belum tersedia');
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+    } else {
+      toast.error('Gagal mengunduh dokumen: URL tidak valid');
+    }
+  };
+
+  const handlePreview = () => {
+    setShowPreview(!showPreview);
   };
 
   const handleSubmitComment = async (event: FormEvent<HTMLFormElement>) => {
@@ -125,9 +139,10 @@ export default function DocumentDetailPage() {
         userId,
         authorName,
         content: commentText.trim(),
-        severity: undefined,
+        severity: isUrgent ? 'high' : undefined,
       });
       setCommentText('');
+      setIsUrgent(false);
     } catch {
       toast.error('Gagal mengirim komentar');
     }
@@ -231,6 +246,10 @@ export default function DocumentDetailPage() {
                 <div className="font-medium">{doc.nomorDokumen || '-'}</div>
               </div>
               <div>
+                <div className="text-xs text-muted-foreground dark:text-slate-300">Status Dokumen</div>
+                <div className="font-medium">{statusLabel}</div>
+              </div>
+              <div>
                 <div className="text-xs text-muted-foreground dark:text-slate-300">Tanggal</div>
                 <div className="font-medium">{formatDate(doc.documentDate)}</div>
               </div>
@@ -258,11 +277,28 @@ export default function DocumentDetailPage() {
                 <div className="text-xs text-muted-foreground dark:text-slate-300">Tanggal Upload</div>
                 <div className="font-medium">{formatDate(doc.createdAt)}</div>
               </div>
-              <Button className="w-full mt-4" variant="outline" onClick={handleDownload}>
-                <Download className="mr-2 h-4 w-4" />
-                Download Original
-              </Button>
+              
+              <div className="flex flex-col gap-2 mt-4">
+                <Button className="w-full" variant="outline" onClick={handlePreview}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  {showPreview ? 'Tutup Preview' : 'Preview Dokumen'}
+                </Button>
+                <Button className="w-full" variant="default" onClick={handleDownload}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Original
+                </Button>
+              </div>
             </CardContent>
+            
+            {showPreview && (
+              <div className="border-t p-4">
+                <iframe 
+                  src={`${downloadUrl}&preview=true`} 
+                  className="w-full h-[500px] rounded border bg-white"
+                  title="Document Preview"
+                />
+              </div>
+            )}
           </Card>
 
           {/* Attachments (Document Versions) */}
@@ -318,17 +354,18 @@ export default function DocumentDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {renderTimelineStep('Pengiriman/Penerimaan Dokumen', doc.pengiriman)}
+            {renderTimelineStep('Asal Dokumen', doc.asalDokumen)}
+            {renderTimelineStep('Pengiriman', doc.pengiriman)}
             {renderTimelineStep('Penerimaan', doc.penerimaan)}
             {renderTimelineStep('Digitalisasi', doc.digitalisasi)}
             {renderTimelineStep('Pendeskripsian', doc.pendeskripsian)}
-            {renderTimelineStep('Foldering/Indexing')}
-            {renderTimelineStep('Entry Data')}
-            {renderTimelineStep('Telaah Pajak')}
-            {renderTimelineStep('Telaah Pembukuan')}
-            {renderTimelineStep('Pengarsipan')}
-            {renderTimelineStep('Pengembalian ke Klien')}
-            {renderTimelineStep('Berita Acara')}
+            {renderTimelineStep('Foldering', doc.foldering)}
+            {renderTimelineStep('Entry Data', doc.entryData)}
+            {renderTimelineStep('Telaah Pajak', doc.telaahPajak)}
+            {renderTimelineStep('Telaah Pembukuan', doc.telaahPembukuan)}
+            {renderTimelineStep('Pengarsipan', doc.pengarsipan)}
+            {renderTimelineStep('Pengembalian', doc.pengembalian)}
+            {renderTimelineStep('Berita Acara', doc.beritaAcara)}
           </CardContent>
         </Card>
       </div>
@@ -364,10 +401,10 @@ export default function DocumentDetailPage() {
                     </span>
                     <span>•</span>
                     <span>{formatDate(comment.createdAt)}</span>
-                    {comment.severity && (
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
-                        {comment.severity}
-                      </span>
+                    {comment.severity === 'high' && (
+                      <Badge variant="destructive" className="h-5 px-2 text-[10px]">
+                        Warning
+                      </Badge>
                     )}
                   </div>
                   <p className="mt-1 text-sm text-slate-700 dark:text-slate-100 whitespace-pre-line">
@@ -380,20 +417,30 @@ export default function DocumentDetailPage() {
 
           <form onSubmit={handleSubmitComment} className="space-y-2">
             <p className="text-xs font-medium text-slate-700 dark:text-slate-100">Add Comment</p>
-            <div className="flex flex-col gap-2 md:flex-row">
+            <div className="flex flex-col gap-2">
               <Textarea
+                placeholder="Tulis komentar..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Add a comment..."
-                className="min-h-[60px] md:flex-1"
+                className="min-h-[80px]"
               />
-              <Button
-                type="submit"
-                className="self-end md:self-auto md:h-10 md:px-4"
-                disabled={createCommentMutation.isPending || !tenantId || !userId}
-              >
-                {createCommentMutation.isPending ? 'Mengirim...' : 'Post'}
-              </Button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="urgent-comment"
+                    checked={isUrgent}
+                    onChange={(e) => setIsUrgent(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="urgent-comment" className="text-sm text-slate-700 dark:text-slate-300">
+                    Apakah penting?
+                  </label>
+                </div>
+                <Button type="submit" size="sm" disabled={createCommentMutation.isPending}>
+                  {createCommentMutation.isPending ? 'Mengirim...' : 'Kirim'}
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

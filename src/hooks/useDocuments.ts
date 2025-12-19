@@ -8,6 +8,7 @@ import api from '@/lib/api';
 export interface WorkflowStep {
   status: boolean;
   by: string | null;
+  byName?: string | null;
   date: string | null;
   source?: string | null;
 }
@@ -238,7 +239,7 @@ export const useDocument = (tenantId: string, projectId: string, documentId: str
     queryKey: ['document', tenantId, projectId, documentId],
     queryFn: async () => {
       const { data } = await api.get<Document>(
-        `/document/api/v1/project/${projectId}/documents/${documentId}?currentTenantId=${tenantId}`
+        `/document/api/v1/projects/${projectId}/documents/${documentId}?currentTenantId=${tenantId}`
       );
       return data;
     },
@@ -408,7 +409,7 @@ export const useUpdateDocument = () => {
       payload: UpdateDocumentPayload;
     }) => {
       const { data } = await api.patch<Document>(
-        `/document/api/v1/project/${projectId}/documents/${documentId}`,
+        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
         {
           ...payload,
           currentTenantId: tenantId,
@@ -444,7 +445,7 @@ export const useDeleteDocument = () => {
       documentId: string;
     }) => {
       const { data } = await api.delete(
-        `/document/api/v1/project/${projectId}/documents/${documentId}`,
+        `/document/api/v1/projects/${projectId}/documents/${documentId}`,
         {
           data: { currentTenantId: tenantId },
         }

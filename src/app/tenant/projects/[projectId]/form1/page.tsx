@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { getProjectById, type Project } from '@/services/project.service';
-import { useBundles, useCreateBundle, type DocumentBundle } from '@/hooks/useBundles';
+import { getReferenceTypes } from '@/services/reference-type.service';
+import { useBundles, useCreateBundle, useDeleteBundle, type DocumentBundle } from '@/hooks/useBundles';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,17 +79,31 @@ export default function ProjectFormOnePage() {
   const [isCreateBundleOpen, setIsCreateBundleOpen] = useState(false);
   const [bundleName, setBundleName] = useState('');
   const [bundleType, setBundleType] = useState('');
-  const [bundlePeriod, setBundlePeriod] = useState('');
+  
+  // Period state
+  const [periodStartMonth, setPeriodStartMonth] = useState('');
+  const [periodEndMonth, setPeriodEndMonth] = useState('');
+  const [periodYear, setPeriodYear] = useState(new Date().getFullYear().toString());
+  
   const [bundleScope, setBundleScope] = useState('');
 
-  const { data: project, isLoading: isProjectLoading } = useQuery<Project>({
+  const { data: project, isLoading: isProjectLoading } = useQuery({
     queryKey: ['project', projectId],
-    queryFn: () => getProjectById(projectId),
+    queryFn: () => getProjectById(projectId as string),
     enabled: !!projectId,
+  });
+
+  const { data: bundleTypes, isLoading: isBundleTypesLoading } = useQuery({
+    queryKey: ['reference-types', 'JENIS_BUNDLE'],
+    queryFn: () => getReferenceTypes('JENIS_BUNDLE'),
   });
 
   const { data: bundlesResponse } = useBundles(tenantId, projectId);
   const createBundleMutation = useCreateBundle();
+  const deleteBundleMutation = useDeleteBundle();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [bundleToDelete, setBundleToDelete] = useState<BundleRow | null>(null);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
 
   const bundles: BundleRow[] = useMemo(
     () => bundlesResponse?.items ?? [],
@@ -138,7 +153,9 @@ export default function ProjectFormOnePage() {
   const resetBundleForm = () => {
     setBundleName('');
     setBundleType('');
-    setBundlePeriod('');
+    setPeriodStartMonth('');
+    setPeriodEndMonth('');
+    setPeriodYear(new Date().getFullYear().toString());
     setBundleScope('');
   };
 
@@ -150,10 +167,23 @@ export default function ProjectFormOnePage() {
       return;
     }
 
-    if (!bundlePeriod) {
-      toast.error('Periode wajib dipilih');
+    if (!periodStartMonth || !periodEndMonth || !periodYear) {
+      toast.error('Periode lengkap wajib dipilih');
       return;
     }
+
+    // Month mapping for validation
+    const monthMap: Record<string, number> = {
+      'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
+      'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
+    };
+
+    if (monthMap[periodStartMonth] > monthMap[periodEndMonth]) {
+      toast.error('Periode awal tidak boleh lebih besar dari periode akhir');
+      return;
+    }
+
+    const bundlePeriod = `${periodStartMonth}-${periodEndMonth} ${periodYear}`;
 
     if (!bundleScope.trim()) {
       toast.error('Scope pekerjaan wajib diisi');
@@ -188,6 +218,37 @@ export default function ProjectFormOnePage() {
     }
   };
 
+  const handleDeleteClick = (bundle: BundleRow) => {
+    setBundleToDelete(bundle);
+    setDeleteConfirmationText('');
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!bundleToDelete) return;
+    if (deleteConfirmationText !== 'SETUJU') {
+      toast.error('Ketik SETUJU untuk mengkonfirmasi penghapusan');
+      return;
+    }
+
+    try {
+      await deleteBundleMutation.mutateAsync({
+        tenantId,
+        projectId,
+        bundleId: bundleToDelete.id,
+        userId,
+      });
+
+      toast.success('Bundle berhasil dihapus (Soft Delete)');
+      setIsDeleteOpen(false);
+      setBundleToDelete(null);
+      setDeleteConfirmationText('');
+    } catch (error) {
+      toast.error('Gagal menghapus bundle');
+      console.error(error);
+    }
+  };
+
   return (
     <div className="space-y-6 p-6">
       <Dialog open={isCreateBundleOpen} onOpenChange={setIsCreateBundleOpen}>
@@ -201,23 +262,14 @@ export default function ProjectFormOnePage() {
           <form onSubmit={handleSubmitCreateBundle} className="space-y-6">
             <div className="space-y-1.5">
               <Label htmlFor="bundle-name">Nama Bundle</Label>
-              <Select
-                value={bundleName || 'default'}
-                onValueChange={(val) => setBundleName(val === 'default' ? '' : val)}
-              >
-                <SelectTrigger id="bundle-name">
-                  <SelectValue placeholder="Pilih nama bundle" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default" disabled>
-                    Pilih nama bundle
-                  </SelectItem>
-                  <SelectItem value="PO-Februari-Maret">PO-Februari-Maret</SelectItem>
-                  <SelectItem value="PO-Q1-2023">PO-Q1-2023</SelectItem>
-                  <SelectItem value="SO-Q1-2023">Sales Order Q1 2023</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                id="bundle-name"
+                value={bundleName}
+                onChange={(e) => setBundleName(e.target.value)}
+                placeholder="Masukkan nama bundle (contoh: PO-Februari-Maret)"
+              />
             </div>
+            
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="bundle-type">Jenis Bundle</Label>
@@ -232,32 +284,82 @@ export default function ProjectFormOnePage() {
                     <SelectItem value="default" disabled>
                       Pilih jenis bundle
                     </SelectItem>
-                    <SelectItem value="po-feb-maret">PO-Februari-Maret</SelectItem>
-                    <SelectItem value="invoice-feb-maret">Invoice-Februari-Maret</SelectItem>
-                    <SelectItem value="lainnya">Lainnya</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="bundle-period">Periode</Label>
-                <Select
-                  value={bundlePeriod || 'default'}
-                  onValueChange={(val) => setBundlePeriod(val === 'default' ? '' : val)}
-                >
-                  <SelectTrigger id="bundle-period">
-                    <SelectValue placeholder="Pilih periode" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default" disabled>
-                      Pilih periode
-                    </SelectItem>
-                    <SelectItem value="Januari-Maret">Januari-Maret</SelectItem>
-                    <SelectItem value="Februari-Maret">Februari-Maret</SelectItem>
-                    <SelectItem value="Q1 2023">Q1 2023</SelectItem>
+                    {isBundleTypesLoading ? (
+                      <SelectItem value="loading" disabled>
+                        Loading types...
+                      </SelectItem>
+                    ) : bundleTypes && Array.isArray(bundleTypes) && bundleTypes.length > 0 ? (
+                      bundleTypes.map((type: any) => (
+                        <SelectItem key={type.id} value={type.name}>
+                          {type.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      // Fallback if no types found or loading
+                      <>
+                        <SelectItem value="PO">PO (Fallback)</SelectItem>
+                        <SelectItem value="Invoice">Invoice (Fallback)</SelectItem>
+                        <SelectItem value="Bank Statement">Bank Statement (Fallback)</SelectItem>
+                        <SelectItem value="Lainnya">Lainnya (Fallback)</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
             </div>
+
+            <div className="space-y-1.5">
+              <Label>Periode</Label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Select value={periodStartMonth} onValueChange={setPeriodStartMonth}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Dari Bulan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Januari">Januari</SelectItem>
+                    <SelectItem value="Februari">Februari</SelectItem>
+                    <SelectItem value="Maret">Maret</SelectItem>
+                    <SelectItem value="April">April</SelectItem>
+                    <SelectItem value="Mei">Mei</SelectItem>
+                    <SelectItem value="Juni">Juni</SelectItem>
+                    <SelectItem value="Juli">Juli</SelectItem>
+                    <SelectItem value="Agustus">Agustus</SelectItem>
+                    <SelectItem value="September">September</SelectItem>
+                    <SelectItem value="Oktober">Oktober</SelectItem>
+                    <SelectItem value="November">November</SelectItem>
+                    <SelectItem value="Desember">Desember</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="hidden sm:flex items-center text-muted-foreground">-</span>
+                <Select value={periodEndMonth} onValueChange={setPeriodEndMonth}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Sampai Bulan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Januari">Januari</SelectItem>
+                    <SelectItem value="Februari">Februari</SelectItem>
+                    <SelectItem value="Maret">Maret</SelectItem>
+                    <SelectItem value="April">April</SelectItem>
+                    <SelectItem value="Mei">Mei</SelectItem>
+                    <SelectItem value="Juni">Juni</SelectItem>
+                    <SelectItem value="Juli">Juli</SelectItem>
+                    <SelectItem value="Agustus">Agustus</SelectItem>
+                    <SelectItem value="September">September</SelectItem>
+                    <SelectItem value="Oktober">Oktober</SelectItem>
+                    <SelectItem value="November">November</SelectItem>
+                    <SelectItem value="Desember">Desember</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="w-full sm:w-[100px]"
+                  value={periodYear}
+                  onChange={(e) => setPeriodYear(e.target.value)}
+                  placeholder="Tahun"
+                  type="number"
+                />
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="bundle-scope">
                 Scope Pekerjaan <span className="text-red-500">*</span>
@@ -570,7 +672,7 @@ export default function ProjectFormOnePage() {
                             className="h-8 w-8 text-red-600"
                             onClick={(e) => {
                               e.stopPropagation();
-                              toast.info('Hapus bundle belum tersedia');
+                              handleDeleteClick(bundle);
                             }}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -614,6 +716,42 @@ export default function ProjectFormOnePage() {
           </div>
         </CardContent>
       </Card>
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hapus Bundle</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus bundle ini?
+              <br />
+              <br />
+              Tindakan ini akan mengakibatkan <strong>{bundleToDelete?.documents || 0} dokumen</strong> dan data terkait lainnya ikut terhapus secara soft delete (bisa dipulihkan oleh admin).
+              <br />
+              <br />
+              Ketik <strong>SETUJU</strong> untuk melanjutkan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={deleteConfirmationText}
+              onChange={(e) => setDeleteConfirmationText(e.target.value)}
+              placeholder="Ketik SETUJU"
+              className="border-red-300 focus:border-red-500"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteConfirmationText !== 'SETUJU' || deleteBundleMutation.isPending}
+            >
+              {deleteBundleMutation.isPending ? 'Menghapus...' : 'Hapus Bundle'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
