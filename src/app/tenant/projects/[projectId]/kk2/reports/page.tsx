@@ -5,6 +5,7 @@ import StatsCards from './components/StatsCards';
 import ReportFilters from './components/ReportFilters';
 import GeneralLedger from './components/GeneralLedger';
 import TrialBalance from './components/TrialBalance';
+import Neraca from './components/Neraca';
 import PlaceholderTab from './components/PlaceholderTab';
 import { statsCards } from './data/mockData';
 
@@ -132,10 +133,7 @@ export default function KK2ReportsPage() {
             </TabsContent>
 
             <TabsContent value="neraca" className="mt-8">
-              <PlaceholderTab
-                title="Neraca"
-                description="Balance sheet report"
-              />
+              <Neraca />
             </TabsContent>
 
             <TabsContent value="laba-rugi" className="mt-8">

@@ -38,6 +38,33 @@ export interface TrialBalanceAccount {
   normalSide: 'Debit' | 'Credit';
 }
 
+export interface BalanceSheetAccount {
+  accountNo: string;
+  accountName: string;
+  amount: number;
+}
+
+export interface BalanceSheetSection {
+  title: string;
+  accounts: BalanceSheetAccount[];
+  total: number;
+}
+
+export interface BalanceSheetData {
+  companyName: string;
+  reportDate: string;
+  aktiva: {
+    lancar: BalanceSheetSection;
+    tetap: BalanceSheetSection;
+  };
+  kewajiban: BalanceSheetSection;
+  modal: BalanceSheetSection;
+  totalAktiva: number;
+  totalKewajibanModal: number;
+  isBalanced: boolean;
+  difference: number;
+}
+
 export const statsCards: StatsCard[] = [
   {
     icon: 'file-done',
@@ -192,6 +219,44 @@ export const trialBalanceAccounts: TrialBalanceAccount[] = [
     normalSide: 'Credit',
   },
 ];
+
+export const balanceSheetData: BalanceSheetData = {
+  companyName: 'PT. MAJU BERSAMA INDONESIA',
+  reportDate: 'Per 29 September 2025',
+  aktiva: {
+    lancar: {
+      title: 'AKTIVA LANCAR',
+      accounts: [
+        { accountNo: '1102', accountName: 'Bank', amount: 55500000 },
+      ],
+      total: 55500000,
+    },
+    tetap: {
+      title: 'AKTIVA TETAP',
+      accounts: [
+        { accountNo: '1201', accountName: 'Piutang Dagang', amount: 107500000 },
+      ],
+      total: 107500000,
+    },
+  },
+  kewajiban: {
+    title: 'KEWAJIBAN',
+    accounts: [
+      { accountNo: '2101', accountName: 'Hutang PPN', amount: 15500000 },
+      { accountNo: '2201', accountName: 'Uang Muka Penjualan', amount: 50000000 },
+    ],
+    total: -65500000,
+  },
+  modal: {
+    title: 'MODAL',
+    accounts: [],
+    total: 0,
+  },
+  totalAktiva: 165500000,
+  totalKewajibanModal: -65500000,
+  isBalanced: false,
+  difference: 231000000,
+};
 
 export const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('id-ID', {
