@@ -155,8 +155,12 @@ export default function DetailProjectTab() {
 											</SelectTrigger>
 											<SelectContent>
 												{clients.map((client: any) => (
-													<SelectItem key={client.id} value={client.id}>
-														{client.name}
+													<SelectItem 
+														key={client.id} 
+														value={client.id}
+														disabled={client.status !== 'active'}
+													>
+														{client.name} {client.status !== 'active' ? '(Nonaktif)' : ''}
 													</SelectItem>
 												))}
 											</SelectContent>

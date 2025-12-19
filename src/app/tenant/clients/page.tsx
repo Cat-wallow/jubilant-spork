@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary, useTerminateClient } from '@/hooks/useClients';
+import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary, useTerminateClient, useActivateClient } from '@/hooks/useClients';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import { SummaryCards } from './components/SummaryCards';
@@ -30,6 +30,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
   MoreHorizontal,
   Plus,
   FileDown,
@@ -41,6 +51,7 @@ import {
   Eye,
   Building2,
   Ban,
+  CheckCircle,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -52,142 +63,191 @@ import {
 import { Client } from '@/hooks/useClients';
 import { useToast } from '@/hooks/use-toast';
 
-// const columns: ColumnDef<Client>[] = [
-//   {
-//     accessorKey: 'name',
-//     header: 'Klien',
-//     cell: ({ row }) => (
-//       <div className="font-medium">
-//         <div className="flex flex-col">
-//           <span className="text-sm font-medium">{row.getValue('name')}</span>
-//           <span className="text-xs text-muted-foreground">{row.original.code}</span>
-//         </div>
-//       </div>
-//     ),
-//   },
-//   {
-//     accessorKey: 'status',
-//     header: 'Status Client',
-//     cell: ({ row }) => {
-//       const status = row.getValue('status') as string;
-//       return (
-//         <Badge
-//           variant={status === 'active' ? 'default' : 'secondary'}
-//           className={
-//             status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-//           }
-//         >
-//           {status === 'active' ? 'Active' : 'Non Aktif'}
-//         </Badge>
-//       );
-//     },
-//   },
-//   {
-//     accessorKey: 'type',
-//     header: 'Jenis Usaha',
-//     cell: ({ row }) => {
-//       const type = row.getValue('type') as string;
-//       const typeLabels = {
-//         corporate: 'Konstruksi',
-//         individual: 'Trading',
-//         other: 'Manufaktur',
-//       };
-//       return typeLabels[type as keyof typeof typeLabels] || type;
-//     },
-//   },
-//   {
-//     accessorKey: 'npwp',
-//     header: 'NPWP',
-//     cell: ({ row }) => <span className="font-mono text-sm">{row.getValue('npwp') || '-'}</span>,
-//   },
-//   {
-//     accessorKey: 'pkp_status',
-//     header: 'Status PKP',
-//     cell: ({ row }) => {
-//       const pkpStatus = row.original.pkp_status;
-//       return (
-//         <Badge
-//           variant={pkpStatus ? 'default' : 'secondary'}
-//           className={pkpStatus ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}
-//         >
-//           {pkpStatus ? 'PKP' : 'NON PKP'}
-//         </Badge>
-//       );
-//     },
-//   },
-//   {
-//     accessorKey: 'active_projects',
-//     header: 'Active Project',
-//     cell: ({ row }) => (
-//       <span className="text-sm font-medium">{row.original.active_projects || 0}</span>
-//     ),
-//   },
-//   {
-//     accessorKey: 'updated_at',
-//     header: 'Last Update',
-//     cell: ({ row }) => {
-//       const date = new Date(row.getValue('updated_at'));
-//       return (
-//         <span className="text-sm">
-//           {date.toLocaleDateString('id-ID', {
-//             day: '2-digit',
-//             month: 'short',
-//             year: 'numeric',
-//           })}
-//         </span>
-//       );
-//     },
-//   },
-//   {
-//     accessorKey: 'deadline_project',
-//     header: 'Deadline Project',
-//     cell: ({ row }) => {
-//       const deadline = row.original.deadline_project;
-//       if (!deadline) return <span className="text-sm text-muted-foreground">-</span>;
+interface ClientDeleteDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  client: Client | null;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}
 
-//       const date = new Date(deadline);
-//       const isOverdue = date < new Date();
-//       return (
-//         <span className={`text-sm ${isOverdue ? 'font-medium text-red-600' : ''}`}>
-//           {date.toLocaleDateString('id-ID', {
-//             day: '2-digit',
-//             month: 'short',
-//             year: 'numeric',
-//           })}
-//         </span>
-//       );
-//     },
-//   },
-//   {
-//     id: 'actions',
-//     header: 'Action',
-//     cell: ({ row }) => (
-//       <DropdownMenu>
-//         <DropdownMenuTrigger asChild>
-//           <Button variant="ghost" className="h-8 w-8 p-0">
-//             <span className="sr-only">Open menu</span>
-//             <MoreHorizontal className="h-4 w-4" />
-//           </Button>
-//         </DropdownMenuTrigger>
-//         <DropdownMenuContent align="end">
-//           <DropdownMenuItem>
-//             <Edit className="mr-2 h-4 w-4" />
-//             Edit
-//           </DropdownMenuItem>
-//           <DropdownMenuItem>
-//             <Link className="mr-2 h-4 w-4" />
-//             View Details
-//           </DropdownMenuItem>
-//           <DropdownMenuSeparator />
-//           <DropdownMenuItem className="text-red-600">
-//             <Trash2 className="mr-2 h-4 w-4" />
-//             Delete
-//           </DropdownMenuItem>
-//         </DropdownMenuContent>
-//       </DropdownMenu>
-//     ),
-//   },
-// ];
+function ClientDeleteDialog({
+  open,
+  onOpenChange,
+  client,
+  onConfirm,
+  isDeleting,
+}: ClientDeleteDialogProps) {
+  const [confirmText, setConfirmText] = useState('');
+  const isConfirmed = confirmText === 'SETUJU';
+
+  useEffect(() => {
+    if (open) {
+      setConfirmText('');
+    }
+  }, [open]);
+
+  if (!client) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hapus Klien</DialogTitle>
+          <DialogDescription>
+            Apakah anda yakin? menghapus klien ini berarti kehilangan{' '}
+            <span className="font-bold text-red-500">
+              {client.active_projects || 0} project
+            </span>{' '}
+            dari klien tersebut. Tindakan ini tidak dapat dibatalkan sepenuhnya (soft delete).
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="confirm-text">
+              Ketik <span className="font-bold">SETUJU</span> untuk melanjutkan
+            </Label>
+            <Input
+              id="confirm-text"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="Ketik SETUJU"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Batal
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={!isConfirmed || isDeleting}
+          >
+            {isDeleting ? 'Menghapus...' : 'Hapus Klien'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface ClientTerminateDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  client: Client | null;
+  onConfirm: () => void;
+  isTerminating: boolean;
+}
+
+function ClientTerminateDialog({
+  open,
+  onOpenChange,
+  client,
+  onConfirm,
+  isTerminating,
+}: ClientTerminateDialogProps) {
+  const [confirmText, setConfirmText] = useState('');
+  const isConfirmed = confirmText === 'PUTUS';
+
+  useEffect(() => {
+    if (open) {
+      setConfirmText('');
+    }
+  }, [open]);
+
+  if (!client) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Putus Kerja Sama</DialogTitle>
+          <DialogDescription asChild>
+            <div>
+              Apakah anda yakin ingin memutus kerja sama dengan <span className="font-bold">{client.name}</span>?
+              <br /><br />
+              Tindakan ini akan:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Mengubah status klien menjadi <span className="font-bold text-orange-600">Non Aktif</span></li>
+                <li>Menangguhkan (suspend) semua <span className="font-bold">{client.active_projects || 0} project aktif</span></li>
+              </ul>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="confirm-terminate">
+              Ketik <span className="font-bold">PUTUS</span> untuk melanjutkan
+            </Label>
+            <Input
+              id="confirm-terminate"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="Ketik PUTUS"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Batal
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={!isConfirmed || isTerminating}
+            className="bg-orange-600 hover:bg-orange-700"
+          >
+            {isTerminating ? 'Memproses...' : 'Putus Kerja Sama'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface ClientActivateDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  client: Client | null;
+  onConfirm: () => void;
+  isActivating: boolean;
+}
+
+function ClientActivateDialog({
+  open,
+  onOpenChange,
+  client,
+  onConfirm,
+  isActivating,
+}: ClientActivateDialogProps) {
+  if (!client) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Aktifkan Klien</DialogTitle>
+          <DialogDescription>
+            Apakah anda yakin ingin mengaktifkan kembali klien <span className="font-bold">{client.name}</span>?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Batal
+          </Button>
+          <Button
+            className="bg-green-600 hover:bg-green-700"
+            onClick={onConfirm}
+            disabled={isActivating}
+          >
+            {isActivating ? 'Mengaktifkan...' : 'Ya, Aktifkan'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function ClientsPage() {
   const { tenant } = useAuth();
@@ -196,6 +256,7 @@ export default function ClientsPage() {
   const createClientMutation = useCreateClient();
   const deleteClientMutation = useDeleteClient();
   const terminateClientMutation = useTerminateClient();
+  const activateClientMutation = useActivateClient();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -204,6 +265,12 @@ export default function ClientsPage() {
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [clientToTerminate, setClientToTerminate] = useState<Client | null>(null);
+  const [showTerminateDialog, setShowTerminateDialog] = useState(false);
+  const [clientToActivate, setClientToActivate] = useState<Client | null>(null);
+  const [showActivateDialog, setShowActivateDialog] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -395,60 +462,60 @@ export default function ClientsPage() {
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => router.push(`/tenant/clients/${row.original.id}/edit`)}>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); router.push(`/tenant/clients/${row.original.id}/edit`); }}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(`/tenant/clients/${row.original.id}`)}>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); router.push(`/tenant/clients/${row.original.id}`); }}>
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-orange-600 cursor-pointer"
-                onClick={() => {
-                  if (confirm('Putus kerja sama akan menghentikan semua project client dan mengubah status client menjadi Non Aktif. Lanjutkan?')) {
-                    terminateClientMutation.mutate(
-                      { tenantId: tenant.id, id: row.original.id },
-                      {
-                        onSuccess: () => {
-                          toast({
-                            title: 'Berhasil',
-                            description: 'Kerja sama client berhasil diputus',
-                          });
-                        },
-                        onError: (error: any) => {
-                          const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan';
-                          toast({
-                            title: 'Gagal',
-                            description: errorMessage,
-                            variant: 'destructive',
-                          });
-                        },
-                      }
-                    );
-                  }
-                }}
-              >
-                <Ban className="mr-2 h-4 w-4" />
-                Putus Kerja Sama
-              </DropdownMenuItem>
+              
+              {row.original.status === 'inactive' ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-green-600 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setClientToActivate(row.original);
+                      setShowActivateDialog(true);
+                    }}
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Aktifkan
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-orange-600 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setClientToTerminate(row.original);
+                      setShowTerminateDialog(true);
+                    }}
+                  >
+                    <Ban className="mr-2 h-4 w-4" />
+                    Putus Kerja Sama
+                  </DropdownMenuItem>
+                </>
+              )}
+              
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
-                onClick={() => {
-                  if (confirm('Are you sure you want to delete this client?')) {
-                    deleteClientMutation.mutate({
-                      tenantId: tenant.id,
-                      id: row.original.id,
-                    });
-                  }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setClientToDelete(row.original);
+                  setShowDeleteDialog(true);
                 }}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -459,7 +526,19 @@ export default function ClientsPage() {
         ),
       },
     ],
-    [deleteClientMutation, terminateClientMutation, tenant.id]
+    [
+      deleteClientMutation,
+      terminateClientMutation,
+      activateClientMutation,
+      tenant.id,
+      router,
+      setClientToDelete,
+      setShowDeleteDialog,
+      setClientToTerminate,
+      setShowTerminateDialog,
+      setClientToActivate,
+      setShowActivateDialog
+    ]
   );
 
   const clients = data?.items || [];
@@ -586,24 +665,123 @@ export default function ClientsPage() {
         open={showCreateModal}
         onOpenChange={setShowCreateModal}
         onSubmit={async (data) => {
-          try {
-            await createClientMutation.mutateAsync({
-              tenantId: tenant.id,
-              data,
-            });
-            toast({
-              title: 'Berhasil',
-              description: 'Klien baru berhasil ditambahkan',
-            });
-            setShowCreateModal(false);
-          } catch (error: any) {
-            console.error('Failed to create client:', error);
-            const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat membuat klien';
-            toast({
-              title: 'Gagal membuat klien',
-              description: errorMessage,
-              variant: 'destructive',
-            });
+          return createClientMutation.mutateAsync({
+            tenantId: tenant.id,
+            data,
+          });
+        }}
+      />
+
+      <ClientDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        client={clientToDelete}
+        isDeleting={deleteClientMutation.isPending}
+        onConfirm={() => {
+          if (clientToDelete) {
+            deleteClientMutation.mutate(
+              {
+                tenantId: tenant.id,
+                id: clientToDelete.id,
+              },
+              {
+                onSuccess: () => {
+                  toast({
+                    title: 'Berhasil',
+                    description: 'Klien berhasil dihapus',
+                  });
+                  setShowDeleteDialog(false);
+                  setClientToDelete(null);
+                },
+                onError: (error: any) => {
+                  const errorMessage =
+                    error?.response?.data?.message ||
+                    error?.message ||
+                    'Terjadi kesalahan saat menghapus klien';
+                  toast({
+                    title: 'Gagal menghapus klien',
+                    description: errorMessage,
+                    variant: 'destructive',
+                  });
+                },
+              }
+            );
+          }
+        }}
+      />
+
+      <ClientTerminateDialog
+        open={showTerminateDialog}
+        onOpenChange={setShowTerminateDialog}
+        client={clientToTerminate}
+        isTerminating={terminateClientMutation.isPending}
+        onConfirm={() => {
+          if (clientToTerminate) {
+            terminateClientMutation.mutate(
+              {
+                tenantId: tenant.id,
+                id: clientToTerminate.id,
+              },
+              {
+                onSuccess: () => {
+                  toast({
+                    title: 'Berhasil',
+                    description: 'Kerja sama berhasil diputus',
+                  });
+                  setShowTerminateDialog(false);
+                  setClientToTerminate(null);
+                },
+                onError: (error: any) => {
+                  const errorMessage =
+                    error?.response?.data?.message ||
+                    error?.message ||
+                    'Terjadi kesalahan saat memutus kerja sama';
+                  toast({
+                    title: 'Gagal memutus kerja sama',
+                    description: errorMessage,
+                    variant: 'destructive',
+                  });
+                },
+              }
+            );
+          }
+        }}
+      />
+
+      <ClientActivateDialog
+        open={showActivateDialog}
+        onOpenChange={setShowActivateDialog}
+        client={clientToActivate}
+        isActivating={activateClientMutation.isPending}
+        onConfirm={() => {
+          if (clientToActivate) {
+            activateClientMutation.mutate(
+              {
+                tenantId: tenant.id,
+                id: clientToActivate.id,
+              },
+              {
+                onSuccess: () => {
+                  toast({
+                    title: 'Berhasil',
+                    description: 'Klien berhasil diaktifkan kembali',
+                  });
+                  setShowActivateDialog(false);
+                  setClientToActivate(null);
+                },
+                onError: (error: any) => {
+                  const errorMessage =
+                    error?.response?.data?.message ||
+                    error?.message ||
+                    'Terjadi kesalahan saat mengaktifkan klien';
+                  toast({
+                    title: 'Gagal mengaktifkan klien',
+                    description: errorMessage,
+                    variant: 'destructive',
+                  });
+                },
+              }
+            );
           }
         }}
       />

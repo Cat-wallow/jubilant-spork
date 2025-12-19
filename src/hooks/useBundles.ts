@@ -78,6 +78,23 @@ export const useBundles = (
   });
 };
 
+export const useBundle = (
+  tenantId: string,
+  projectId: string,
+  bundleId: string,
+) => {
+  return useQuery<DocumentBundle>({
+    queryKey: ['bundle', tenantId, projectId, bundleId],
+    queryFn: async () => {
+      const { data } = await api.get<DocumentBundle>(
+        `/document/api/v1/projects/${projectId}/bundles/${bundleId}?currentTenantId=${tenantId}`,
+      );
+      return data;
+    },
+    enabled: !!tenantId && !!projectId && !!bundleId,
+  });
+};
+
 export const useDeleteBundle = () => {
   const queryClient = useQueryClient();
 

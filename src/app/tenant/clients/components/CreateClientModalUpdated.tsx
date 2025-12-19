@@ -24,6 +24,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DatePicker } from '@/components/ui/date-picker';
+import { format } from 'date-fns';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -237,9 +239,10 @@ const clientFormSchema = z.object({
     account_number: z
       .string()
       .min(1, 'Nomor akun wajib diisi')
-      .refine((v) => !/[A-Za-z]/.test(v), 'Nomor akun tidak boleh mengandung huruf'),
+      .regex(/^\d+$/, 'Nomor akun harus berupa angka'),
     account_name: z.string().min(1, 'Nama akun wajib diisi'),
     account_type: z.string().min(1, 'Tipe akun wajib dipilih'),
+    normal_balance: z.string().min(1, 'Saldo normal wajib dipilih'),
     description: z.string().optional(),
   })).default([]),
 
@@ -275,6 +278,7 @@ export function CreateClientModalUpdated({
   const [accountTypeOptions, setAccountTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
+  const [missingDocs, setMissingDocs] = useState<string[]>([]);
   const { toast } = useToast();
   const submitIntentRef = useRef(false);
 
@@ -443,7 +447,7 @@ export function CreateClientModalUpdated({
     const currentCoa = watchedValues.customCoa || [];
     setValue('customCoa', [
       ...currentCoa,
-      { account_number: '', account_name: '', account_type: '', description: '' }
+      { account_number: '', account_name: '', account_type: '', normal_balance: '', description: '' }
     ]);
   };
 
@@ -471,7 +475,7 @@ export function CreateClientModalUpdated({
     const loadAccountTypes = async () => {
       try {
         const resp = await api.get('project/reference-types', {
-          params: { type: 'ACCOUNT_TYPE' },
+          params: { type: 'TIPE_AKUN' },
         });
 
         const data = resp?.data?.data ?? resp?.data ?? [];
@@ -675,11 +679,19 @@ export function CreateClientModalUpdated({
       };
 
       await onSubmit(transformedData);
+      toast({
+        title: 'Sukses',
+        description: 'Client berhasil dibuat',
+      });
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating client:', error);
-      // Re-throw so the caller (e.g. ClientsPage) can surface the error via toast.
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat membuat klien';
+      toast({
+        title: 'Gagal membuat klien',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -751,13 +763,15 @@ export function CreateClientModalUpdated({
       });
 
       if (missing.length > 0) {
+        setMissingDocs(missing);
         toast({
           title: 'Dokumen legal belum lengkap',
-          description: 'Setiap dokumen wajib diupload atau pilih "Tidak tersedia".',
+          description: 'Mohon lengkapi status dokumen yang ditandai merah (Upload atau pilih "Tidak tersedia").',
           variant: 'destructive',
         });
         return;
       }
+      setMissingDocs([]);
     }
 
     const ok = stepField ? await trigger(stepField, { shouldFocus: true } as any) : true;
@@ -942,10 +956,27 @@ export function CreateClientModalUpdated({
             <div className="grid grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="basicInfo.establishment_date">Tanggal Berdiri</Label>
-                <Input
-                  id="basicInfo.establishment_date"
-                  type="date"
-                  {...register('basicInfo.establishment_date')}
+                <Controller
+                  control={control}
+                  name="basicInfo.establishment_date"
+                  render={({ field }) => (
+                    <DatePicker
+                      value={
+                        field.value
+                          ? (() => {
+                              const parts = field.value.split('-');
+                              if (parts.length !== 3) return undefined;
+                              const [y, m, d] = parts.map(Number);
+                              return new Date(y, m - 1, d);
+                            })()
+                          : undefined
+                      }
+                      onChange={(date) => {
+                        field.onChange(date ? format(date, 'yyyy-MM-dd') : '');
+                      }}
+                      placeholder="Pilih tanggal"
+                    />
+                  )}
                 />
               </div>
               <div>
@@ -1826,6 +1857,10 @@ export function CreateClientModalUpdated({
                       <Input
                         {...register(`customCoa.${index}.account_number`)}
                         placeholder="1001"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setValue(`customCoa.${index}.account_number`, value);
+                        }}
                       />
                     </div>
                     <div>
@@ -1837,29 +1872,52 @@ export function CreateClientModalUpdated({
                     </div>
                   </div>
 
-                  <div>
-                    <Label>Tipe Akun *</Label>
-                    <Controller
-                      control={control}
-                      name={`customCoa.${index}.account_type` as const}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value || ''}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih tipe akun" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {accountTypeOptions.map((opt) => (
-                              <SelectItem key={opt.id} value={opt.name}>
-                                {opt.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Tipe Akun *</Label>
+                      <Controller
+                        control={control}
+                        name={`customCoa.${index}.account_type` as const}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} value={field.value || ''}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih tipe akun" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {accountTypeOptions.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.name}>
+                                  {opt.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.customCoa?.[index]?.account_type && (
+                        <p className="text-red-500 text-sm">{errors.customCoa[index]?.account_type?.message as any}</p>
                       )}
-                    />
-                    {errors.customCoa?.[index]?.account_type && (
-                      <p className="text-red-500 text-sm">{errors.customCoa[index]?.account_type?.message as any}</p>
-                    )}
+                    </div>
+                    <div>
+                      <Label>Saldo Normal *</Label>
+                      <Controller
+                        control={control}
+                        name={`customCoa.${index}.normal_balance` as const}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} value={field.value || ''}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih saldo normal" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Debit">Debit</SelectItem>
+                              <SelectItem value="Credit">Credit</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.customCoa?.[index]?.normal_balance && (
+                        <p className="text-red-500 text-sm">{errors.customCoa[index]?.normal_balance?.message as any}</p>
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -1930,6 +1988,7 @@ export function CreateClientModalUpdated({
             } else {
               setValue('legalDocuments', [...currentDocs, newDoc]);
             }
+            setMissingDocs((prev) => prev.filter((id) => id !== docType));
           } catch (e: any) {
             console.error(e);
             const msg = e?.response?.data?.message || e?.message || 'Upload dokumen gagal';
@@ -1962,12 +2021,16 @@ export function CreateClientModalUpdated({
           } else {
             setValue('legalDocuments', [...currentDocs, newDoc]);
           }
+          setMissingDocs((prev) => prev.filter((id) => id !== docType));
         };
 
         return (
           <div className="space-y-4">
             <div className="space-y-1">
               <h3 className="font-semibold text-blue-900 dark:text-blue-100">Upload Dokumen Legal *</h3>
+              <p className="text-sm text-muted-foreground">
+                Mohon tentukan status ketersediaan untuk setiap dokumen di bawah ini.
+              </p>
             </div>
 
             <div className="space-y-3">
@@ -1975,14 +2038,20 @@ export function CreateClientModalUpdated({
                 const doc = getDocByType(docType.id);
                 const isUploaded = doc?.status === 'uploaded';
                 const isNotAvailable = doc?.status === 'not_available';
+                const isMissing = missingDocs.includes(docType.id);
 
                 return (
-                  <div key={docType.id} className="border rounded-lg overflow-hidden">
+                  <div key={docType.id} className={`border rounded-lg overflow-hidden ${isMissing ? 'border-red-500' : ''}`}>
                     {/* Document Header */}
-                    <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900">
+                    <div className={`flex items-center justify-between p-4 ${isMissing ? 'bg-red-50 dark:bg-red-900/20' : 'bg-white dark:bg-slate-900'}`}>
                       <div>
                         <p className="font-medium text-blue-900 dark:text-blue-100">{docType.label}</p>
                         <p className="text-xs text-muted-foreground">Format: {docType.format}</p>
+                        {isMissing && (
+                          <p className="text-red-500 text-sm font-medium mt-1">
+                            Wajib diisi (Upload atau pilih "Tidak tersedia")
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {isUploaded && (
