@@ -518,7 +518,13 @@ export default function ProjectFormOnePage() {
                   </TableRow>
                 ) : (
                   pageItems.map((bundle) => (
-                    <TableRow key={bundle.id}>
+                    <TableRow
+                      key={bundle.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() =>
+                        router.push(`/tenant/projects/${projectId}/form1/bundles/${bundle.id}`)
+                      }
+                    >
                       <TableCell>{bundle.period}</TableCell>
                       <TableCell className="font-medium">{bundle.name}</TableCell>
                       <TableCell>{bundle.documents}</TableCell>
@@ -549,9 +555,12 @@ export default function ProjectFormOnePage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() =>
-                              router.push(`/tenant/projects/${projectId}/form1/bundles/${bundle.id}`)
-                            }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(
+                                `/tenant/projects/${projectId}/form1/bundles/${bundle.id}`,
+                              );
+                            }}
                           >
                             <Edit3 className="h-4 w-4" />
                           </Button>
@@ -559,7 +568,10 @@ export default function ProjectFormOnePage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-red-600"
-                            onClick={() => toast.info('Hapus bundle belum tersedia')}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toast.info('Hapus bundle belum tersedia');
+                            }}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

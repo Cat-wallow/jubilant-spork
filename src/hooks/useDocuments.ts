@@ -12,7 +12,19 @@ export interface WorkflowStep {
   source?: string | null;
 }
 
-export type WorkflowStepKey = 'pengiriman' | 'penerimaan' | 'digitalisasi' | 'pendeskripsian';
+export type WorkflowStepKey =
+  | 'asalDokumen'
+  | 'pengiriman'
+  | 'penerimaan'
+  | 'digitalisasi'
+  | 'pendeskripsian'
+  | 'foldering'
+  | 'entryData'
+  | 'telaahPajak'
+  | 'telaahPembukuan'
+  | 'pengarsipan'
+  | 'pengembalian'
+  | 'beritaAcara';
 
 export interface Document {
   id: string;
@@ -35,6 +47,13 @@ export interface Document {
   penerimaan: WorkflowStep;
   digitalisasi: WorkflowStep;
   pendeskripsian: WorkflowStep;
+  foldering: WorkflowStep;
+  entryData: WorkflowStep;
+  telaahPajak: WorkflowStep;
+  telaahPembukuan: WorkflowStep;
+  pengarsipan: WorkflowStep;
+  pengembalian: WorkflowStep;
+  beritaAcara: WorkflowStep;
 
   // File Info
   originalFilename: string;

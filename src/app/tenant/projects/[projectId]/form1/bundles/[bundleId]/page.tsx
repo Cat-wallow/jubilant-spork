@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDocuments, useUploadDocuments } from '@/hooks/useDocuments';
+import { useDocuments, useUploadDocuments, useUpdateWorkflow } from '@/hooks/useDocuments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,8 +14,28 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileUploader } from '@/components/shared/FileUploader';
-import { ArrowLeft, Download, Plus } from 'lucide-react';
+import { ArrowLeft, Download, Plus, CalendarIcon, CheckCircle2, Circle } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+const WORKFLOW_STEPS = [
+  { key: 'asalDokumen', label: 'Asal Dokumen' },
+  { key: 'pengiriman', label: 'Pengiriman' },
+  { key: 'penerimaan', label: 'Penerimaan' },
+  { key: 'digitalisasi', label: 'Digitalisasi' },
+  { key: 'pendeskripsian', label: 'Pendeskripsian' },
+  { key: 'foldering', label: 'Foldering' },
+  { key: 'entryData', label: 'Entry Data' },
+  { key: 'telaahPajak', label: 'Telaah Pajak' },
+  { key: 'telaahPembukuan', label: 'Telaah Pembukuan' },
+  { key: 'pengarsipan', label: 'Pengarsipan' },
+  { key: 'pengembalian', label: 'Pengembalian' },
+  { key: 'beritaAcara', label: 'Berita Acara' },
+];
 
 export default function FormOneBundleDetailPage() {
   const params = useParams();
@@ -36,7 +56,7 @@ export default function FormOneBundleDetailPage() {
   const [tipeDokumen, setTipeDokumen] = useState('');
   const [jenisDokumen, setJenisDokumen] = useState('');
   const [nomorDokumen, setNomorDokumen] = useState('');
-  const [documentDate, setDocumentDate] = useState('');
+  const [documentDate, setDocumentDate] = useState<Date | undefined>(undefined);
   const [jumlahLembar, setJumlahLembar] = useState<number>(1);
   const [docStatus, setDocStatus] = useState<'digital' | 'asli' | 'copy'>('digital');
   const [adminPicKlien, setAdminPicKlien] = useState('');
@@ -46,6 +66,58 @@ export default function FormOneBundleDetailPage() {
   const [catatan, setCatatan] = useState('');
 
   const uploadMutation = useUploadDocuments();
+  const updateWorkflowMutation = useUpdateWorkflow();
+
+  const [isWorkflowDialogOpen, setIsWorkflowDialogOpen] = useState(false);
+  const [selectedWorkflowDoc, setSelectedWorkflowDoc] = useState<any>(null);
+  const [selectedWorkflowStep, setSelectedWorkflowStep] = useState<string>('');
+  const [workflowDate, setWorkflowDate] = useState<Date | undefined>(new Date());
+
+  const isStepClickable = (doc: any, stepKey: string) => {
+    const stepIndex = WORKFLOW_STEPS.findIndex(s => s.key === stepKey);
+    if (stepIndex <= 0) return true;
+    
+    const prevStepKey = WORKFLOW_STEPS[stepIndex - 1].key;
+    return doc[prevStepKey]?.status === true;
+  };
+
+  const handleWorkflowClick = (doc: any, stepKey: string) => {
+    if (doc[stepKey]?.status) return; // Already done
+    
+    if (!isStepClickable(doc, stepKey)) {
+      toast.error('Harap selesaikan tahapan sebelumnya terlebih dahulu.');
+      return;
+    }
+    
+    setSelectedWorkflowDoc(doc);
+    setSelectedWorkflowStep(stepKey);
+    setWorkflowDate(new Date());
+    setIsWorkflowDialogOpen(true);
+  };
+
+  const handleWorkflowSave = async () => {
+    if (!workflowDate) {
+      toast.error('Tanggal wajib diisi');
+      return;
+    }
+    
+    try {
+      await updateWorkflowMutation.mutateAsync({
+        tenantId,
+        projectId,
+        documentId: selectedWorkflowDoc.id,
+        userId,
+        workflowStep: selectedWorkflowStep as any,
+        date: format(workflowDate, 'yyyy-MM-dd'),
+      });
+      
+      toast.success('Status workflow berhasil diupdate');
+      setIsWorkflowDialogOpen(false);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Gagal update status workflow';
+      toast.error(msg);
+    }
+  };
 
   const { data, isLoading, error } = useDocuments(
     tenantId,
@@ -77,7 +149,7 @@ export default function FormOneBundleDetailPage() {
     setTipeDokumen('');
     setJenisDokumen('');
     setNomorDokumen('');
-    setDocumentDate('');
+    setDocumentDate(undefined);
     setJumlahLembar(1);
     setDocStatus('digital');
     setAdminPicKlien('');
@@ -127,7 +199,7 @@ export default function FormOneBundleDetailPage() {
           tipeDokumen: tipeDokumen.trim(),
           jenisDokumen: jenisDokumen.trim(),
           nomorDokumen: nomorDokumen.trim(),
-          documentDate,
+          documentDate: format(documentDate, 'yyyy-MM-dd'),
           jumlahLembar,
           status: docStatus,
           description: catatan.trim(),
@@ -141,8 +213,9 @@ export default function FormOneBundleDetailPage() {
       toast.success('Dokumen berhasil ditambahkan ke bundle');
       setIsUploadOpen(false);
       resetUploadForm();
-    } catch {
-      toast.error('Gagal upload dokumen');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Gagal upload dokumen';
+      toast.error(msg);
     }
   };
 
@@ -234,7 +307,9 @@ export default function FormOneBundleDetailPage() {
               <Skeleton className="h-10 w-full" />
             </div>
           ) : error || !data ? (
-            <p className="text-sm text-red-500">Gagal memuat dokumen bundle.</p>
+            <p className="text-sm text-red-500">
+              {(error as any)?.response?.data?.message || (error as any)?.message || "Gagal memuat dokumen bundle."}
+            </p>
           ) : data.items.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada dokumen di bundle ini.</p>
           ) : (
@@ -281,28 +356,57 @@ export default function FormOneBundleDetailPage() {
                 </div>
               </div>
 
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Jenis Dokumen</TableHead>
-                      <TableHead>Tipe Dokumen</TableHead>
-                      <TableHead>Nomor Dokumen</TableHead>
-                      <TableHead>Tanggal</TableHead>
-                      <TableHead>Jumlah Lembar</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
+                      <TableHead className="min-w-[200px]">Identitas Dokumen</TableHead>
+                      {WORKFLOW_STEPS.map((step) => (
+                        <TableHead key={step.key} className="text-center min-w-[120px] whitespace-nowrap">{step.label}</TableHead>
+                      ))}
+                      <TableHead className="text-right min-w-[100px]">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {pagedDocs.map((doc) => (
                       <TableRow key={doc.id}>
-                        <TableCell className="font-medium">{doc.jenisDokumen}</TableCell>
-                        <TableCell>{doc.tipeDokumen}</TableCell>
-                        <TableCell>{doc.nomorDokumen || '-'}</TableCell>
-                        <TableCell>{doc.documentDate || '-'}</TableCell>
-                        <TableCell>{doc.jumlahLembar}</TableCell>
-                        <TableCell>{doc.status}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <span className="font-medium">{doc.jenisDokumen}</span>
+                            <span className="text-xs text-muted-foreground">{doc.tipeDokumen}</span>
+                            <span className="text-xs text-muted-foreground">{doc.nomorDokumen || '-'}</span>
+                            <span className="text-xs text-muted-foreground">{doc.documentDate ? format(new Date(doc.documentDate), 'dd/MM/yyyy') : '-'}</span>
+                          </div>
+                        </TableCell>
+                        {WORKFLOW_STEPS.map((step) => {
+                          const isDone = doc[step.key]?.status === true;
+                          const clickable = !isDone && isStepClickable(doc, step.key);
+                          
+                          return (
+                            <TableCell key={step.key} className="text-center p-2">
+                              <div 
+                                className={cn(
+                                  "inline-flex justify-center items-center p-2 rounded-full transition-all",
+                                  clickable && "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-110",
+                                  !clickable && !isDone && "opacity-30 cursor-not-allowed"
+                                )}
+                                onClick={() => clickable && handleWorkflowClick(doc, step.key)}
+                                title={isDone ? `Selesai oleh ${doc[step.key]?.by || '-'} pada ${doc[step.key]?.date ? format(new Date(doc[step.key]?.date), 'dd/MM/yyyy') : '-'}` : (clickable ? "Klik untuk update status" : "Selesaikan tahap sebelumnya")}
+                              >
+                                {isDone ? (
+                                  <CheckCircle2 className="h-6 w-6 text-green-600 fill-green-50" />
+                                ) : (
+                                  <Circle className="h-6 w-6 text-slate-300" />
+                                )}
+                              </div>
+                              {isDone && doc[step.key]?.date && (
+                                <div className="text-[10px] text-muted-foreground mt-1">
+                                  {format(new Date(doc[step.key]?.date), 'dd/MM')}
+                                </div>
+                              )}
+                            </TableCell>
+                          );
+                        })}
                         <TableCell className="text-right">
                           <Button asChild size="sm" variant="outline">
                             <Link href={`/tenant/projects/${projectId}/form1/documents/${doc.id}`}>Detail</Link>
@@ -347,10 +451,10 @@ export default function FormOneBundleDetailPage() {
         setIsUploadOpen(open);
         if (!open) resetUploadForm();
       }}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Tambah Dokumen Baru</DialogTitle>
-            <DialogDescription>Tambahkan dokumen baru ke dengan mengisi informasi di bawah ini</DialogDescription>
+            <DialogDescription>Tambahkan dokumen baru dengan mengisi informasi di bawah ini</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -391,9 +495,34 @@ export default function FormOneBundleDetailPage() {
                   <Label>Nomor Dokumen *</Label>
                   <Input value={nomorDokumen} onChange={(e) => setNomorDokumen(e.target.value)} placeholder="Masukan nomor" />
                 </div>
-                <div>
+                <div className="flex flex-col gap-2">
                   <Label>Tanggal Dokumen *</Label>
-                  <Input type="date" value={documentDate} onChange={(e) => setDocumentDate(e.target.value)} />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          'w-full justify-start text-left font-normal',
+                          !documentDate && 'text-muted-foreground',
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {documentDate ? (
+                          format(documentDate, 'dd MMMM yyyy', { locale: id })
+                        ) : (
+                          <span>Pilih tanggal</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={documentDate}
+                        onSelect={setDocumentDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div>
                   <Label>Jumlah Lembar *</Label>
@@ -495,6 +624,79 @@ export default function FormOneBundleDetailPage() {
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               {uploadMutation.isPending ? 'Mengupload...' : 'Upload Dokumen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isWorkflowDialogOpen} onOpenChange={setIsWorkflowDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Update Progress Dokumen</DialogTitle>
+            <DialogDescription>
+              Update status untuk tahap <strong>{WORKFLOW_STEPS.find(s => s.key === selectedWorkflowStep)?.label}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <Card className="border-none shadow-none">
+               <h3 className="font-semibold mb-4 text-lg">
+                 {WORKFLOW_STEPS.find(s => s.key === selectedWorkflowStep)?.label}
+               </h3>
+               
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <Label>Nama</Label>
+                   <Input 
+                     value={user?.name || 'User'} 
+                     readOnly 
+                     className="bg-slate-50"
+                   />
+                 </div>
+                 
+                 <div className="space-y-2">
+                   <Label>Tanggal *</Label>
+                   <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          'w-full justify-start text-left font-normal',
+                          !workflowDate && 'text-muted-foreground',
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {workflowDate ? (
+                          format(workflowDate, 'dd/MM/yyyy', { locale: id })
+                        ) : (
+                          <span>Pilih tanggal</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={workflowDate}
+                        onSelect={setWorkflowDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                 </div>
+               </div>
+            </Card>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsWorkflowDialogOpen(false)}>
+              Batal
+            </Button>
+            <Button 
+              onClick={handleWorkflowSave} 
+              disabled={updateWorkflowMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {updateWorkflowMutation.isPending ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>
         </DialogContent>

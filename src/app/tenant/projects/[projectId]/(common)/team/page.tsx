@@ -103,7 +103,7 @@ function TeamPageContent() {
 				<div className="mb-6 flex items-start justify-between">
 					<div className="flex flex-col gap-1">
 						<h2 className="text-2xl font-bold text-primary">
-							Daftar anggota tim
+							Daftar Anggota Tim
 						</h2>
 						<p className="text-sm text-primary">
 							Kelola anggota tim yang terlibat dalam proyek ini
