@@ -65,6 +65,82 @@ export interface BalanceSheetData {
   difference: number;
 }
 
+export interface IncomeStatementLineItem {
+  accountNo?: string;
+  accountName: string;
+  amount: number;
+}
+
+export interface IncomeStatementSection {
+  title: string;
+  items: IncomeStatementLineItem[];
+  total: number;
+  percentage?: number;
+}
+
+export interface IncomeStatementData {
+  companyName: string;
+  reportTitle: string;
+  period: string;
+  summary: {
+    totalRevenue: number;
+    grossProfit: number;
+    grossProfitPercentage: number;
+    totalExpenses: number;
+    totalExpensesPercentage: number;
+    netProfit: number;
+    netProfitPercentage: number;
+  };
+  sections: {
+    revenue: IncomeStatementSection;
+    cogs: IncomeStatementSection;
+    operatingExpenses: IncomeStatementSection;
+  };
+  analysis: {
+    grossProfitMargin: number;
+    operatingExpenseRatio: number;
+    netProfitMargin: number;
+  };
+}
+
+export interface CashFlowLineItem {
+  description: string;
+  amount: number;
+}
+
+export interface CashFlowSection {
+  title: string;
+  items: CashFlowLineItem[];
+  total: number;
+}
+
+export interface CashFlowData {
+  companyName: string;
+  reportTitle: string;
+  period: string;
+  summary: {
+    operatingCash: number;
+    investingCash: number;
+    financingCash: number;
+    netCashFlow: number;
+  };
+  sections: {
+    operating: CashFlowSection;
+    investing: CashFlowSection;
+    financing: CashFlowSection;
+  };
+  reconciliation: {
+    netCashIncrease: number;
+    beginningCash: number;
+    endingCash: number;
+  };
+  analysis: {
+    operatingDescription: string;
+    investingDescription: string;
+    financingDescription: string;
+  };
+}
+
 export const statsCards: StatsCard[] = [
   {
     icon: 'file-done',
@@ -256,6 +332,110 @@ export const balanceSheetData: BalanceSheetData = {
   totalKewajibanModal: -65500000,
   isBalanced: false,
   difference: 231000000,
+};
+
+export const incomeStatementData: IncomeStatementData = {
+  companyName: 'PT. MAJU BERSAMA INDONESIA',
+  reportTitle: 'LAPORAN LABA RUGI',
+  period: 'Periode 30 September 2025',
+  summary: {
+    totalRevenue: -100000000,
+    grossProfit: 100000000,
+    grossProfitPercentage: 100.0,
+    totalExpenses: 0,
+    totalExpensesPercentage: 0.0,
+    netProfit: -100000000,
+    netProfitPercentage: -100.0,
+  },
+  sections: {
+    revenue: {
+      title: 'PENDAPATAN',
+      items: [
+        {
+          accountNo: '4102',
+          accountName: 'Penjualan Service',
+          amount: 100000000,
+        },
+      ],
+      total: -100000000,
+      percentage: 100.0,
+    },
+    cogs: {
+      title: 'HARGA POKOK PENJUALAN',
+      items: [],
+      total: 0,
+      percentage: 0.0,
+    },
+    operatingExpenses: {
+      title: 'BEBAN OPERASIONAL',
+      items: [],
+      total: 0,
+      percentage: 0.0,
+    },
+  },
+  analysis: {
+    grossProfitMargin: 100.0,
+    operatingExpenseRatio: 0.0,
+    netProfitMargin: -100.0,
+  },
+};
+
+export const cashFlowData: CashFlowData = {
+  companyName: 'PT. MAJU BERSAMA INDONESIA',
+  reportTitle: 'LAPORAN ARUS KAS',
+  period: 'Periode 30 September 2025',
+  summary: {
+    operatingCash: 765000000,
+    investingCash: -375000000,
+    financingCash: 105000000,
+    netCashFlow: 495000000,
+  },
+  sections: {
+    operating: {
+      title: 'Arus Kas dari Aktivitas Operasi',
+      items: [
+        { description: 'Penerimaan dari pelanggan', amount: 2800000000 },
+        { description: 'Pembayaran kepada pemasok', amount: -1200000000 },
+        { description: 'Pembayaran gaji karyawan', amount: -450000000 },
+        { description: 'Pembayaran beban operasional', amount: -280000000 },
+        { description: 'Pembayaran pajak', amount: -120000000 },
+        { description: 'Penerimaan bunga', amount: 15000000 },
+      ],
+      total: 765000000,
+    },
+    investing: {
+      title: 'Arus Kas dari Aktivitas Investasi',
+      items: [
+        { description: 'Pembelian peralatan', amount: -350000000 },
+        { description: 'Penjualan aset tetap', amount: 75000000 },
+        { description: 'Investasi jangka panjang', amount: -100000000 },
+      ],
+      total: -375000000,
+    },
+    financing: {
+      title: 'Arus Kas dari Aktivitas Pendanaan',
+      items: [
+        { description: 'Penerimaan pinjaman bank', amount: 500000000 },
+        { description: 'Pembayaran pokok pinjaman', amount: -200000000 },
+        { description: 'Pembayaran bunga pinjaman', amount: -45000000 },
+        { description: 'Pembayaran dividen', amount: -150000000 },
+      ],
+      total: 105000000,
+    },
+  },
+  reconciliation: {
+    netCashIncrease: 495000000,
+    beginningCash: 450000000,
+    endingCash: 945000000,
+  },
+  analysis: {
+    operatingDescription:
+      'Arus kas operasi positif menunjukkan kemampuan perusahaan menghasilkan kas dari operasi utama.',
+    investingDescription:
+      'Arus kas investasi negatif menunjukkan perusahaan sedang melakukan ekspansi dan investasi.',
+    financingDescription:
+      'Arus kas pendanaan positif menunjukkan adanya tambahan modal atau pinjaman.',
+  },
 };
 
 export const formatCurrency = (value: number): string => {
