@@ -1,20 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen } from 'lucide-react';
+import { StatsCards } from './components/StatsCards';
+import { JournalTable } from './components/JournalTable';
+import { journalListData, journalStatsData } from './mock-data';
 
 export default function KK2JournalPage() {
   return (
-    <Card className="rounded-[20px]">
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-6 w-6 text-[#332687]" />
-          <CardTitle>Journal</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-          Journal page coming soon...
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col items-start gap-[30px] self-stretch">
+      <StatsCards data={journalStatsData} />
+      <JournalTable data={journalListData} />
+    </div>
   );
 }
