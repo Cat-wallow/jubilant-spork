@@ -6,6 +6,8 @@ import ReportFilters from './components/ReportFilters';
 import GeneralLedger from './components/GeneralLedger';
 import TrialBalance from './components/TrialBalance';
 import Neraca from './components/Neraca';
+import LabaRugi from './components/LabaRugi';
+import CashFlow from './components/CashFlow';
 import PlaceholderTab from './components/PlaceholderTab';
 import { statsCards } from './data/mockData';
 
@@ -137,17 +139,11 @@ export default function KK2ReportsPage() {
             </TabsContent>
 
             <TabsContent value="laba-rugi" className="mt-8">
-              <PlaceholderTab
-                title="Laba-Rugi"
-                description="Profit and loss statement"
-              />
+              <LabaRugi />
             </TabsContent>
 
             <TabsContent value="cash-flow" className="mt-8">
-              <PlaceholderTab
-                title="Cash Flow"
-                description="Cash flow statement"
-              />
+              <CashFlow />
             </TabsContent>
           </Tabs>
         </TabsContent>
