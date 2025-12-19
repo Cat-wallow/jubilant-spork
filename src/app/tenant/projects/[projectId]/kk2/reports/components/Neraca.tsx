@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, FileText, TrendingUp, TrendingDown, DollarSign, Building2, X, AlertTriangle } from 'lucide-react';
 import { balanceSheetData, formatCurrency } from '../data/mockData';
+import { Card } from '@/components/ui/card';
 
 export default function Neraca() {
   const data = balanceSheetData;
 
   return (
-    <div className="space-y-4">
+    <Card className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -298,6 +299,6 @@ export default function Neraca() {
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

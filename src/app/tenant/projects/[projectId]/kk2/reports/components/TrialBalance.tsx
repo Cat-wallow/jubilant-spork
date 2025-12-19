@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download } from 'lucide-react';
 import { trialBalanceAccounts, formatCurrency } from '../data/mockData';
+import { Card } from '@/components/ui/card';
 
 export default function TrialBalance() {
   const totalDebit = trialBalanceAccounts.reduce((sum, acc) => sum + acc.debit, 0);
   const totalCredit = trialBalanceAccounts.reduce((sum, acc) => sum + acc.credit, 0);
 
   return (
-    <div className="space-y-4">
+    <Card className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-dm text-2xl font-bold leading-8 tracking-tight text-[#2B3674]">
@@ -136,6 +137,6 @@ export default function TrialBalance() {
           </Button>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

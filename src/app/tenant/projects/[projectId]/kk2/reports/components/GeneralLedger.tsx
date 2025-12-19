@@ -9,6 +9,7 @@ import {
   formatCurrency,
   generalLedgerAccounts,
 } from '../data/mockData';
+import { Card } from '@/components/ui/card';
 
 export default function GeneralLedger() {
   const [accounts, setAccounts] = useState<GeneralLedgerAccount[]>(
@@ -24,13 +25,13 @@ export default function GeneralLedger() {
   };
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-10 border-b border-[rgba(0,0,0,0.1)] pb-2">
+    <Card className="space-y-1">
+      <div className="flex items-center gap-10 border-b  pb-2">
         <div className="w-[1149px] text-xs font-medium text-[#1E293B]">Account</div>
         <div className="w-[116px] text-right text-xs font-medium text-[#1E293B]">
           Debit
         </div>
-        <div className="w-[138px] text-right text-xs font-medium text-[#1E293B]">
+        <div className="w-[138px] text-right text-xs  font-medium text-[#1E293B]">
           Credit
         </div>
         <div className="flex-1 text-right text-xs font-medium text-[#1E293B]">
@@ -40,7 +41,7 @@ export default function GeneralLedger() {
 
       {accounts.map((account) => (
         <div key={account.id} className="space-y-0">
-          <div className="flex items-center justify-between rounded-lg border border-[rgba(0,0,0,0.1)] p-4">
+          <div className="flex items-center justify-between rounded-lg border  p-4">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -55,10 +56,10 @@ export default function GeneralLedger() {
                 )}
               </Button>
               <div>
-                <div className="font-arial text-base font-normal text-[#0A0A0A]">
+                <div className="font-arial text-base font-normal">
                   {account.accountNumber}
                 </div>
-                <div className="font-arial text-sm text-[#717182]">
+                <div className=" text-sm ">
                   {account.accountName}
                 </div>
               </div>
@@ -66,50 +67,50 @@ export default function GeneralLedger() {
 
             <div className="flex items-center gap-8">
               <div className="w-[120px] text-right">
-                <div className="font-arial text-sm text-[#0A0A0A]">
+                <div className="font-arial text-sm">
                   {formatCurrency(account.totalDebit)}
                 </div>
-                <div className="font-arial text-xs text-[#717182]">Total Debit</div>
+                <div className=" text-xs ">Total Debit</div>
               </div>
               <div className="w-[120px] text-right">
-                <div className="font-arial text-sm text-[#0A0A0A]">
+                <div className="font-arial text-sm">
                   {account.totalCredit > 0 ? formatCurrency(account.totalCredit) : 'Rp0'}
                 </div>
-                <div className="font-arial text-xs text-[#717182]">Total Credit</div>
+                <div className=" text-xs ">Total Credit</div>
               </div>
               <div className="w-[120px] text-right">
-                <div className="font-arial text-base font-normal text-[#0A0A0A]">
+                <div className="font-arial text-base font-normal">
                   {formatCurrency(account.balance)}
                 </div>
-                <div className="font-arial text-xs text-[#717182]">Balance</div>
+                <div className=" text-xs ">Balance</div>
               </div>
             </div>
           </div>
 
           {account.expanded && account.transactions && account.transactions.length > 0 && (
-            <div className="ml-12 rounded-lg border border-[rgba(0,0,0,0.1)] shadow-md">
-              <div className="flex items-center justify-between border-b border-[rgba(0,0,0,0.1)] p-3 text-sm">
-                <div className="w-[182px] font-arial text-[#0A0A0A]">Date</div>
-                <div className="w-[153px] font-arial text-[#0A0A0A]">Type</div>
-                <div className="w-[293px] font-arial text-[#0A0A0A]">Voucher</div>
-                <div className="w-[271px] font-arial text-[#0A0A0A]">Narration</div>
-                <div className="w-[105px] text-right font-arial text-[#0A0A0A]">Debit</div>
-                <div className="w-[214px] text-right font-arial text-[#0A0A0A]">Credit</div>
-                <div className="w-[135px] text-right font-arial text-[#0A0A0A]">Balance</div>
+            <div className="ml-12 rounded-lg border  shadow-md">
+              <div className="flex items-center justify-between border-b  p-3 text-sm">
+                <div className="w-[182px] font-arial">Date</div>
+                <div className="w-[153px] font-arial">Type</div>
+                <div className="w-[293px] font-arial">Voucher</div>
+                <div className="w-[271px] font-arial">Narration</div>
+                <div className="w-[105px] text-right font-arial">Debit</div>
+                <div className="w-[214px] text-right font-arial">Credit</div>
+                <div className="w-[135px] text-right font-arial">Balance</div>
               </div>
 
               {account.transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between border-b border-[rgba(0,0,0,0.1)] p-3 text-sm last:border-b-0"
+                  className="flex items-center justify-between border-b  p-3 text-sm last:border-b-0"
                 >
-                  <div className="w-[182px] font-arial text-[#0A0A0A]">
+                  <div className="w-[182px] font-arial">
                     {transaction.date}
                   </div>
                   <div className="w-[153px]">
                     <Badge
                       variant="outline"
-                      className="rounded-lg border-[rgba(0,0,0,0.1)]"
+                      className="rounded-lg "
                     >
                       {transaction.type}
                     </Badge>
@@ -126,21 +127,21 @@ export default function GeneralLedger() {
                       >
                         {transaction.voucher}
                       </Badge>
-                      <span className="font-arial text-xs text-[#0A0A0A]">
+                      <span className="font-arial text-xs">
                         {transaction.voucherCode}
                       </span>
                     </div>
                   </div>
-                  <div className="w-[271px] font-arial text-[#0A0A0A]">
+                  <div className="w-[271px] font-arial">
                     {transaction.narration}
                   </div>
-                  <div className="w-[105px] text-right font-arial text-[#0A0A0A]">
+                  <div className="w-[105px] text-right font-arial">
                     {transaction.debit > 0 ? formatCurrency(transaction.debit) : 'Rp0'}
                   </div>
-                  <div className="w-[214px] text-right font-arial text-[#0A0A0A]">
+                  <div className="w-[214px] text-right font-arial">
                     {formatCurrency(transaction.credit)}
                   </div>
-                  <div className="w-[135px] text-right font-arial text-[#0A0A0A]">
+                  <div className="w-[135px] text-right font-arial">
                     {transaction.balance > 0
                       ? formatCurrency(transaction.balance)
                       : 'Rp 0'}
@@ -181,6 +182,6 @@ export default function GeneralLedger() {
           </Button>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
