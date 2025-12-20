@@ -78,7 +78,7 @@ const formatNpwp = (value: unknown) => {
 const clientFormSchema = z.object({
   // Basic Information
   basicInfo: z.object({
-    code: z.string().min(1, 'Kode client wajib diisi'),
+    code: z.string().optional(),
     name: z.string().min(1, 'Nama client wajib diisi'),
     legal_name: z.string().min(1, 'Nama legal wajib diisi'),
     brand_name: z.string().optional(),
@@ -786,15 +786,14 @@ export function CreateClientModalUpdated({
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="basicInfo.code">Kode Client *</Label>
+                <Label htmlFor="basicInfo.code">Kode Client</Label>
                 <Input
                   id="basicInfo.code"
+                  disabled
                   {...register('basicInfo.code')}
-                  placeholder="C001"
+                  placeholder="Auto-generated"
+                  className="bg-muted text-muted-foreground"
                 />
-                {errors.basicInfo?.code && (
-                  <p className="text-red-500 text-sm">{errors.basicInfo.code.message}</p>
-                )}
               </div>
               <div>
                 <Label htmlFor="basicInfo.name">Nama Client *</Label>
