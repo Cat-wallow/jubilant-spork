@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { toast } from "sonner";
 
 export interface Client {
 	id: string;
@@ -158,6 +159,9 @@ export const useTerminateClient = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["clients-compliance", variables.tenantId],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["client-history", variables.tenantId, variables.id],
+			});
 		},
 	});
 };
@@ -180,6 +184,9 @@ export const useActivateClient = () => {
 			});
 			queryClient.invalidateQueries({
 				queryKey: ["clients-compliance", variables.tenantId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["client-history", variables.tenantId, variables.id],
 			});
 		},
 	});
@@ -321,6 +328,9 @@ export const useDeleteClient = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["clients-compliance", variables.tenantId],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["client-history", variables.tenantId, variables.id],
+			});
 		},
 	});
 };
@@ -349,6 +359,9 @@ export const useUpdateClient = () => {
 		},
 		onSuccess: (_, variables) => {
 			console.log("Mutation successful for client:", variables.id); // DEBUG LOG
+			toast.success("Berhasil", {
+				description: "Edit data klien berhasil",
+			});
 			queryClient.invalidateQueries({
 				queryKey: ["clients", variables.tenantId],
 			});
@@ -358,9 +371,15 @@ export const useUpdateClient = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["clients-compliance", variables.tenantId],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["client-history", variables.tenantId, variables.id],
+			});
 		},
 		onError: (error) => {
 			console.error("Mutation error:", error); // DEBUG LOG
+			toast.error("Gagal", {
+				description: "Gagal mengedit data klien",
+			});
 		},
 	});
 };

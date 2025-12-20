@@ -27,7 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import api from '@/lib/api';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   ChevronLeft,
   ChevronRight,
@@ -279,7 +279,6 @@ export function CreateClientModalUpdated({
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
   const [missingDocs, setMissingDocs] = useState<string[]>([]);
-  const { toast } = useToast();
   const submitIntentRef = useRef(false);
 
   const {
@@ -624,10 +623,8 @@ export function CreateClientModalUpdated({
         });
 
         if (missing.length > 0) {
-          toast({
-            title: 'Dokumen legal belum lengkap',
+          toast.error('Dokumen legal belum lengkap', {
             description: 'Setiap dokumen wajib diupload atau pilih "Tidak tersedia".',
-            variant: 'destructive',
           });
           setIsSubmitting(false);
           return;
@@ -679,18 +676,15 @@ export function CreateClientModalUpdated({
       };
 
       await onSubmit(transformedData);
-      toast({
-        title: 'Sukses',
+      toast.success('Sukses', {
         description: 'Client berhasil dibuat',
       });
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error creating client:', error);
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat membuat klien';
-      toast({
-        title: 'Gagal membuat klien',
+      toast.error('Gagal membuat klien', {
         description: errorMessage,
-        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -711,10 +705,8 @@ export function CreateClientModalUpdated({
     const step = getFirstInvalidStep(errs);
     setCurrentStep(step);
     const first = getFirstError(errs);
-    toast({
-      title: 'Form belum lengkap',
+    toast.error('Form belum lengkap', {
       description: first?.message || 'Masih ada field yang wajib diisi. Cek input yang berwarna merah.',
-      variant: 'destructive',
     });
 
     if (first?.path) {
@@ -764,10 +756,8 @@ export function CreateClientModalUpdated({
 
       if (missing.length > 0) {
         setMissingDocs(missing);
-        toast({
-          title: 'Dokumen legal belum lengkap',
+        toast.error('Dokumen legal belum lengkap', {
           description: 'Mohon lengkapi status dokumen yang ditandai merah (Upload atau pilih "Tidak tersedia").',
-          variant: 'destructive',
         });
         return;
       }
@@ -1992,10 +1982,8 @@ export function CreateClientModalUpdated({
           } catch (e: any) {
             console.error(e);
             const msg = e?.response?.data?.message || e?.message || 'Upload dokumen gagal';
-            toast({
-              title: 'Upload gagal',
+            toast.error('Upload gagal', {
               description: msg,
-              variant: 'destructive',
             });
           }
         };

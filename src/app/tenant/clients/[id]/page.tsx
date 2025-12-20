@@ -31,7 +31,8 @@ import {
   Plus,
   Eye,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  History
 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -262,6 +263,14 @@ export default function ClientDetailPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Detail Klien</h1>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => router.push(`/tenant/clients/${id}/history`)}
+            >
+              <History className="h-4 w-4" />
+              Riwayat
+            </Button>
             <Button
               variant="outline"
               className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:hover:bg-red-950/50 dark:text-red-400"

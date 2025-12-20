@@ -51,6 +51,7 @@ export default function FormOnePage() {
             projectId={projectId} 
             tenantId={tenantId} 
             userId={userId} 
+            userName={userName}
           />
         </TabsContent>
 
