@@ -6,5 +6,5 @@ export default async function Home({
 	params: Promise<{ projectId: string }>;
 }) {
 	const { projectId } = await params;
-	redirect(`/tenant/projects/${projectId}/summary`);
+	redirect(`/tenant/projects/${projectId}/kk3/overview`);
 }

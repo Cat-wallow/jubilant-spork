@@ -1,8 +1,10 @@
 {
-  "lockfileVersion": 0,
+  "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "dependencies": {
+        "": ".",
         "@chakra-ui/hooks": "^2.1.4",
         "@chakra-ui/modal": "^2.2.9",
         "@chakra-ui/popover": "^2.1.8",
@@ -91,8 +93,11 @@
   "overrides": {
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
+    "react-error-overlay": "6.0.9",
   },
   "packages": {
+    "": ["@root:", {}],
+
     "@adobe/css-tools": ["@adobe/css-tools@4.4.4", "", {}, "sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg=="],
 
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
