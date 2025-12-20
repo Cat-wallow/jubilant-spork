@@ -23,7 +23,7 @@ export function DocumentPagination({
 
 	return (
 		<div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-			<p className="font-geist text-sm font-normal leading-[150%] tracking-[0.07px] text-[#737373]">
+			<p className="font-geist text-sm leading-[150%] tracking-[0.07px] text-[#737373]">
 				Showing {startItem}-{endItem} of {totalItems} products
 			</p>
 
@@ -33,7 +33,7 @@ export function DocumentPagination({
 					variant="ghost"
 					onClick={() => onPageChange(Math.max(1, currentPage - 1))}
 					disabled={currentPage === 1}
-					className="flex h-9 min-h-9 items-center gap-2 rounded-lg bg-transparent px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px] text-[#404040] hover:bg-muted disabled:opacity-50"
+					className="flex h-9 min-h-9 items-center gap-2 rounded-lg bg-transparent px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px]  hover:bg-muted disabled:opacity-50"
 				>
 					<ChevronLeft className="h-[9.5px] w-[5.5px] fill-[#0A0A0A]" />
 					Previous
@@ -48,8 +48,8 @@ export function DocumentPagination({
 						className={cn(
 							"flex h-9 w-[34px] min-h-9 items-center justify-center gap-2 rounded-lg px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px]",
 							currentPage === page
-								? "border border-[#D4D4D4] bg-[rgba(255,255,255,0.10)] text-[#0A0A0A] shadow-[0_1px_3px_0_rgba(0,0,0,0.10),0_1px_2px_-1px_rgba(0,0,0,0.10)]"
-								: "bg-transparent text-[#404040] hover:bg-muted",
+								? "border border-[#D4D4D4] bg-[rgba(255,255,255,0.10)]  shadow-[0_1px_3px_0_rgba(0,0,0,0.10),0_1px_2px_-1px_rgba(0,0,0,0.10)]"
+								: "bg-transparent  hover:bg-muted",
 						)}
 					>
 						{page}
@@ -69,7 +69,7 @@ export function DocumentPagination({
 				<Button
 					variant="ghost"
 					onClick={() => onPageChange(totalPages)}
-					className="flex h-9 w-[34px] min-h-9 items-center justify-center gap-2 rounded-lg bg-transparent px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px] text-[#404040] hover:bg-muted"
+					className="flex h-9 w-[34px] min-h-9 items-center justify-center gap-2 rounded-lg bg-transparent px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px]  hover:bg-muted"
 				>
 					{totalPages}
 				</Button>
@@ -79,7 +79,7 @@ export function DocumentPagination({
 					variant="ghost"
 					onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
 					disabled={currentPage === totalPages}
-					className="flex h-9 min-h-9 items-center gap-2 rounded-lg bg-transparent px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px] text-[#404040] hover:bg-muted disabled:opacity-50"
+					className="flex h-9 min-h-9 items-center gap-2 rounded-lg bg-transparent px-4 py-[7.5px] font-geist text-sm font-medium leading-[150%] tracking-[0.07px]  hover:bg-muted disabled:opacity-50"
 				>
 					Next
 					<ChevronRight className="h-[9.5px] w-[5.5px] fill-[#0A0A0A]" />

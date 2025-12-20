@@ -16,7 +16,7 @@ const Project = () => {
         </p>
       </div>
       {/* Project 1 */}
-      <div className="flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
+      <div className="flex w-full items-center justify-between rounded-2xl bg-card p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex items-center">
           <div className="">
             <Image
@@ -47,7 +47,7 @@ const Project = () => {
         </div>
       </div>
       {/* Project 1 */}
-      <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
+      <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-card p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex items-center">
           <div className="">
             <Image
@@ -78,7 +78,7 @@ const Project = () => {
         </div>
       </div>
       {/* Project 1 */}
-      <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
+      <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-card p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex items-center">
           <div className="">
             <Image

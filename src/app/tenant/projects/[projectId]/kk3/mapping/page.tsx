@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function KK3MappingPage() {
 	return (
-		<div className="flex flex-col gap-[30px] p-[30px]">
+		<div className="flex flex-col gap-[30px] ">
 			{/* Stats Cards */}
 			<StatsCards />
 

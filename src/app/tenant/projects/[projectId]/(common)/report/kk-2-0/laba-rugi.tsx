@@ -21,29 +21,29 @@ export function LabaRugiTab() {
 		<Card className="flex p-8 flex-col gap-5 self-stretch rounded-[20px] shadow-[0_1px_2px_0_rgba(0,0,0,0.3),0_1px_3px_1px_rgba(0,0,0,0.15)]">
 			<div className="flex items-start justify-between self-stretch">
 				<div className="flex flex-col">
-					<h2 className="font-dm-sans text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+					<h2 className="font-dm-sans text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 						Laba-Rugi Statement
 					</h2>
-					<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+					<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 						Kelola Invoice di dalam Project
 					</p>
 				</div>
 				<div className="flex items-center gap-2.5">
 					<Button
 						variant="outline"
-						className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9]"
+						className="flex items-center gap-1 rounded-[10px] border "
 					>
-						<Download className="h-[30px] w-[30px] text-[#404040]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<Download className="h-[30px] w-[30px] " />
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Export XLSX
 						</span>
 					</Button>
 					<Button
 						variant="outline"
-						className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9]"
+						className="flex items-center gap-1 rounded-[10px] border "
 					>
-						<Download className="h-[30px] w-[30px] text-[#404040]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<Download className="h-[30px] w-[30px] " />
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Export PDF
 						</span>
 					</Button>
@@ -57,31 +57,31 @@ export function LabaRugiTab() {
 					<div className="flex w-[823px] flex-col gap-2.5">
 						<div className="flex w-[1080px] items-center justify-between">
 							<div className="flex w-[150px] shrink-0 items-center gap-2.5">
-								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 									Akun
 								</div>
-								<ChevronDown className="h-6 w-6 shrink-0 text-[#A3AED0]" />
+								<ChevronDown className="h-6 w-6 shrink-0 text-muted-foreground" />
 							</div>
 							<div className="flex w-[150px] shrink-0 items-center gap-2.5">
-								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 									Januari
 								</div>
-								<ChevronDown className="h-6 w-6 shrink-0 text-[#A3AED0]" />
+								<ChevronDown className="h-6 w-6 shrink-0 text-muted-foreground" />
 							</div>
 							<div className="flex w-[120px] shrink-0 items-center gap-[7px]">
-								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 									Februari
 								</div>
-								<ChevronDown className="h-6 w-6 shrink-0 text-[#A3AED0]" />
+								<ChevronDown className="h-6 w-6 shrink-0 text-muted-foreground" />
 							</div>
 							<div className="flex w-[120px] shrink-0 items-center gap-[7px]">
-								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 									Market
 								</div>
-								<ChevronDown className="h-6 w-6 shrink-0 text-[#A3AED0]" />
+								<ChevronDown className="h-6 w-6 shrink-0 text-muted-foreground" />
 							</div>
 							<div className="flex w-[120px] shrink-0 items-center gap-[7px]">
-								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+								<div className="font-dm-sans text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 									YTD
 								</div>
 							</div>
@@ -93,27 +93,27 @@ export function LabaRugiTab() {
 								className="flex w-[1070px] items-center justify-between"
 							>
 								<div className="flex w-[150px] shrink-0 items-center gap-2.5">
-									<div className="w-[120px] shrink-0 font-inter text-sm font-medium leading-[14px] text-[#404040]">
+									<div className="w-[120px] shrink-0 font-inter text-sm font-medium leading-[14px] ">
 										{category.name}
 									</div>
 								</div>
 								<div className="flex w-[120px] shrink-0 flex-col gap-2.5">
-									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] text-[#404040]">
+									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] ">
 										{category.januari}
 									</div>
 								</div>
 								<div className="flex w-[120px] shrink-0 flex-col gap-2.5">
-									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] text-[#404040]">
+									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] ">
 										{category.februari}
 									</div>
 								</div>
 								<div className="flex w-[120px] shrink-0 flex-col gap-2.5">
-									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] text-[#404040]">
+									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] ">
 										{category.maret}
 									</div>
 								</div>
 								<div className="flex w-[120px] shrink-0 flex-col gap-2.5">
-									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] text-[#404040]">
+									<div className="w-[120px] font-inter text-sm font-medium leading-[14px] ">
 										{category.ytd}
 									</div>
 								</div>
@@ -125,7 +125,7 @@ export function LabaRugiTab() {
 				</div>
 
 				<div className="h-[410px] w-[600px] rounded-[20px] border border-[rgba(145,158,171,0.2)] p-4">
-					<div className="mb-4 font-dm-sans text-lg font-bold text-[#2B3674]">
+					<div className="mb-4 font-dm-sans text-lg font-bold text-primary">
 						Trend Analysis
 					</div>
 					<ResponsiveContainer width="100%" height="90%">

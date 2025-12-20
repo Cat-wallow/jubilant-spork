@@ -37,9 +37,9 @@ export function FileFilters({
 			{/* First Row - Results count and Search */}
 			<div className="flex items-center gap-5">
 				<Select defaultValue="20">
-					<SelectTrigger className="h-[54px] w-[120px] rounded-[10px] border border-[#D9D9D9]">
+					<SelectTrigger className="h-[54px] w-[120px] rounded-[10px] border ">
 						<SelectValue />
-						<ChevronDown className="ml-2 h-6 w-6 text-[#332687]" />
+						<ChevronDown className="ml-2 h-6 w-6 text-primary" />
 					</SelectTrigger>
 					<SelectContent>
 						<SelectItem value="10">10</SelectItem>
@@ -50,12 +50,12 @@ export function FileFilters({
 				</Select>
 
 				<div className="relative flex flex-1 items-center">
-					<Search className="absolute left-4 h-5 w-5 text-[#332687]" />
+					<Search className="absolute left-4 h-5 w-5 text-primary" />
 					<Input
 						placeholder="Cari nama user"
 						value={searchQuery}
 						onChange={(e) => onSearchChange(e.target.value)}
-						className="h-[54px] rounded-[10px] border border-[#D9D9D9] pl-12 font-dm text-base text-[#8F9BBA]"
+						className="h-[54px] rounded-[10px] border  pl-12 font-dm text-base text-muted-foreground"
 					/>
 				</div>
 			</div>
@@ -64,9 +64,9 @@ export function FileFilters({
 			<div className="flex items-center justify-between gap-2.5">
 				<div className="flex items-center gap-2.5">
 					<Select value={selectedModule} onValueChange={onModuleChange}>
-						<SelectTrigger className="h-[54px] w-auto min-w-[140px] rounded-[10px] border border-[#D9D9D9]">
+						<SelectTrigger className="h-[54px] w-auto min-w-[140px] rounded-[10px] border ">
 							<SelectValue placeholder="All Modul" />
-							<ChevronDown className="ml-2 h-6 w-6 text-[#332687]" />
+							<ChevronDown className="ml-2 h-6 w-6 text-primary" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">All Modul</SelectItem>
@@ -77,9 +77,9 @@ export function FileFilters({
 					</Select>
 
 					<Select value={selectedAssignee} onValueChange={onAssigneeChange}>
-						<SelectTrigger className="h-[54px] w-auto min-w-[140px] rounded-[10px] border border-[#D9D9D9]">
+						<SelectTrigger className="h-[54px] w-auto min-w-[140px] rounded-[10px] border ">
 							<SelectValue placeholder="Assignee" />
-							<ChevronDown className="ml-2 h-6 w-6 text-[#332687]" />
+							<ChevronDown className="ml-2 h-6 w-6 text-primary" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">All Assignees</SelectItem>
@@ -89,9 +89,9 @@ export function FileFilters({
 					</Select>
 
 					<Select value={selectedStatus} onValueChange={onStatusChange}>
-						<SelectTrigger className="h-[54px] w-auto min-w-[140px] rounded-[10px] border border-[#D9D9D9]">
+						<SelectTrigger className="h-[54px] w-auto min-w-[140px] rounded-[10px] border ">
 							<SelectValue placeholder="All Status" />
-							<ChevronDown className="ml-2 h-6 w-6 text-[#332687]" />
+							<ChevronDown className="ml-2 h-6 w-6 text-primary" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">All Status</SelectItem>
@@ -102,20 +102,20 @@ export function FileFilters({
 
 					<Button
 						variant="outline"
-						className="h-[54px] gap-2 rounded-[10px] border border-[#D9D9D9]"
+						className="h-[54px] gap-2 rounded-[10px] border "
 					>
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Due
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#332687]" />
+						<ChevronDown className="h-6 w-6 text-primary" />
 					</Button>
 
 					<Button
 						variant="outline"
-						className="h-[54px] gap-2 rounded-[10px] border border-[#D9D9D9]"
+						className="h-[54px] gap-2 rounded-[10px] border "
 					>
-						<Filter className="h-[18px] w-[18px] text-[#332687]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<Filter className="h-[18px] w-[18px] text-primary" />
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Filter
 						</span>
 					</Button>

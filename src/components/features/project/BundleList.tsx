@@ -300,7 +300,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
                       id="date"
                       variant={"outline"}
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left",
                         !date && "text-muted-foreground"
                       )}
                     >
@@ -368,7 +368,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="border-none bg-blue-50/70 dark:bg-blue-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <CheckCircle2 className="h-5 w-5 text-blue-600" />
             </div>
             <div>
@@ -383,7 +383,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
 
         <Card className="border-none bg-red-50/70 dark:bg-red-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <div>
@@ -396,7 +396,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
 
         <Card className="border-none bg-violet-50/70 dark:bg-violet-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <FileText className="h-5 w-5 text-violet-600" />
             </div>
             <div>
@@ -409,7 +409,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
 
         <Card className="border-none bg-emerald-50/70 dark:bg-emerald-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <Clock className="h-5 w-5 text-emerald-600" />
             </div>
             <div>

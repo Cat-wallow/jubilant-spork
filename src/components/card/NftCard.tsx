@@ -15,7 +15,7 @@ const NftCard = (props: {
   const { title, author, price, image, bidders, extra } = props;
   const [heart, setHeart] = useState(true);
   return (
-    <Card extra={`flex flex-col w-full h-full !p-4 3xl:p-![18px] bg-white ${extra}`}>
+    <Card extra={`flex flex-col w-full h-full !p-4 3xl:p-![18px] bg-card ${extra}`}>
       <div className="h-full w-full">
         <div className="relative w-full">
           {/* <Image
@@ -34,7 +34,7 @@ const NftCard = (props: {
           />
           <button
             onClick={() => setHeart(!heart)}
-            className="absolute right-3 top-3 flex items-center justify-center rounded-full bg-white p-2 text-brand-500 hover:cursor-pointer"
+            className="absolute right-3 top-3 flex items-center justify-center rounded-full bg-card p-2 text-brand-500 hover:cursor-pointer"
           >
             <div className="flex h-full w-full items-center justify-center rounded-full text-xl hover:bg-gray-50 dark:text-navy-900">
               {heart ? <IoHeartOutline /> : <IoHeart className="text-brand-500" />}

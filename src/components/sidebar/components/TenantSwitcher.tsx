@@ -72,8 +72,8 @@ export default function TenantSwitcher() {
     // Show current tenant as static badge if user has exactly one tenant
     if (availableTenants.length === 1 && tenant) {
       return (
-        <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-white px-[5px] dark:bg-navy-700">
-          <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-brand-500 dark:text-white">
+        <div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-card px-[5px] dark:bg-navy-700">
+          <span className="font-dm text-xs leading-[24px] tracking-[-0.24px] text-brand-500 dark:text-white">
             {`${tenant.name}`}
           </span>
         </div>
@@ -89,7 +89,7 @@ export default function TenantSwitcher() {
         disabled={isSwitching}
         className="inline-flex items-center justify-center gap-2.5 rounded-[5px] bg-[#EDECFC] px-[5px] transition-colors hover:bg-[#d8d5f7] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-navy-700 dark:hover:bg-navy-600"
       >
-        <span className="font-dm text-xs font-normal leading-[24px] tracking-[-0.24px] text-brand-500 dark:text-white">
+        <span className="font-dm text-xs leading-[24px] tracking-[-0.24px] text-brand-500 dark:text-white">
           {isSwitching ? 'Switching...' : tenant.name}
         </span>
         {/* Dropdown indicator */}
@@ -107,7 +107,7 @@ export default function TenantSwitcher() {
       </button>
 
       {isOpen && !isSwitching && (
-        <div className="absolute left-0 top-full z-50 mt-2 flex w-[220px] flex-col gap-px rounded-[5.25px] border border-black/15 bg-white p-1 shadow-[0_4px_6px_4px_rgba(0,0,0,0.10),0_2px_4px_-2px_rgba(0,0,0,0.10)] dark:border-white/15 dark:bg-navy-800">
+        <div className="absolute left-0 top-full z-50 mt-2 flex w-[220px] flex-col gap-px rounded-[5.25px] border border-black/15 bg-card p-1 shadow-[0_4px_6px_4px_rgba(0,0,0,0.10),0_2px_4px_-2px_rgba(0,0,0,0.10)] dark:border-white/15 dark:bg-navy-800">
           <div className="flex h-[24.488px] items-start px-[7px] py-[5.25px]">
             <span className="font-inter flex-1 text-[10.5px] font-bold leading-[14px] text-slate-500 dark:text-slate-400">
               Switch Organization

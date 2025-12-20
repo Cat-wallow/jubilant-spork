@@ -27,8 +27,9 @@ export default function KertasKerjaPerpajakan({
 	const currency = watch("currency") || "IDR";
 	const transactionTaxes = watch("transaction_taxes") || {};
 	const taxProofFiles = watch("tax_proof_files") || [];
-    const taxErrors = errors.transaction_taxes as any;
-    const calculatedTagihanExcludePajak = watch('calculated_tagihan_exclude_pajak') || 0;
+	const taxErrors = errors.transaction_taxes as any;
+	const calculatedTagihanExcludePajak =
+		watch("calculated_tagihan_exclude_pajak") || 0;
 
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat("id-ID", {
@@ -102,51 +103,72 @@ export default function KertasKerjaPerpajakan({
 		window.open(url, "_blank");
 	};
 
-    const taxFields = useMemo(() => ([
-        { name: "tax_deposit", label: "Setoran Pajak (KK-1.7.1)" },
-        { name: "ppn", label: "PPN (KK-1.7.2)" },
-        { name: "pph_21", label: "PPh Pasal 21 (KK-1.7.3)" },
-        { name: "pph_23", label: "PPh Pasal 23 (KK-1.7.3)" },
-        { name: "pph_4_2", label: "PPh Pasal 4(2) (KK-1.7.3)" },
-        { name: "pph_credit", label: "Piutang/Kredit PPh dipot/put pihak lain (KK-1.7.6)" },
-        { name: "other_pph", label: "P2Ph Lainnya (KK-1.7.7)" },
-    ]), []);
+	const taxFields = useMemo(
+		() => [
+			{ name: "tax_deposit", label: "Setoran Pajak (KK-1.7.1)" },
+			{ name: "ppn", label: "PPN (KK-1.7.2)" },
+			{ name: "pph_21", label: "PPh Pasal 21 (KK-1.7.3)" },
+			{ name: "pph_23", label: "PPh Pasal 23 (KK-1.7.3)" },
+			{ name: "pph_4_2", label: "PPh Pasal 4(2) (KK-1.7.3)" },
+			{
+				name: "pph_credit",
+				label: "Piutang/Kredit PPh dipot/put pihak lain (KK-1.7.6)",
+			},
+			{ name: "other_pph", label: "P2Ph Lainnya (KK-1.7.7)" },
+		],
+		[],
+	);
 
-    // Effect to calculate amount from percentage
-    useEffect(() => {
-        taxFields.forEach(field => {
-            const percentage = watch(`transaction_taxes.${field.name}_percentage`);
-            const currentAmount = watch(`transaction_taxes.${field.name}`);
+	// Effect to calculate amount from percentage
+	useEffect(() => {
+		taxFields.forEach((field) => {
+			const percentage = watch(`transaction_taxes.${field.name}_percentage`);
+			const currentAmount = watch(`transaction_taxes.${field.name}`);
 
-            if (percentage !== undefined && calculatedTagihanExcludePajak !== 0) {
-                const newAmount = (percentage / 100) * calculatedTagihanExcludePajak;
-                if (newAmount !== currentAmount) {
-                    setValue(`transaction_taxes.${field.name}`, newAmount, { shouldValidate: true });
-                }
-            } else if (percentage === undefined || calculatedTagihanExcludePajak === 0) {
-                 // If percentage is cleared or base is zero, amount should be zero, but don't clear if existing amount is non-zero
-                 if (currentAmount !== 0) {
-                     // setValue(`transaction_taxes.${field.name}`, 0, { shouldValidate: true });
-                 }
-            }
-        });
-    }, [watch, setValue, calculatedTagihanExcludePajak, taxFields]);
+			if (percentage !== undefined && calculatedTagihanExcludePajak !== 0) {
+				const newAmount = (percentage / 100) * calculatedTagihanExcludePajak;
+				if (newAmount !== currentAmount) {
+					setValue(`transaction_taxes.${field.name}`, newAmount, {
+						shouldValidate: true,
+					});
+				}
+			} else if (
+				percentage === undefined ||
+				calculatedTagihanExcludePajak === 0
+			) {
+				// If percentage is cleared or base is zero, amount should be zero, but don't clear if existing amount is non-zero
+				if (currentAmount !== 0) {
+					// setValue(`transaction_taxes.${field.name}`, 0, { shouldValidate: true });
+				}
+			}
+		});
+	}, [watch, setValue, calculatedTagihanExcludePajak, taxFields]);
 
-    // Effect to calculate percentage from amount (for initial load/existing data)
-    useEffect(() => {
-        taxFields.forEach(field => {
-            const amount = watch(`transaction_taxes.${field.name}`);
-            const currentPercentage = watch(`transaction_taxes.${field.name}_percentage`);
+	// Effect to calculate percentage from amount (for initial load/existing data)
+	useEffect(() => {
+		taxFields.forEach((field) => {
+			const amount = watch(`transaction_taxes.${field.name}`);
+			const currentPercentage = watch(
+				`transaction_taxes.${field.name}_percentage`,
+			);
 
-            if (amount !== undefined && calculatedTagihanExcludePajak !== 0 && currentPercentage === undefined) {
-                const newPercentage = (amount / calculatedTagihanExcludePajak) * 100;
-                if (!isNaN(newPercentage) && newPercentage >= 0) { // Avoid NaN for division by zero
-                    setValue(`transaction_taxes.${field.name}_percentage`, newPercentage, { shouldValidate: true });
-                }
-            }
-        });
-    }, [watch, setValue, calculatedTagihanExcludePajak, taxFields]);
-
+			if (
+				amount !== undefined &&
+				calculatedTagihanExcludePajak !== 0 &&
+				currentPercentage === undefined
+			) {
+				const newPercentage = (amount / calculatedTagihanExcludePajak) * 100;
+				if (!isNaN(newPercentage) && newPercentage >= 0) {
+					// Avoid NaN for division by zero
+					setValue(
+						`transaction_taxes.${field.name}_percentage`,
+						newPercentage,
+						{ shouldValidate: true },
+					);
+				}
+			}
+		});
+	}, [watch, setValue, calculatedTagihanExcludePajak, taxFields]);
 
 	return (
 		<Card className="flex-1 rounded-xl border p-5">
@@ -158,35 +180,49 @@ export default function KertasKerjaPerpajakan({
 
 			<div className="grid grid-cols-2 gap-4">
 				{/* Explicit Rows */}
-                {taxFields.map((field) => (
-                    <div key={field.name} className="flex gap-5 items-center">
-                        <div className="flex flex-1 flex-col gap-2">
-                            <Label>{field.label}</Label>
-                            <div className="flex gap-2 items-center">
-                                <Input
-                                    type="number"
-                                    placeholder="0"
-                                    className={cn("w-20", taxErrors?.[`${field.name}_percentage`] && "border-red-500")}
-                                    {...register(`transaction_taxes.${field.name}_percentage`, {
-                                        valueAsNumber: true,
-                                    })}
-                                />
-                                <span className="text-lg">%</span>
-                                <Input
-                                    type="number"
-                                    readOnly
-                                    placeholder="0"
-                                    className={cn("flex-1 cursor-not-allowed", taxErrors?.[field.name] && "border-red-500")}
-                                    {...register(`transaction_taxes.${field.name}`, {
-                                        valueAsNumber: true,
-                                    })}
-                                />
-                            </div>
-                            {taxErrors?.[field.name] && <p className="text-xs text-red-500">{taxErrors[field.name].message}</p>}
-                            {taxErrors?.[`${field.name}_percentage`] && <p className="text-xs text-red-500">{taxErrors[`${field.name}_percentage`].message}</p>}
-                        </div>
-                    </div>
-                ))}
+				{taxFields.map((field) => (
+					<div key={field.name} className="flex gap-5 items-center">
+						<div className="flex flex-1 flex-col gap-2">
+							<Label>{field.label}</Label>
+							<div className="flex gap-2 items-center">
+								<Input
+									type="number"
+									placeholder="0"
+									className={cn(
+										"w-20",
+										taxErrors?.[`${field.name}_percentage`] && "border-red-500",
+									)}
+									{...register(`transaction_taxes.${field.name}_percentage`, {
+										valueAsNumber: true,
+									})}
+								/>
+								<span className="text-lg">%</span>
+								<Input
+									type="number"
+									readOnly
+									placeholder="0"
+									className={cn(
+										"flex-1 cursor-not-allowed",
+										taxErrors?.[field.name] && "border-red-500",
+									)}
+									{...register(`transaction_taxes.${field.name}`, {
+										valueAsNumber: true,
+									})}
+								/>
+							</div>
+							{taxErrors?.[field.name] && (
+								<p className="text-xs text-red-500">
+									{taxErrors[field.name].message}
+								</p>
+							)}
+							{taxErrors?.[`${field.name}_percentage`] && (
+								<p className="text-xs text-red-500">
+									{taxErrors[`${field.name}_percentage`].message}
+								</p>
+							)}
+						</div>
+					</div>
+				))}
 			</div>
 
 			{/* Upload Bukti Potong / Setor Pajak */}
@@ -203,7 +239,7 @@ export default function KertasKerjaPerpajakan({
 							<div
 								key={file.id || fileIndex}
 								onClick={() => handleFileClick(file.file_url)}
-								className="flex items-center justify-between cursor-pointer rounded-md border p-2 bg-white"
+								className="flex items-center justify-between cursor-pointer rounded-md border p-2 bg-card"
 							>
 								<div className="flex items-center gap-2">
 									<FileText className="h-4 w-4 text-blue-500" />
@@ -235,7 +271,8 @@ export default function KertasKerjaPerpajakan({
 						accept: {
 							"image/*": [],
 							"application/pdf": [],
-							"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [],
+							"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+								[],
 							"text/csv": [],
 							"application/vnd.ms-excel": [],
 						},
@@ -245,7 +282,6 @@ export default function KertasKerjaPerpajakan({
 						subtitle: "Upload bukti potong/setor pajak",
 						fileTypes: "PDF, JPG, PNG, XLSX, CSV (Max 5MB)",
 					}}
-
 				/>
 
 				{errors.tax_proof_files && isAnyTaxInputFilled && (

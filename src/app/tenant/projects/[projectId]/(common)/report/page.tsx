@@ -14,10 +14,10 @@ export default function ReportPage() {
 		<Card className="flex flex-col gap-[20px] p-4">
 			{/* Page Header */}
 			<div className="flex flex-col px-2">
-				<h1 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+				<h1 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 					Laporan Project
 				</h1>
-				<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+				<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 					Tinjau laporan di dalam project
 				</p>
 			</div>

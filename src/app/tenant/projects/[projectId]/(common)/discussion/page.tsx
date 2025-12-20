@@ -32,7 +32,7 @@ function DiscussionPageContent() {
 		<div className="flex flex-col items-start gap-[30px] self-stretch">
 			<div className="flex flex-col items-start gap-2.5 self-stretch">
 				<div className="flex items-start gap-5 self-stretch">
-					<div className="flex h-[54px] flex-1 bg-card items-center gap-[15px] rounded-[10px] border border-[#D9D9D9] px-4">
+					<div className="flex h-[54px] flex-1 bg-card items-center gap-[15px] rounded-[10px] border  px-4">
 						<div className="relative h-5 w-5 ">
 							<div className="absolute left-0 top-0 h-[18px] w-[18px] rounded-full border-[3px] border-[#332687]" />
 						</div>
@@ -40,13 +40,13 @@ function DiscussionPageContent() {
 							placeholder="Cari forum diskusi berdasarkan judul atau konten"
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="h-5 flex-1 border-0 bg-transparent p-0 font-dm-sans text-base leading-5 text-foreground placeholder:text-[#8F9BBA] focus-visible:ring-0"
+							className="h-5 flex-1 border-0 bg-transparent p-0 font-dm-sans text-base leading-5 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
 						/>
 					</div>
 					<div className="flex items-center justify-end gap-2.5 self-stretch">
-						<Button className="flex items-center gap-1 rounded-[10px] bg-[#332687] hover:bg-[#332687]/90">
+						<Button className="flex items-center gap-1 rounded-[10px] bg-primary hover:bg-primary/90">
 							<Plus className="h-6 w-6 text-white" />
-							<span className="whitespace-nowrap font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
+							<span className="whitespace-nowrap  text-sm font-medium leading-5 tracking-[0.1px] text-white">
 								Tambah Forum Disusi
 							</span>
 						</Button>
@@ -62,14 +62,12 @@ function DiscussionPageContent() {
 							}
 							className={`flex h-[26px] items-center gap-2 rounded-[5.5px] border px-3 py-1 ${
 								activeFilter === "my"
-									? "border-[#332687] bg-[#332687] text-white hover:bg-[#332687]/90"
+									? "border-[#332687] bg-primary text-white hover:bg-primary/90"
 									: "border-[#CCC9C2] bg-transparent hover:bg-accent"
 							}`}
 						>
 							<ImageIcon className="h-2.5 w-2.5" />
-							<span className="font-inter text-[9px] font-normal">
-								Diskusi Saya
-							</span>
+							<span className="font-inter text-[9px]">Diskusi Saya</span>
 						</Button>
 						<Button
 							variant="outline"
@@ -78,14 +76,12 @@ function DiscussionPageContent() {
 							}
 							className={`flex h-[26px] items-center gap-2 rounded-[6.5px] border px-3 py-1 ${
 								activeFilter === "pinned"
-									? "border-[#332687] bg-[#332687] text-white hover:bg-[#332687]/90"
+									? "border-[#332687] bg-primary text-white hover:bg-primary/90"
 									: "border-[#CFCAC4] bg-transparent hover:bg-accent"
 							}`}
 						>
 							<Pin className="h-2.5 w-2.5" />
-							<span className="font-inter text-[10px] font-normal">
-								Dipinned
-							</span>
+							<span className="font-inter text-[10px]">Dipinned</span>
 						</Button>
 						<Button
 							variant="outline"
@@ -94,14 +90,12 @@ function DiscussionPageContent() {
 							}
 							className={`flex h-[26px] items-center gap-2 rounded border px-3 py-1 ${
 								activeFilter === "unread"
-									? "border-[#332687] bg-[#332687] text-white hover:bg-[#332687]/90"
+									? "border-[#332687] bg-primary text-white hover:bg-primary/90"
 									: "border-[#E5E5E5] bg-transparent hover:bg-accent"
 							}`}
 						>
 							<Mail className="h-2.5 w-2.5" />
-							<span className="font-inter text-[10px] font-normal">
-								Belum Dibaca (1)
-							</span>
+							<span className="font-inter text-[10px]">Belum Dibaca (1)</span>
 						</Button>
 						<Button
 							variant="outline"
@@ -110,17 +104,15 @@ function DiscussionPageContent() {
 							}
 							className={`flex h-[26px] items-center gap-2 rounded-[6.25px] border px-3 py-1 ${
 								activeFilter === "tags"
-									? "border-[#332687] bg-[#332687] text-white hover:bg-[#332687]/90"
+									? "border-[#332687] bg-primary text-white hover:bg-primary/90"
 									: "border-[#D3D0CA] bg-transparent hover:bg-accent"
 							}`}
 						>
 							<Tag className="h-2.5 w-2.5" />
-							<span className="font-inter text-center text-[10px] font-normal">
-								Tags
-							</span>
+							<span className="font-inter text-center text-[10px]">Tags</span>
 						</Button>
 					</div>
-					<span className="font-inter text-xs font-normal text-[#A19FB0]">
+					<span className="font-inter text-xs text-[#A19FB0]">
 						{filteredDiscussions.length} dari {discussions.length} diskusi
 					</span>
 				</div>

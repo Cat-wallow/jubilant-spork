@@ -209,11 +209,11 @@ export default function ProjectSummaryPage() {
 			<div className="flex gap-[30px]">
 				{/* Progress */}
 				<Card className="flex h-[97px] flex-1 items-center gap-[18px] rounded-[20px] p-[6px_20px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<TrendingUp className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<TrendingUp className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Progress
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
@@ -223,7 +223,7 @@ export default function ProjectSummaryPage() {
 							<span className="font-dm text-xs font-bold leading-5  text-[#05CD99]">
 								{projectData.stats.progressChange}
 							</span>
-							<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+							<span className="font-dm text-xs leading-5  text-muted-foreground">
 								dari target
 							</span>
 						</div>
@@ -232,11 +232,11 @@ export default function ProjectSummaryPage() {
 
 				{/* Modules Approval */}
 				<Card className="flex h-[97px] flex-1 items-center gap-[18px] rounded-[20px] p-[6px_20px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<CheckCircle2 className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<CheckCircle2 className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex w-[144px] flex-col gap-[3px]">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Modules Approval
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
@@ -246,7 +246,7 @@ export default function ProjectSummaryPage() {
 							<span className="font-dm text-xs font-bold leading-5  text-[#05CD99]">
 								{projectData.stats.currentModule}
 							</span>
-							<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+							<span className="font-dm text-xs leading-5  text-muted-foreground">
 								On Progress
 							</span>
 						</div>
@@ -255,11 +255,11 @@ export default function ProjectSummaryPage() {
 
 				{/* Overdue */}
 				<Card className="flex h-[97px] flex-1 items-center gap-[18px] rounded-[20px] p-[6px_20px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<AlertCircle className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<AlertCircle className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Overdue
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
@@ -269,7 +269,7 @@ export default function ProjectSummaryPage() {
 							<span className="font-dm text-xs font-bold leading-5  text-[#05CD99]">
 								Requires
 							</span>
-							<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+							<span className="font-dm text-xs leading-5  text-muted-foreground">
 								your attention
 							</span>
 						</div>
@@ -278,11 +278,11 @@ export default function ProjectSummaryPage() {
 
 				{/* Compliance Status */}
 				<Card className="flex h-[97px] flex-1 items-center gap-[18px] rounded-[20px] p-[6px_20px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<FileCheck className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<FileCheck className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex w-[234px] flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Compliance Status
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
@@ -293,11 +293,11 @@ export default function ProjectSummaryPage() {
 
 				{/* Timeline */}
 				<Card className="flex h-[97px] flex-1 items-center gap-[18px] rounded-[20px] p-[6px_20px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<Clock className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<Clock className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Timeline
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
@@ -307,7 +307,7 @@ export default function ProjectSummaryPage() {
 							<span className="font-dm text-xs font-bold leading-5  text-[#05CD99]">
 								/ {projectData.stats.totalDays}
 							</span>
-							<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+							<span className="font-dm text-xs leading-5  text-muted-foreground">
 								from timeline
 							</span>
 						</div>
@@ -325,7 +325,7 @@ export default function ProjectSummaryPage() {
 							<CardTitle className="text-[22px] font-medium ">
 								Informasi Project
 							</CardTitle>
-							<p className="text-xs font-normal leading-4 text-primary">
+							<p className="text-xs leading-4 text-primary">
 								Indormasi dasar project dan timeline
 							</p>
 						</CardHeader>
@@ -335,13 +335,13 @@ export default function ProjectSummaryPage() {
 									Project ID:
 								</span>
 								<span className="text-sm font-medium text-muted-foreground">
-								{isProjectLoading ? (
-									<Skeleton asChild className="h-4 w-[140px]">
-										<span />
-									</Skeleton>
-								) : (
-									projectCode
-								)}
+									{isProjectLoading ? (
+										<Skeleton asChild className="h-4 w-[140px]">
+											<span />
+										</Skeleton>
+									) : (
+										projectCode
+									)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -349,13 +349,13 @@ export default function ProjectSummaryPage() {
 									Project Name:
 								</span>
 								<span className="text-sm font-medium text-muted-foreground">
-								{isProjectLoading ? (
-									<Skeleton asChild className="h-4 w-[200px]">
-										<span />
-									</Skeleton>
-								) : (
-									projectName
-								)}
+									{isProjectLoading ? (
+										<Skeleton asChild className="h-4 w-[200px]">
+											<span />
+										</Skeleton>
+									) : (
+										projectName
+									)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -363,13 +363,13 @@ export default function ProjectSummaryPage() {
 									Client Name:
 								</span>
 								<span className="text-sm font-medium text-muted-foreground">
-								{isProjectLoading ? (
-									<Skeleton asChild className="h-4 w-[180px]">
-										<span />
-									</Skeleton>
-								) : (
-									clientName
-								)}
+									{isProjectLoading ? (
+										<Skeleton asChild className="h-4 w-[180px]">
+											<span />
+										</Skeleton>
+									) : (
+										clientName
+									)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -391,14 +391,14 @@ export default function ProjectSummaryPage() {
 									Description
 								</span>
 								<p className="text-xs leading-4 text-primary">
-								{isProjectLoading ? (
-									<Skeleton asChild className="h-4 w-full">
-										<span className="block" />
-									</Skeleton>
-								) : (
-									projectDescription
-								)}
-							</p>
+									{isProjectLoading ? (
+										<Skeleton asChild className="h-4 w-full">
+											<span className="block" />
+										</Skeleton>
+									) : (
+										projectDescription
+									)}
+								</p>
 							</div>
 						</CardContent>
 					</Card>
@@ -431,7 +431,7 @@ export default function ProjectSummaryPage() {
 								</div>
 								<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-[#A3AED0]">
 									<div
-										className="h-full bg-[#332687]"
+										className="h-full bg-primary"
 										style={{ width: `${projectData.overallProgress}%` }}
 									/>
 								</div>
@@ -480,7 +480,7 @@ export default function ProjectSummaryPage() {
 								{projectData.modules.map((module) => (
 									<div
 										key={module.name}
-										className="flex flex-col gap-5 rounded-[20px] border border-[#D9D9D9] bg-white p-5 shadow-sm"
+										className="flex flex-col gap-5 rounded-[20px] border  bg-card p-5 shadow-sm"
 									>
 										<div className="flex items-center justify-between">
 											<div className="flex items-center gap-2.5">
@@ -493,8 +493,8 @@ export default function ProjectSummaryPage() {
 														module.status === "Completed"
 															? "bg-[#CFF7D3] text-muted-foreground"
 															: module.status === "On Progress"
-																? "bg-[#F4F7FE] text-muted-foreground"
-																: "bg-white text-muted-foreground",
+																? "bg-background text-muted-foreground"
+																: "bg-card text-muted-foreground",
 													)}
 												>
 													{module.status}
@@ -512,7 +512,7 @@ export default function ProjectSummaryPage() {
 										<div className="flex flex-col gap-[5px]">
 											<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-[#A3AED0]">
 												<div
-													className="h-full bg-[#332687]"
+													className="h-full bg-primary"
 													style={{ width: `${module.progress}%` }}
 												/>
 											</div>
@@ -548,7 +548,7 @@ export default function ProjectSummaryPage() {
 							{projectData.team.map((member) => (
 								<div key={member.name} className="flex items-center gap-2.5">
 									<div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#4F46E5]">
-										<span className="font-dm text-xl font-normal leading-[30px]  text-white">
+										<span className="font-dm text-xl leading-[30px]  text-white">
 											{member.initials}
 										</span>
 									</div>
@@ -561,7 +561,7 @@ export default function ProjectSummaryPage() {
 									{member.modules.map((module) => (
 										<Badge
 											key={module}
-											className="rounded-[5px] border  bg-[#F4F7FE] px-2.5 py-[5px] text-xs text-[#332687]"
+											className="rounded-[5px] border  bg-background px-2.5 py-[5px] text-xs text-primary"
 										>
 											{module}
 										</Badge>
@@ -594,7 +594,7 @@ export default function ProjectSummaryPage() {
 						{/* First Issue with percentage */}
 						<div className="my-2.5 flex items-center gap-2.5 pr-[15px]">
 							<div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#FEE9E7]">
-								<span className="font-dm text-2xl font-normal leading-[30px]  text-[#BF6A02]">
+								<span className="font-dm text-2xl leading-[30px]  text-[#BF6A02]">
 									80%
 								</span>
 							</div>
@@ -629,7 +629,7 @@ export default function ProjectSummaryPage() {
 											? "bg-[#FFFBEB]"
 											: issue.severity === "High"
 												? "bg-[#FEE9E7]"
-												: "bg-white",
+												: "bg-card",
 									)}
 								>
 									<AlertTriangle className="h-[30px] w-[30px]" />
@@ -648,7 +648,7 @@ export default function ProjectSummaryPage() {
 												? "bg-[#FFE8A3] text-[#BF6A02]"
 												: issue.severity === "High"
 													? "bg-[#FDD3D0] text-[#BF6A02]"
-													: "bg-white text-muted-foreground",
+													: "bg-card text-muted-foreground",
 										)}
 									>
 										{issue.severity}
@@ -681,7 +681,7 @@ export default function ProjectSummaryPage() {
 						{/* Compliance percentage */}
 						<div className="my-2.5 flex items-center gap-2.5 pr-[15px]">
 							<div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#FEE9E7]">
-								<span className="font-dm text-2xl font-normal leading-[30px]  text-[#BF6A02]">
+								<span className="font-dm text-2xl leading-[30px]  text-[#BF6A02]">
 									80%
 								</span>
 							</div>

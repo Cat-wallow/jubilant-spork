@@ -49,7 +49,7 @@ const renderTimelineStep = (label: string, step?: WorkflowStep) => {
           className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs ${
             isDone
               ? 'border-emerald-500 bg-emerald-500 text-white'
-              : 'border-slate-300 bg-white text-slate-400'
+              : 'border-slate-300 bg-card text-slate-400'
           }`}
         >
           {isDone ? <CheckCircle2 className="h-4 w-4" /> : <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />}
@@ -294,7 +294,7 @@ export default function DocumentDetailPage() {
               <div className="border-t p-4">
                 <iframe 
                   src={`${downloadUrl}&preview=true`} 
-                  className="w-full h-[500px] rounded border bg-white"
+                  className="w-full h-[500px] rounded border bg-card"
                   title="Document Preview"
                 />
               </div>

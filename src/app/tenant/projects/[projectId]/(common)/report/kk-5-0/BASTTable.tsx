@@ -33,33 +33,33 @@ export function BASTTable() {
 	};
 
 	return (
-		<Card className="flex flex-col items-start gap-5 self-stretch rounded-[20px] border border-[rgba(145,158,171,0.20)] p-6">
+		<Card className="flex flex-col items-start gap-5 self-stretch rounded-[20px] border  p-6">
 			{/* Header */}
 			<div className="flex items-start justify-between self-stretch">
 				<div className="flex flex-col items-start">
-					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 						Berita Acara Serah Terima (BAST)
 					</h2>
-					<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+					<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 						Kelola Invoice di dalam Project
 					</p>
 				</div>
 				<div className="flex items-center justify-end gap-2.5">
 					<Button
 						variant="outline"
-						className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9] px-3 py-2"
+						className="flex items-center gap-1 rounded-[10px] border  px-3 py-2"
 					>
 						<Download className="h-[30px] w-[30px]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Export XLSX
 						</span>
 					</Button>
 					<Button
 						variant="outline"
-						className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9] px-3 py-2"
+						className="flex items-center gap-1 rounded-[10px] border  px-3 py-2"
 					>
 						<Download className="h-[30px] w-[30px]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Export PDF
 						</span>
 					</Button>
@@ -70,47 +70,47 @@ export function BASTTable() {
 			<div className="flex items-center gap-5 self-stretch rounded-[10px]">
 				<Button
 					variant="outline"
-					className="flex h-[54px] items-center gap-1 rounded-[10px] border border-[#D9D9D9] px-3"
+					className="flex h-[54px] items-center gap-1 rounded-[10px] border  px-3"
 				>
-					<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+					<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 						20
 					</span>
 					<ChevronDown className="h-3 w-6" />
 				</Button>
 
-				<div className="relative flex h-[54px] flex-1 items-center gap-[15px] rounded-[10px] border border-[#D9D9D9] px-4">
-					<Search className="h-5 w-5 text-[#332687]" />
+				<div className="relative flex h-[54px] flex-1 items-center gap-[15px] rounded-[10px] border  px-4">
+					<Search className="h-5 w-5 text-primary" />
 					<Input
 						placeholder="Nama tugas"
-						className="border-0 p-0 font-dm text-base leading-5 tracking-[-0.32px] text-[#8F9BBA] focus-visible:ring-0"
+						className="border-0 p-0 font-dm text-base leading-5 tracking-[-0.32px] text-muted-foreground focus-visible:ring-0"
 					/>
 				</div>
 
 				<div className="flex h-[54px] items-center gap-2.5">
 					<Button
 						variant="outline"
-						className="flex h-[54px] items-center gap-1 rounded-[10px] border border-[#D9D9D9] px-3"
+						className="flex h-[54px] items-center gap-1 rounded-[10px] border  px-3"
 					>
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							All Status
 						</span>
 						<ChevronDown className="h-3 w-6" />
 					</Button>
 					<Button
 						variant="outline"
-						className="flex h-[54px] items-center gap-1 rounded-[10px] border border-[#D9D9D9] px-3"
+						className="flex h-[54px] items-center gap-1 rounded-[10px] border  px-3"
 					>
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							All Type
 						</span>
 						<ChevronDown className="h-3 w-6" />
 					</Button>
 					<Button
 						variant="outline"
-						className="flex h-[54px] items-center gap-1 rounded-[10px] border border-[#D9D9D9] px-3"
+						className="flex h-[54px] items-center gap-1 rounded-[10px] border  px-3"
 					>
 						<Filter className="h-[18px] w-[18px]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Filter
 						</span>
 					</Button>
@@ -132,40 +132,40 @@ export function BASTTable() {
 							checked={selectedItems.length === bastData.length}
 							onCheckedChange={toggleAll}
 						/>
-						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							BAST
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-[7px]">
-						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							Date
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-[7px]">
-						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							Description
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-[7px]">
-						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							Status
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-[7px]">
-						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							Signed By
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-[7px]">
-						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<span className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							Action
 						</span>
-						<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 text-muted-foreground" />
 					</div>
 				</div>
 
@@ -182,15 +182,15 @@ export function BASTTable() {
 								checked={selectedItems.includes(item.id)}
 								onCheckedChange={() => toggleItem(item.id)}
 							/>
-							<span className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+							<span className=" text-xs leading-4 tracking-[0.4px] text-primary">
 								{item.id}
 							</span>
 						</div>
-						<span className="w-[120px] font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+						<span className="w-[120px] font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 							{item.date}
 						</span>
 						<div className="flex w-[120px] items-center gap-2.5">
-							<span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+							<span className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 								{item.description}
 							</span>
 						</div>
@@ -202,17 +202,17 @@ export function BASTTable() {
 										: "bg-[rgba(255,232,163,1)]"
 								}`}
 							>
-								<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#4A4459]">
+								<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-[#4A4459]">
 									{item.status === "signed" ? "Signed" : "Pending"}
 								</span>
 							</Badge>
 						</div>
-						<span className="w-[120px] font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+						<span className="w-[120px] font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 							{item.signedBy}
 						</span>
 						<div className="flex w-[120px] items-center gap-[5px]">
-							<div className="flex items-center justify-center gap-2.5 rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2 py-1">
-								<span className="font-inter text-xs font-normal text-[rgba(191,106,2,1)]">
+							<div className="flex items-center justify-center gap-2.5 rounded-[5px] border  px-2 py-1">
+								<span className="font-inter text-xs text-[rgba(191,106,2,1)]">
 									{item.days} days
 								</span>
 							</div>

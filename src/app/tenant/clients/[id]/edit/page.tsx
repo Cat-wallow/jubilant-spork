@@ -1503,7 +1503,7 @@ export default function EditClientPage() {
                     </p>
                     {watch('use_default_coa') && (
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="px-3 py-1 bg-white dark:bg-slate-800 border rounded-md text-sm">
+                        <span className="px-3 py-1 bg-card dark:bg-slate-800 border rounded-md text-sm">
                           Trading COA Template
                         </span>
                         <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
@@ -1729,7 +1729,7 @@ export default function EditClientPage() {
                       </div>
                       
                       {doc.file_url ? (
-                        <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg border">
+                        <div className="mt-3 p-3 bg-card dark:bg-slate-800 rounded-lg border">
                           <p className="font-medium text-blue-900 dark:text-blue-100">{doc.file_name || 'Dokumen'}</p>
                           <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                             {doc.expiry_date && (
@@ -1804,7 +1804,7 @@ export default function EditClientPage() {
             )}
           </div>
 
-          <div className="w-full h-[70vh] rounded-md border overflow-hidden bg-white">
+          <div className="w-full h-[70vh] rounded-md border overflow-hidden bg-card">
             {previewUrl ? (
               <iframe
                 src={previewUrl}

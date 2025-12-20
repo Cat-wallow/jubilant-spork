@@ -6,7 +6,7 @@ const PopoverHorizon = (props: { extra: string; trigger: ReactElement; content: 
     <Popover>
       <PopoverTrigger>{trigger}</PopoverTrigger>
       <PopoverContent
-        className={`w-max rounded-xl bg-white px-4 py-3 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none ${extra}`}
+        className={`w-max rounded-xl bg-card px-4 py-3 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none ${extra}`}
       >
         {content}
       </PopoverContent>

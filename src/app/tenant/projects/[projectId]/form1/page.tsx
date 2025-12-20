@@ -36,11 +36,11 @@ export default function FormOnePage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 lg:w-[400px] border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50">
-          <TabsTrigger value="documents" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm">
+          <TabsTrigger value="documents" className="flex items-center gap-2 data-[state=active]:bg-card dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm">
             <FileText className="h-4 w-4" />
             Daftar Dokumen
           </TabsTrigger>
-          <TabsTrigger value="bundles" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm">
+          <TabsTrigger value="bundles" className="flex items-center gap-2 data-[state=active]:bg-card dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm">
             <FolderOpen className="h-4 w-4" />
             Daftar Bundle
           </TabsTrigger>

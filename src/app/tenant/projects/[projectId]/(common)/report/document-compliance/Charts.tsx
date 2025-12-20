@@ -97,9 +97,9 @@ export function Charts({ distributionChart, completenessChart }: ChartsProps) {
 	return (
 		<div className="grid grid-cols-1 gap-[30px] lg:grid-cols-2">
 			{/* Distribution Chart */}
-			<Card className="border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="border  p-[30px]">
 				<CardHeader className="p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						Distribusi Status Dokumen
 					</CardTitle>
 				</CardHeader>
@@ -114,9 +114,9 @@ export function Charts({ distributionChart, completenessChart }: ChartsProps) {
 			</Card>
 
 			{/* Completeness Chart */}
-			<Card className="border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="border  p-[30px]">
 				<CardHeader className="p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						Kelengkapa Berdasarkan Jenis Dokumen
 					</CardTitle>
 				</CardHeader>

@@ -19,44 +19,45 @@ export default function KK3Layout({ children }: { children: React.ReactNode }) {
 	const projectId = params.projectId as string;
 
 	return (
-		<div className="flex flex-col gap-[30px] p-6">
-			<div className="flex flex-col gap-[5px]">
-				<div className="text-sm font-medium leading-6 text-[#707EAE]">
-					KK 3.0
+		<>
+			{pathname.includes("/p2pph/") ? (
+				children
+			) : (
+				<div className="flex flex-col gap-[30px] py-6 px-2 ">
+					<div className="flex flex-col gap-[5px]">
+						<div className="flex flex-col">
+							<h1 className="text-[34px] font-bold leading-[42px] tracking-[-0.68px] ">
+								Kelola KK 3.0 (Manajemen Perpajakan)
+							</h1>
+							<p className="text-sm leading-6 tracking-[-0.28px] ">
+								Analisa Pemenuhan Kewajiban Perpajakan
+							</p>
+						</div>
+					</div>
+
+					<div className="flex h-[42px] items-center gap-5 rounded-[5px] bg-card p-1">
+						{tabs.map((tab) => {
+							const href = `/tenant/projects/${projectId}/kk3/${tab.path}`;
+							const isActive = pathname.includes(`/kk3/${tab.path}`);
+
+							return (
+								<Link
+									key={tab.path}
+									href={href}
+									className={cn(
+										"flex flex-1 items-center justify-center gap-2.5 self-stretch rounded-[5px] px-[15px] py-[3px] text-sm font-semibold leading-[22px] transition-colors",
+										isActive ? "bg-muted " : "bg-card  ",
+									)}
+								>
+									{tab.label}
+								</Link>
+							);
+						})}
+					</div>
+
+					{children}
 				</div>
-				<div className="flex flex-col">
-					<h1 className="text-[34px] font-bold leading-[42px] tracking-[-0.68px] text-[#0B1437]">
-						Kelola KK 3.0 (Manajemen Perpajakan)
-					</h1>
-					<p className="text-sm font-normal leading-6 tracking-[-0.28px] text-black">
-						Analisa Pemenuhan Kewajiban Perpajakan
-					</p>
-				</div>
-			</div>
-
-			<div className="flex h-[42px] items-center gap-5 rounded-[5px] bg-[#F4F7FE] p-[5px]">
-				{tabs.map((tab) => {
-					const href = `/tenant/projects/${projectId}/kk3/${tab.path}`;
-					const isActive = pathname.includes(`/kk3/${tab.path}`);
-
-					return (
-						<Link
-							key={tab.path}
-							href={href}
-							className={cn(
-								"flex flex-1 items-center justify-center gap-2.5 self-stretch rounded-[5px] px-[15px] py-[3px] text-sm font-semibold leading-[22px] transition-colors",
-								isActive
-									? "bg-white text-[#757575]"
-									: "bg-transparent text-[#757575] hover:bg-white/50",
-							)}
-						>
-							{tab.label}
-						</Link>
-					);
-				})}
-			</div>
-
-			{children}
-		</div>
+			)}
+		</>
 	);
 }

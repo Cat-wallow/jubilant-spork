@@ -2003,7 +2003,7 @@ export function CreateClientModalUpdated({
         // Helper to mark document as not available
         const markAsNotAvailable = (docType: string) => {
           const existingIndex = currentDocs.findIndex(d => d.document_type === docType);
-          
+
           const newDoc = {
             document_type: docType,
             document_number: '',
@@ -2043,7 +2043,7 @@ export function CreateClientModalUpdated({
                 return (
                   <div key={docType.id} className={`border rounded-lg overflow-hidden ${isMissing ? 'border-red-500' : ''}`}>
                     {/* Document Header */}
-                    <div className={`flex items-center justify-between p-4 ${isMissing ? 'bg-red-50 dark:bg-red-900/20' : 'bg-white dark:bg-slate-900'}`}>
+                    <div className={`flex items-center justify-between p-4 ${isMissing ? 'bg-red-50 dark:bg-red-900/20' : 'bg-card dark:bg-slate-900'}`}>
                       <div>
                         <p className="font-medium text-blue-900 dark:text-blue-100">{docType.label}</p>
                         <p className="text-xs text-muted-foreground">Format: {docType.format}</p>
@@ -2078,10 +2078,10 @@ export function CreateClientModalUpdated({
                           </Button>
                         )}
                         {isUploaded && (
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
                             className="text-red-500 hover:text-red-700"
                             onClick={() => {
                               setValue('legalDocuments', currentDocs.filter(d => d.document_type !== docType.id));
@@ -2107,9 +2107,9 @@ export function CreateClientModalUpdated({
                                 Upload
                               </span>
                             </label>
-                            <Button 
-                              type="button" 
-                              variant="secondary" 
+                            <Button
+                              type="button"
+                              variant="secondary"
                               size="sm"
                               className="bg-slate-700 text-white hover:bg-slate-800"
                               onClick={() => markAsNotAvailable(docType.id)}
@@ -2135,9 +2135,9 @@ export function CreateClientModalUpdated({
                                 Upload
                               </span>
                             </label>
-                            <Button 
-                              type="button" 
-                              variant="secondary" 
+                            <Button
+                              type="button"
+                              variant="secondary"
                               size="sm"
                               className="bg-slate-700 text-white hover:bg-slate-800"
                               disabled
@@ -2181,7 +2181,7 @@ export function CreateClientModalUpdated({
             <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg text-sm text-blue-700 dark:text-blue-300">
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <p>
-                Dokumen yang diupload akan disimpan dengan enkripsi dan hanya dapat diakses oleh tim yang berwenang. 
+                Dokumen yang diupload akan disimpan dengan enkripsi dan hanya dapat diakses oleh tim yang berwenang.
                 Pastikan dokumen yang diupload sudah benar dan masih berlaku.
               </p>
             </div>
@@ -2195,21 +2195,21 @@ export function CreateClientModalUpdated({
         const legalDocs = watchedValues.legalDocuments || [];
         const preferences = watchedValues.preferences;
         const errorList = flattenErrors(errors);
-        
+
         // Calculate completeness
         const uploadedDocs = legalDocs.filter(d => d.status === 'uploaded' || d.status === 'verified').length;
         const totalDocs = legalDocs.length;
         const completenessPercent = totalDocs > 0 ? Math.round((uploadedDocs / totalDocs) * 100) : 100;
-        
+
         // Get primary contact
         const primaryContact = contacts.find(c => c.is_primary);
         const billingContact = contacts.find(c => c.is_billing_contact);
-        
+
         // Get applicable taxes for display
         const activeTaxes = taxInfo?.applicable_taxes || [];
-        
+
         // Get PKP effective date
-        const pkpDate = taxInfo?.pkp_confirmation_date 
+        const pkpDate = taxInfo?.pkp_confirmation_date
           ? new Date(taxInfo.pkp_confirmation_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })
           : '-';
 
@@ -2431,11 +2431,11 @@ export function CreateClientModalUpdated({
                     ktp_direktur: 'KTP Direktur',
                   };
                   const isUploaded = doc.status === 'uploaded' || doc.status === 'verified';
-                  
+
                   return (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg"
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-card dark:bg-slate-900 rounded-lg"
                     >
                       <div>
                         <p className="font-medium text-blue-900 dark:text-blue-100">
@@ -2446,7 +2446,7 @@ export function CreateClientModalUpdated({
                           {doc.upload_date && ` • Diupload ${new Date(doc.upload_date).toLocaleDateString('id-ID')}`}
                         </p>
                       </div>
-                      <Badge 
+                      <Badge
                         variant={isUploaded ? 'default' : 'secondary'}
                         className={isUploaded ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : ''}
                       >
@@ -2545,8 +2545,8 @@ export function CreateClientModalUpdated({
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={() => {

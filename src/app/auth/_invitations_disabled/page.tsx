@@ -111,7 +111,7 @@ export default function InvitationsPage() {
       {/* Invitations List */}
       <div className="mt-6">
         {invitations.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-12 text-center dark:border-gray-700 dark:bg-navy-800">
+          <div className="rounded-lg border border-gray-200 bg-card p-12 text-center dark:border-gray-700 dark:bg-navy-800">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
               <svg
                 className="h-8 w-8 text-gray-400"

@@ -36,7 +36,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
 
 	return (
 		<div
-			className={`sm:none duration-175 linear fixed !z-50 flex min-h-full flex-col bg-white pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
+			className={`sm:none duration-175 linear fixed !z-50 flex min-h-full flex-col bg-card pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
 				open ? "translate-x-0" : "-translate-x-96 xl:translate-x-0"
 			} ${isCollapsed ? "w-[80px]" : "w-[290px]"}`}
 		>
@@ -50,7 +50,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
 			{/* Toggle Button for Desktop */}
 			{isProjectDetail ? null : (
 				<span
-					className="absolute -right-3 top-8 hidden h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100 xl:flex text-gray-600 border border-gray-200 z-[60]"
+					className="absolute -right-3 top-8 hidden h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-card shadow-md hover:bg-gray-100 xl:flex text-gray-600 border border-gray-200 z-[60]"
 					onClick={() => setIsCollapsed(!isCollapsed)}
 				>
 					<HiMenuAlt3
@@ -71,7 +71,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
 							height={29}
 							className="h-[29px] w-[120px]"
 						/>
-						<p className="font-dm text-xs font-normal leading-[150%] tracking-[-0.24px] text-brand-900 dark:text-white">
+						<p className="font-dm text-xs leading-[150%] tracking-[-0.24px] text-brand-900 dark:text-white">
 							Tax Consultancy
 						</p>
 					</div>
@@ -96,7 +96,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
 				</div>
 
 				<div
-					className={`h-[2px] bg-gray-300 dark:bg-white/30 ${isCollapsed ? "w-full" : "w-[250px]"}`}
+					className={`h-[2px] bg-gray-300 dark:bg-card/30 ${isCollapsed ? "w-full" : "w-[250px]"}`}
 				/>
 			</div>
 

@@ -22,7 +22,7 @@ export default function TenantFilters({
     <div className="mb-5 rounded-[10px] bg-lightPrimary p-2.5 dark:bg-navy-900">
       <div className="flex items-center gap-5">
         {/* Items per page */}
-        <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-white px-1.5 dark:border-gray-600 dark:bg-navy-800">
+        <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-card px-1.5 dark:border-gray-600 dark:bg-navy-800">
           <span className="px-2.5 text-sm font-medium leading-5 tracking-[0.1px] text-gray-700 dark:text-gray-300">
             20
           </span>
@@ -31,7 +31,7 @@ export default function TenantFilters({
         {/*<Dropdown></Dropdown>*/}
 
         {/* Search */}
-        <div className="flex flex-1 items-center gap-[15px] rounded-[10px] border border-gray-300 bg-white px-5 py-3 dark:border-gray-600 dark:bg-navy-800">
+        <div className="flex flex-1 items-center gap-[15px] rounded-[10px] border border-gray-300 bg-card px-5 py-3 dark:border-gray-600 dark:bg-navy-800">
           <Search className="h-5 w-5 text-brand-500" />
           <input
             type="text"
@@ -43,7 +43,7 @@ export default function TenantFilters({
         </div>
 
         {/* Status Filter */}
-        <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-white px-3 dark:border-gray-600 dark:bg-navy-800">
+        <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-card px-3 dark:border-gray-600 dark:bg-navy-800">
           <select
             value={statusFilter}
             onChange={(e) => onStatusChange(e.target.value)}
@@ -57,7 +57,7 @@ export default function TenantFilters({
         </div>
 
         {/* Plan Filter */}
-        <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-white px-3 dark:border-gray-600 dark:bg-navy-800">
+        <div className="flex h-[54px] items-center gap-1 rounded-[10px] border border-gray-300 bg-card px-3 dark:border-gray-600 dark:bg-navy-800">
           <select
             value={planFilter}
             onChange={(e) => onPlanChange(e.target.value)}

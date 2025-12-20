@@ -211,7 +211,7 @@ export default function DocumentsPage() {
 			{/* Header Section */}
 			<div className="flex flex-col gap-[30px] sm:flex-row sm:items-start sm:justify-between">
 				<div className="flex-1">
-					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 						Document Project 1
 					</h2>
 				</div>
@@ -224,24 +224,21 @@ export default function DocumentsPage() {
 			{/* Document Folders Grid */}
 			<DocumentFolderGrid folders={documentFolders} />
 
-			<FileUploader
-				value={uploadedFiles}
-				onValueChange={handleFileChange}
-			/>
+			<FileUploader value={uploadedFiles} onValueChange={handleFileChange} />
 
 			{/* Document List Section */}
 			<Card className="flex flex-col gap-5 rounded-[20px]  px-10 py-6">
 				{/* Section Header */}
 				<div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
 					<div className="flex flex-col">
-						<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+						<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 							Daftar Dokumen
 						</h2>
-						<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+						<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 							Kelola dokumen di dalam project
 						</p>
 					</div>
-					<Button className="h-12 w-full rounded-[10px] bg-[#332687] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] hover:bg-[#241963] sm:w-auto">
+					<Button className="h-12 w-full rounded-[10px] bg-primary px-4  text-sm font-medium leading-5 tracking-[0.1px] hover:bg-[#241963] sm:w-auto">
 						Add Document
 					</Button>
 				</div>

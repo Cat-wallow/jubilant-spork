@@ -40,9 +40,9 @@ export function Charts({ severityDistribution, equalisasiChart }: ChartsProps) {
 	return (
 		<div className="grid grid-cols-1 gap-[30px] lg:grid-cols-2">
 			{/* Pie Chart - Distribusi Severity Temuan */}
-			<Card className="flex flex-col items-center justify-center gap-[30px] rounded-[20px] border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="flex flex-col items-center justify-center gap-[30px] rounded-[20px] border  p-[30px]">
 				<CardHeader className="h-[32px] w-full p-0">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						{severityDistribution.title}
 					</CardTitle>
 				</CardHeader>
@@ -81,9 +81,9 @@ export function Charts({ severityDistribution, equalisasiChart }: ChartsProps) {
 			</Card>
 
 			{/* Bar Chart - Equalisasi SPT vs Laporan */}
-			<Card className="flex flex-col items-center rounded-[20px] border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="flex flex-col items-center rounded-[20px] border  p-[30px]">
 				<CardHeader className="h-[32px] w-full p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						{equalisasiChart.title}
 					</CardTitle>
 				</CardHeader>
@@ -111,7 +111,11 @@ export function Charts({ severityDistribution, equalisasiChart }: ChartsProps) {
 								data={equalisasiChart.data}
 								margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
 							>
-								<CartesianGrid strokeDasharray="0" stroke="#f1f1f1" vertical={false} />
+								<CartesianGrid
+									strokeDasharray="0"
+									stroke="#f1f1f1"
+									vertical={false}
+								/>
 								<XAxis
 									dataKey="category"
 									axisLine={false}
@@ -119,8 +123,18 @@ export function Charts({ severityDistribution, equalisasiChart }: ChartsProps) {
 									tick={{ fill: "#737373", fontSize: 12, fontFamily: "Geist" }}
 								/>
 								<YAxis hide />
-								<Bar dataKey="spt" fill="#0088FF" radius={[4, 4, 0, 0]} barSize={38} />
-								<Bar dataKey="laporan" fill="#A3B9F8" radius={[4, 4, 0, 0]} barSize={38} />
+								<Bar
+									dataKey="spt"
+									fill="#0088FF"
+									radius={[4, 4, 0, 0]}
+									barSize={38}
+								/>
+								<Bar
+									dataKey="laporan"
+									fill="#A3B9F8"
+									radius={[4, 4, 0, 0]}
+									barSize={38}
+								/>
 							</BarChart>
 						</ResponsiveContainer>
 					</div>

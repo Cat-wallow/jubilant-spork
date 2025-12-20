@@ -611,7 +611,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal',
+                          'w-full justify-start text-left',
                           !documentDate && 'text-muted-foreground',
                         )}
                       >
@@ -813,7 +813,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal h-11',
+                          'w-full justify-start text-left h-11',
                           !workflowDate && 'text-muted-foreground',
                         )}
                       >
