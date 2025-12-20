@@ -859,7 +859,17 @@ export default function EditClientPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="establishment_date">Tanggal Berdiri</Label>
-                      <Input type="date" id="establishment_date" {...register('establishment_date')} />
+                      <Controller
+                        control={control}
+                        name="establishment_date"
+                        render={({ field }) => (
+                          <DatePicker
+                            value={parseDateString(field.value)}
+                            onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                            placeholder="Pilih tanggal"
+                          />
+                        )}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="employee_count">Jumlah Karyawan</Label>
@@ -1156,7 +1166,11 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Tanggal *</Label>
-                      <Input type="date" />
+                      <DatePicker
+                        value={undefined}
+                        onChange={() => {}}
+                        placeholder="Pilih tanggal"
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -1179,7 +1193,11 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Tanggal *</Label>
-                      <Input type="date" />
+                      <DatePicker
+                        value={undefined}
+                        onChange={() => {}}
+                        placeholder="Pilih tanggal"
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -1854,11 +1872,10 @@ export default function EditClientPage() {
 
             <div className="space-y-2">
               <Label>Masa Berlaku Hingga (opsional)</Label>
-              <Input 
-                type="date" 
-                value={newDocument.expiry_date}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, expiry_date: e.target.value }))}
-                placeholder="dd/mm/yyyy"
+              <DatePicker
+                value={parseDateString(newDocument.expiry_date)}
+                onChange={(date) => setNewDocument(prev => ({ ...prev, expiry_date: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                placeholder="Pilih tanggal"
               />
             </div>
 

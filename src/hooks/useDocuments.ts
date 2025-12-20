@@ -66,6 +66,7 @@ export interface Document {
   description: string | null;
   version: number;
   uploadedBy: string;
+  uploadedByName?: string;
   createdAt: string;
   updatedAt: string;
 }

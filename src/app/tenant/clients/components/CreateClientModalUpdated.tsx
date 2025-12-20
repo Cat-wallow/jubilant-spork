@@ -27,7 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import api from '@/lib/api';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   ChevronLeft,
   ChevronRight,
@@ -74,11 +74,19 @@ const formatNpwp = (value: unknown) => {
   return formatted;
 };
 
+const parseDateString = (value: unknown) => {
+  if (typeof value !== 'string' || !value) return undefined;
+  const parts = value.split('-');
+  if (parts.length !== 3) return undefined;
+  const [y, m, d] = parts.map(Number);
+  return new Date(y, m - 1, d);
+};
+
 // Complete form validation schema for all sections
 const clientFormSchema = z.object({
   // Basic Information
   basicInfo: z.object({
-    code: z.string().min(1, 'Kode client wajib diisi'),
+    code: z.string().optional(),
     name: z.string().min(1, 'Nama client wajib diisi'),
     legal_name: z.string().min(1, 'Nama legal wajib diisi'),
     brand_name: z.string().optional(),
@@ -279,7 +287,6 @@ export function CreateClientModalUpdated({
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
   const [missingDocs, setMissingDocs] = useState<string[]>([]);
-  const { toast } = useToast();
   const submitIntentRef = useRef(false);
 
   const {
@@ -624,10 +631,8 @@ export function CreateClientModalUpdated({
         });
 
         if (missing.length > 0) {
-          toast({
-            title: 'Dokumen legal belum lengkap',
+          toast.error('Dokumen legal belum lengkap', {
             description: 'Setiap dokumen wajib diupload atau pilih "Tidak tersedia".',
-            variant: 'destructive',
           });
           setIsSubmitting(false);
           return;
@@ -679,18 +684,15 @@ export function CreateClientModalUpdated({
       };
 
       await onSubmit(transformedData);
-      toast({
-        title: 'Sukses',
+      toast.success('Sukses', {
         description: 'Client berhasil dibuat',
       });
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error creating client:', error);
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat membuat klien';
-      toast({
-        title: 'Gagal membuat klien',
+      toast.error('Gagal membuat klien', {
         description: errorMessage,
-        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -711,10 +713,8 @@ export function CreateClientModalUpdated({
     const step = getFirstInvalidStep(errs);
     setCurrentStep(step);
     const first = getFirstError(errs);
-    toast({
-      title: 'Form belum lengkap',
+    toast.error('Form belum lengkap', {
       description: first?.message || 'Masih ada field yang wajib diisi. Cek input yang berwarna merah.',
-      variant: 'destructive',
     });
 
     if (first?.path) {
@@ -764,10 +764,8 @@ export function CreateClientModalUpdated({
 
       if (missing.length > 0) {
         setMissingDocs(missing);
-        toast({
-          title: 'Dokumen legal belum lengkap',
+        toast.error('Dokumen legal belum lengkap', {
           description: 'Mohon lengkapi status dokumen yang ditandai merah (Upload atau pilih "Tidak tersedia").',
-          variant: 'destructive',
         });
         return;
       }
@@ -796,15 +794,14 @@ export function CreateClientModalUpdated({
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="basicInfo.code">Kode Client *</Label>
+                <Label htmlFor="basicInfo.code">Kode Client</Label>
                 <Input
                   id="basicInfo.code"
+                  disabled
                   {...register('basicInfo.code')}
-                  placeholder="C001"
+                  placeholder="Auto-generated"
+                  className="bg-muted text-muted-foreground"
                 />
-                {errors.basicInfo?.code && (
-                  <p className="text-red-500 text-sm">{errors.basicInfo.code.message}</p>
-                )}
               </div>
               <div>
                 <Label htmlFor="basicInfo.name">Nama Client *</Label>
@@ -1342,10 +1339,16 @@ export function CreateClientModalUpdated({
                   </div>
                   <div>
                     <Label htmlFor="taxInfo.registered_letter_date">Tanggal Surat</Label>
-                    <Input
-                      id="taxInfo.registered_letter_date"
-                      type="date"
-                      {...register('taxInfo.registered_letter_date')}
+                    <Controller
+                      control={control}
+                      name="taxInfo.registered_letter_date"
+                      render={({ field }) => (
+                        <DatePicker
+                          value={parseDateString(field.value)}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          placeholder="Pilih tanggal"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1383,10 +1386,16 @@ export function CreateClientModalUpdated({
                   </div>
                   <div>
                     <Label htmlFor="taxInfo.pkp_confirmation_date">Tanggal Surat</Label>
-                    <Input
-                      id="taxInfo.pkp_confirmation_date"
-                      type="date"
-                      {...register('taxInfo.pkp_confirmation_date')}
+                    <Controller
+                      control={control}
+                      name="taxInfo.pkp_confirmation_date"
+                      render={({ field }) => (
+                        <DatePicker
+                          value={parseDateString(field.value)}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          placeholder="Pilih tanggal"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1446,9 +1455,16 @@ export function CreateClientModalUpdated({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Tanggal Surat</Label>
-                      <Input
-                        type="date"
-                        {...register(`taxInfo.otherTaxDocuments.${index}.document_date`)}
+                      <Controller
+                        control={control}
+                        name={`taxInfo.otherTaxDocuments.${index}.document_date`}
+                        render={({ field }) => (
+                          <DatePicker
+                             value={parseDateString(field.value)}
+                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                             placeholder="Pilih tanggal"
+                           />
+                        )}
                       />
                     </div>
                     <div>
@@ -1992,10 +2008,8 @@ export function CreateClientModalUpdated({
           } catch (e: any) {
             console.error(e);
             const msg = e?.response?.data?.message || e?.message || 'Upload dokumen gagal';
-            toast({
-              title: 'Upload gagal',
+            toast.error('Upload gagal', {
               description: msg,
-              variant: 'destructive',
             });
           }
         };
