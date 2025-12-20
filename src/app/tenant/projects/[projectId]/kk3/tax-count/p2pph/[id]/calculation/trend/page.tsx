@@ -1,18 +1,20 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendChart } from './_components/TrendChart';
+import { InsightCards } from './_components/InsightCards';
+import { TaxRateSummary } from './_components/TaxRateSummary';
 
 export default function TrendPage() {
   return (
-    <Card className="rounded-[14px] border-[0.8px] border-black/10">
-      <CardHeader>
-        <CardTitle className="font-arial text-base text-[#0A0A0A]">Trend Analysis</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">
-          Halaman analisis trend akan ditampilkan di sini.
-        </p>
-      </CardContent>
-    </Card>
+    <div className="space-y-[30px]">
+      {/* Trend Chart */}
+      <TrendChart />
+
+      {/* Insight and Summary Section */}
+      <div className="grid grid-cols-1 gap-[30px] lg:grid-cols-2">
+        <InsightCards />
+        <TaxRateSummary />
+      </div>
+    </div>
   );
 }
