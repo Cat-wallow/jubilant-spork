@@ -74,6 +74,14 @@ const formatNpwp = (value: unknown) => {
   return formatted;
 };
 
+const parseDateString = (value: unknown) => {
+  if (typeof value !== 'string' || !value) return undefined;
+  const parts = value.split('-');
+  if (parts.length !== 3) return undefined;
+  const [y, m, d] = parts.map(Number);
+  return new Date(y, m - 1, d);
+};
+
 // Complete form validation schema for all sections
 const clientFormSchema = z.object({
   // Basic Information
@@ -1331,10 +1339,16 @@ export function CreateClientModalUpdated({
                   </div>
                   <div>
                     <Label htmlFor="taxInfo.registered_letter_date">Tanggal Surat</Label>
-                    <Input
-                      id="taxInfo.registered_letter_date"
-                      type="date"
-                      {...register('taxInfo.registered_letter_date')}
+                    <Controller
+                      control={control}
+                      name="taxInfo.registered_letter_date"
+                      render={({ field }) => (
+                        <DatePicker
+                          value={parseDateString(field.value)}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          placeholder="Pilih tanggal"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1372,10 +1386,16 @@ export function CreateClientModalUpdated({
                   </div>
                   <div>
                     <Label htmlFor="taxInfo.pkp_confirmation_date">Tanggal Surat</Label>
-                    <Input
-                      id="taxInfo.pkp_confirmation_date"
-                      type="date"
-                      {...register('taxInfo.pkp_confirmation_date')}
+                    <Controller
+                      control={control}
+                      name="taxInfo.pkp_confirmation_date"
+                      render={({ field }) => (
+                        <DatePicker
+                          value={parseDateString(field.value)}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          placeholder="Pilih tanggal"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1435,9 +1455,16 @@ export function CreateClientModalUpdated({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Tanggal Surat</Label>
-                      <Input
-                        type="date"
-                        {...register(`taxInfo.otherTaxDocuments.${index}.document_date`)}
+                      <Controller
+                        control={control}
+                        name={`taxInfo.otherTaxDocuments.${index}.document_date`}
+                        render={({ field }) => (
+                          <DatePicker
+                             value={parseDateString(field.value)}
+                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                             placeholder="Pilih tanggal"
+                           />
+                        )}
                       />
                     </div>
                     <div>

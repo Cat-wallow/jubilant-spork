@@ -271,7 +271,7 @@ export default function DocumentDetailPage() {
               </div>
               <div>
                 <div className="text-xs text-muted-foreground dark:text-slate-300">Diunggah Oleh</div>
-                <div className="font-medium">{doc.uploadedBy}</div>
+                <div className="font-medium">{doc.uploadedByName || doc.uploadedBy}</div>
               </div>
               <div>
                 <div className="text-xs text-muted-foreground dark:text-slate-300">Tanggal Upload</div>
@@ -315,7 +315,25 @@ export default function DocumentDetailPage() {
                   <Skeleton className="h-10 w-full" />
                 </>
               ) : !versions || versions.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Tidak ada attachment.</p>
+                <div className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium text-slate-900 dark:text-slate-50">
+                      {doc.originalFilename}
+                    </div>
+                    <div className="text-xs text-muted-foreground dark:text-slate-300">
+                      {formatFileSize(doc.fileSize)} • {formatDate(doc.createdAt)}
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={handleDownload}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
               ) : (
                 versions.map((v: DocumentVersion) => (
                   <div
