@@ -1,18 +1,10 @@
-import { Card } from "@/components/ui/card";
+import { CalculationCard } from './components/CalculationCard';
+import { mockData } from './data/mock-data';
 
-export default function PPhBadanPage() {
+export default function Form1771IPage() {
 	return (
-		<div className="flex flex-col gap-[30px]">
-			<Card className="flex items-center justify-center rounded-[20px] bg-card p-[100px]">
-				<div className="text-center">
-					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
-						PPh Badan 1771
-					</h2>
-					<p className="mt-2  text-sm text-muted-foreground">
-						Halaman ini akan segera tersedia
-					</p>
-				</div>
-			</Card>
+		<div className="flex flex-col gap-6">
+			<CalculationCard data={mockData} />
 		</div>
 	);
 }

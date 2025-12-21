@@ -1,0 +1,91 @@
+export const mockData = {
+	stats: [
+		{
+			id: '1',
+			title: 'Penghasilan Neto Fiskal',
+			value: 'Rp 22.30M',
+			subtitle: 'Dari 1771-I',
+			badge: '+12.5%',
+			type: 'green' as const,
+		},
+		{
+			id: '2',
+			title: 'Penghasilan Kena Pajak',
+			value: 'Rp 22.30M',
+			subtitle: 'Setelah kompensasi',
+			badge: 'PKP',
+			type: 'blue' as const,
+		},
+		{
+			id: '3',
+			title: 'PPh Terutang',
+			value: 'Rp 4.91M',
+			subtitle: '22% × PKP',
+			badge: '22%',
+			type: 'purple' as const,
+		},
+		{
+			id: '4',
+			title: 'PPh Kurang Bayar',
+			value: 'Rp 256K',
+			subtitle: 'Harus dibayar',
+			badge: 'Due',
+			type: 'warning' as const,
+		},
+	],
+	calculation: {
+		leftColumn: [
+			{
+				id: 'l1',
+				label: '1. Penghasilan Neto Fiskal',
+				description: 'Dari Formulir 1771-I',
+				value: 'Rp 22.300.000',
+				type: 'default' as const,
+			},
+			{
+				id: 'l2',
+				label: '2. Kompensasi Kerugian Fiskal',
+				description: 'Dari lampiran khusus',
+				value: '-',
+				type: 'default' as const,
+			},
+			{
+				id: 'l3',
+				label: '3. Penghasilan Kena Pajak (1-2)',
+				description: 'PKP',
+				value: 'Rp 22.300.000',
+				type: 'highlighted' as const,
+			},
+			{
+				id: 'l4',
+				label: '4. PPh Terutang',
+				description: '22% × (3)',
+				value: 'Rp 4.906.000',
+				type: 'highlighted' as const,
+			},
+		],
+		rightColumn: [
+			{
+				id: 'r1',
+				label: '7. PPh yang dipotong/dipungut',
+				description: 'Dari bukti potong',
+				value: 'Rp 2.850.000',
+				type: 'default' as const,
+			},
+			{
+				id: 'r2',
+				label: '8. PPh Pasal 25',
+				description: 'Angsuran bulanan',
+				value: 'Rp 1.800.000',
+				type: 'default' as const,
+			},
+			{
+				id: 'r3',
+				label: '11. PPh Kurang Bayar',
+				description: '(4) - (7) - (8)',
+				value: 'Rp 256.000',
+				type: 'warning' as const,
+			},
+		],
+	},
+};
