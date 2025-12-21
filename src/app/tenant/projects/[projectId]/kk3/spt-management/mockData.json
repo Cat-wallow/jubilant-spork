@@ -1,0 +1,135 @@
+{
+  "stats": [
+    {
+      "id": "total-spt",
+      "label": "Total SPT",
+      "value": "20",
+      "icon": "file"
+    },
+    {
+      "id": "draft-spt",
+      "label": "Draft",
+      "value": "10",
+      "icon": "edit"
+    },
+    {
+      "id": "ready-spt",
+      "label": "Ready",
+      "value": "10",
+      "icon": "check"
+    },
+    {
+      "id": "submitted-spt",
+      "label": "Submitted/Approved",
+      "value": "10",
+      "icon": "approve"
+    }
+  ],
+  "sptList": [
+    {
+      "id": "SPT-PPN-1111-2024-03",
+      "type": "PPN 1111",
+      "period": "2024-03",
+      "status": "Ready",
+      "statusColor": "success",
+      "autoFill": "Auto-Filed",
+      "autoFillPercentage": "85%",
+      "approval": "Approved",
+      "approvalColor": "success",
+      "approvedBy": "PAO",
+      "deadline": "30 April 2024",
+      "taxAmount": "Rp 8.250.000",
+      "actions": ["view", "edit", "delete"]
+    },
+    {
+      "id": "SPT-PPH23-1721-2024-03",
+      "type": "PPH 23 (1721)",
+      "period": "2024-03",
+      "status": "Orange",
+      "statusColor": "warning",
+      "autoFill": "Auto-Filed",
+      "autoFillPercentage": "85%",
+      "approval": "Rejected",
+      "approvalColor": "warning",
+      "approvedBy": "Finance",
+      "deadline": "20 April 2024",
+      "taxAmount": "Rp 15.000.000",
+      "actions": ["view", "edit", "delete"]
+    },
+    {
+      "id": "SPT-PPH22-2024-03",
+      "type": "PPH 22",
+      "period": "2024-03",
+      "status": "Ready",
+      "statusColor": "success",
+      "autoFill": "Auto-Filed",
+      "autoFillPercentage": "100%",
+      "approval": "Approved",
+      "approvalColor": "success",
+      "approvedBy": "Director",
+      "deadline": "20 April 2024",
+      "taxAmount": "Rp 5.500.000",
+      "actions": ["view", "edit", "delete"]
+    },
+    {
+      "id": "SPT-BADAN-1771-2023",
+      "type": "Tahunan Badan (1771)",
+      "period": "2023",
+      "status": "Submitted",
+      "statusColor": "info",
+      "autoFill": "Auto-Filed",
+      "autoFillPercentage": "100%",
+      "approval": "Approved",
+      "approvalColor": "success",
+      "approvedBy": "Director",
+      "deadline": "15 April 2024",
+      "taxAmount": "Rp 125.000.000",
+      "actions": ["view", "edit", "delete"]
+    },
+    {
+      "id": "SPT-PPH15-2024-03",
+      "type": "PPH 15",
+      "period": "2024-03",
+      "status": "Orange",
+      "statusColor": "warning",
+      "autoFill": "Manual",
+      "autoFillPercentage": "60%",
+      "approval": "Pending",
+      "approvalColor": "warning",
+      "approvedBy": "PAO",
+      "deadline": "20 April 2024",
+      "taxAmount": "Rp 8.500.000",
+      "actions": ["view", "edit", "delete"]
+    },
+    {
+      "id": "SPT-PPN-1111-2024-04",
+      "type": "PPN 1111",
+      "period": "2024-04",
+      "status": "Orange",
+      "statusColor": "warning",
+      "autoFill": "Auto-Filed",
+      "autoFillPercentage": "75%",
+      "approval": "Pending",
+      "approvalColor": "warning",
+      "approvedBy": "PAO",
+      "deadline": "31 May 2024",
+      "taxAmount": "Rp 4.200.000",
+      "actions": ["view", "edit", "delete"]
+    },
+    {
+      "id": "SPT-PPN-1111-2024-05",
+      "type": "PPN 1111",
+      "period": "2024-05",
+      "status": "In Progress",
+      "statusColor": "processing",
+      "autoFill": "Auto-Filed",
+      "autoFillPercentage": "85%",
+      "approval": "Pending",
+      "approvalColor": "warning",
+      "approvedBy": "PAO",
+      "deadline": "30 June 2024",
+      "taxAmount": "Rp 6.800.000",
+      "actions": ["view", "edit", "delete"]
+    }
+  ]
+}
