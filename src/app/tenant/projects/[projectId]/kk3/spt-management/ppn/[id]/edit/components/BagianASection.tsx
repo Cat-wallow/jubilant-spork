@@ -10,16 +10,16 @@ interface Item {
   value: string;
   subLabel?: string;
   color?: string;
-  summary?: {
-    label: string;
-    value: string;
-    color: string;
-  };
 }
 
 interface Section {
   subtitle: string;
   items: Item[];
+  summary?: {
+    label: string;
+    value: string;
+    color: string;
+  };
 }
 
 interface BagianAData {
@@ -60,21 +60,21 @@ export function BagianASection({ data }: BagianASectionProps) {
                 </div>
               ))}
 
-              {section.items.length > 0 && section.items[0].summary && (
+              {section.summary && (
                 <div className={`rounded-lg p-4 sm:col-span-2 ${
-                  section.items[0].summary.color === 'green'
+                  section.summary.color === 'green'
                     ? 'bg-green-50'
                     : 'bg-gray-50'
                 }`}>
                   <p className="text-sm font-medium text-gray-700">
-                    {section.items[0].summary.label}
+                    {section.summary.label}
                   </p>
                   <p className={`mt-1 text-xl font-bold ${
-                    section.items[0].summary.color === 'green'
+                    section.summary.color === 'green'
                       ? 'text-green-600'
                       : 'text-gray-900'
                   }`}>
-                    {section.items[0].summary.value}
+                    {section.summary.value}
                   </p>
                 </div>
               )}
