@@ -20,7 +20,7 @@ export default function KK3Layout({ children }: { children: React.ReactNode }) {
 
 	return (
 		<>
-			{pathname.includes("/p2pph/") ? (
+			{pathname.includes("/p2pph/") || pathname.includes("/pph/") || pathname.includes("/ppn/") ? (
 				children
 			) : (
 				<div className="flex flex-col gap-[30px] py-6 px-2 ">

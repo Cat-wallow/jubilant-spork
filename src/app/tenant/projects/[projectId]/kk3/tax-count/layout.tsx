@@ -21,7 +21,7 @@ export default function TaxCountLayout({
 
 	return (
 		<>
-			{pathname.includes("/p2pph/") ? (
+			{pathname.includes("/p2pph/") || pathname.includes("/pph/") || pathname.includes("/ppn/") ? (
 				children
 			) : (
 				<div className="flex flex-col gap-[30px]  ">

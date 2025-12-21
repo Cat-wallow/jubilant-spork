@@ -34,9 +34,6 @@ export default function PPNDetailLayout({
 		<div className="flex w-full flex-col gap-[30px] px-[30px]">
 			{/* Header */}
 			<div className="flex flex-col gap-[5px]">
-				<p className="font-dm text-sm font-medium leading-6 text-muted-foreground">
-					KK 3.0 &gt; Perhitungan Pajak
-				</p>
 				<h1 className="font-dm text-[34px] font-bold leading-[42px] tracking-[-0.68px] ">
 					Detail PPN {params.id}
 				</h1>
