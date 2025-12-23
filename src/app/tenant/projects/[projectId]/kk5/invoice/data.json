@@ -1,0 +1,153 @@
+{
+  "stats": {
+    "totalInvoice": {
+      "label": "Total Invoice",
+      "value": 22,
+      "sublabel": "Semua invoice project",
+      "icon": "invoice",
+      "bgColor": "bg-purple-50"
+    },
+    "paid": {
+      "label": "Paid",
+      "value": 10,
+      "sublabel": "/ 22 Invoice",
+      "icon": "fileDone",
+      "bgColor": "bg-purple-50"
+    },
+    "paidAmount": {
+      "label": "Paid Amount",
+      "value": "Rp. 120.000.000",
+      "icon": "check",
+      "bgColor": "bg-purple-50"
+    },
+    "unpaidAmount": {
+      "label": "Unpaid Amount",
+      "value": "Rp. 20.000.000",
+      "icon": "progress",
+      "bgColor": "bg-purple-50"
+    },
+    "overdue": {
+      "label": "Overdue",
+      "value": "3 Invoice",
+      "icon": "warning",
+      "bgColor": "bg-purple-50"
+    }
+  },
+  "invoices": [
+    {
+      "id": "inv-001",
+      "invoiceId": "INV/PRJ-2024-12-1",
+      "date": "2024-10-10",
+      "termin": "Termin 1 (20%)",
+      "total": "Rp. 20.000.000",
+      "status": "Paid",
+      "statusColor": "bg-green-100",
+      "statusTextColor": "text-green-700",
+      "dueDate": "2024-10-10",
+      "dueBadge": "2d",
+      "dueBadgeColor": "bg-red-500",
+      "dueBadgeTextColor": "text-white",
+      "aging": "200 days",
+      "agingColor": "bg-amber-100",
+      "agingTextColor": "text-amber-700"
+    },
+    {
+      "id": "inv-002",
+      "invoiceId": "INV/PRJ-2024-12-1",
+      "date": "2024-10-10",
+      "termin": "Termin 2 (30%)",
+      "total": "Rp. 40.000.000",
+      "status": "Unpaid",
+      "statusColor": "bg-purple-100",
+      "statusTextColor": "text-gray-700",
+      "dueDate": "2024-10-10",
+      "aging": "200 days",
+      "agingColor": "bg-amber-100",
+      "agingTextColor": "text-amber-700"
+    },
+    {
+      "id": "inv-003",
+      "invoiceId": "INV/PRJ-2024-12-1",
+      "date": "2024-10-10",
+      "termin": "Termin 3 (25%)",
+      "total": "Rp. 30.000.000",
+      "status": "Unpaid",
+      "statusColor": "bg-purple-100",
+      "statusTextColor": "text-gray-700",
+      "dueDate": "2024-10-10",
+      "aging": "200 days",
+      "agingColor": "bg-amber-100",
+      "agingTextColor": "text-amber-700"
+    },
+    {
+      "id": "inv-004",
+      "invoiceId": "INV/PRJ-2024-12-1",
+      "date": "2024-10-10",
+      "termin": "Termin 4 (20%)",
+      "total": "Rp. 20.000.000",
+      "status": "Paid",
+      "statusColor": "bg-green-100",
+      "statusTextColor": "text-green-700",
+      "dueDate": "2024-10-10",
+      "dueBadge": "2d",
+      "dueBadgeColor": "bg-red-500",
+      "dueBadgeTextColor": "text-white",
+      "aging": "200 days",
+      "agingColor": "bg-amber-100",
+      "agingTextColor": "text-amber-700"
+    },
+    {
+      "id": "inv-005",
+      "invoiceId": "INV/PRJ-2024-12-1",
+      "date": "2024-10-10",
+      "termin": "Termin 5 (5%)",
+      "total": "Rp. 5.000.000",
+      "status": "Unpaid",
+      "statusColor": "bg-purple-100",
+      "statusTextColor": "text-gray-700",
+      "dueDate": "2024-10-10",
+      "aging": "200 days",
+      "agingColor": "bg-amber-100",
+      "agingTextColor": "text-amber-700"
+    }
+  ],
+  "features": [
+    "Auto-generate nomor invoice serial",
+    "Penagihan per layanan atau paket",
+    "Opsi split billing per layanan",
+    "Format standar PDF + Excel",
+    "Integrasi dengan BAST approval"
+  ],
+  "packages": [
+    {
+      "name": "Sistem Informasi Manajemen",
+      "description": "Layanan dokumen manajemen sistem",
+      "badge": "SIM",
+      "price": "Rp 15.000.000"
+    },
+    {
+      "name": "Sistem Informasi Akuntansi",
+      "description": "Layanan akuntansi manajemen sistem",
+      "badge": "SIA",
+      "price": "Rp 25.000.000"
+    },
+    {
+      "name": "Sistem Informasi Perpajakan",
+      "description": "Layanan pajak manajemen sistem",
+      "badge": "SIP",
+      "price": "Rp 35.000.000"
+    },
+    {
+      "name": "Audit Keuangan & Pajak",
+      "description": "Layanan audit dan quality control",
+      "badge": "AKPAJ",
+      "price": "Rp 20.000.000"
+    },
+    {
+      "name": "Full Service Package",
+      "description": "Paket lengkap semua layanan",
+      "badge": "FULL_SERVICE",
+      "price": "Rp 85.000.000"
+    }
+  ]
+}
