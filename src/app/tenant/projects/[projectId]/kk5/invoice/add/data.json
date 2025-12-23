@@ -1,0 +1,70 @@
+{
+  "steps": [
+    {
+      "number": 1,
+      "label": "Pilih BAST",
+      "active": true
+    },
+    {
+      "number": 2,
+      "label": "Konfigurasi & Finalisasi",
+      "active": false
+    }
+  ],
+  "bastList": [
+    {
+      "id": "bast-008",
+      "bastId": "BAST/2024/008",
+      "client": "PT. Digital Prima Solutions",
+      "person": "Riana Sari",
+      "services": ["SIM", "SIA"],
+      "approvedDate": "2024-03-01",
+      "selected": true
+    },
+    {
+      "id": "bast-009",
+      "bastId": "BAST/2024/009",
+      "client": "CV. Berkah Usaha Mandiri",
+      "person": "Joko Widodo",
+      "services": ["SIP"],
+      "approvedDate": "2024-03-06",
+      "selected": false
+    },
+    {
+      "id": "bast-010",
+      "bastId": "BAST/2024/010",
+      "client": "PT. Cemerlang Teknologi",
+      "person": "Linda Permata",
+      "services": ["FULL_SERVICE"],
+      "approvedDate": "2024-03-11",
+      "selected": false
+    },
+    {
+      "id": "bast-011",
+      "bastId": "BAST/2024/011",
+      "client": "PT. Sukses Mandiri Jaya",
+      "person": "Agus Setiawan",
+      "services": ["SIM", "SIA"],
+      "approvedDate": "2024-03-16",
+      "selected": false
+    },
+    {
+      "id": "bast-012",
+      "bastId": "BAST/2024/012",
+      "client": "CV. Mitra Bisnis Utama",
+      "person": "Siti Rahayu",
+      "services": ["SIP", "AKPAJ"],
+      "approvedDate": "2024-03-21",
+      "selected": false
+    },
+    {
+      "id": "bast-013",
+      "bastId": "BAST/2024/013",
+      "client": "PT. Global Prima Solutions",
+      "person": "Robert Tanama",
+      "services": ["SIA"],
+      "approvedDate": "2024-03-26",
+      "selected": false
+    }
+  ]
+}
