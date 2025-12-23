@@ -14,7 +14,7 @@ export function StagedAdjustmentCard({ adjustment }: StagedAdjustmentCardProps) 
   };
 
   return (
-    <Card className="p-4 border-l-4 border-t border-r border-b border-yellow-500 border-l-yellow-500 shadow-md">
+    <Card className="p-4 border-l-4  border-t border-r border-b border-yellow-500 border-l-yellow-500 shadow-md">
       <div className="space-y-3">
         {/* Header */}
         <div className="flex justify-between items-start">
