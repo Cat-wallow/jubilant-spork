@@ -124,7 +124,7 @@
       "iconBg": "#F6FFED",
       "iconColor": "#52C41A",
       "lastRun": "2025-10-14 09:30",
-      "link": "/tenant/projects/{projectId}/kk4/reconsiliation"
+      "link": "/tenant/projects/{projectId}/kk4/reconciliation"
     },
     {
       "id": "kk-4-2",

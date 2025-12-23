@@ -32,14 +32,14 @@ const iconMap: Record<string, any> = {
 
 export function StatsCards({ stats }: StatsCardsProps) {
 	return (
-		<div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 lg:grid-cols-4">
+		<div className="grid grid-cols-1 gap-[14px] md:grid-cols-2   lg:grid-cols-4">
 			{stats.map((stat) => {
 				const Icon = iconMap[stat.icon];
 
 				return (
 					<Card
 						key={stat.id}
-						className={`flex h-[157px] flex-col gap-[14px] rounded-[14px] bg-gradient-to-br p-[21px] pb-0 shadow-sm ${stat.gradient}`}
+						className={`flex h-[157px] flex-col gap-[14px] rounded-[14px]  p-[21px] pb-0 shadow-sm ${stat.gradient}`}
 					>
 						{/* Header */}
 						<div className="flex items-start justify-between">
