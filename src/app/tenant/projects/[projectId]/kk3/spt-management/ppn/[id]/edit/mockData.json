@@ -1,0 +1,277 @@
+{
+  "header": {
+    "sptId": "SPT-PPN-1111-2024-03",
+    "title": "SUTING DATA SPT-PPN-1111-2024-03",
+    "period": "Periode 2024-03-03 - 2024-03-31 CONTOH PERUSAHAAN"
+  },
+  "stats": [
+    {
+      "id": "dpp-terdapat",
+      "label": "DPP Terdapat",
+      "value": "Rp 150.000.000",
+      "icon": "money",
+      "color": "blue"
+    },
+    {
+      "id": "ppn-terdapat",
+      "label": "PPN Terdapat",
+      "value": "Rp 16.500.000",
+      "icon": "calculator",
+      "color": "teal"
+    },
+    {
+      "id": "pph-masukan",
+      "label": "PPH Masukan",
+      "value": "Rp 20.750.000",
+      "icon": "trending",
+      "color": "purple"
+    },
+    {
+      "id": "kurang-bayar",
+      "label": "Kurang Bayar",
+      "value": "Rp 0",
+      "icon": "alert",
+      "color": "red"
+    }
+  ],
+  "identitasWajibPajak": {
+    "npwp": "12.345.678.9-012.345",
+    "namaWajibPajak": "PT CONTOH PERUSAHAAN",
+    "kodeKlu": "46820",
+    "alamat": "Alamat lengkap wajib pajak",
+    "email": "info@contoh.co.id",
+    "telepon": "021-5555-1234",
+    "periode": "2024",
+    "tahun": "2024"
+  },
+  "bagianA": {
+    "title": "BAGIAN A - PENYERAHAN BARANG KENA PAJAK DAN/ATAU JASA KENA PAJAK",
+    "sections": [
+      {
+        "subtitle": "A. Penyerahan Dalam Negeri dengan Faktur Pajak",
+        "items": [
+          {
+            "label": "1. Yang PPN-nya dibayar sendiri",
+            "value": "100000000"
+          },
+          {
+            "label": "2. Yang PPN-nya dibayar pemungut PPN",
+            "value": "25000000"
+          },
+          {
+            "label": "3. Yang dihubungkan dari penjangkauan PPN",
+            "value": "10000000"
+          }
+        ]
+      },
+      {
+        "subtitle": "B. Ekspor Barang Kena Pajak dan/atau Jasa Kena Pajak",
+        "items": [
+          {
+            "label": "1. Ekspor BKP",
+            "value": "75000000"
+          },
+          {
+            "label": "2. Ekspor JKP",
+            "value": "0"
+          }
+        ],
+        "summary": {
+          "label": "Jumlah Ekspor",
+          "value": "Rp 75.000.000",
+          "color": "green"
+        }
+      }
+    ]
+  },
+  "bagianB": {
+    "title": "BAGIAN B - PENGHITUNGAN PPN KURANG BAYAR ATAU LEBIH BAYAR",
+    "sections": [
+      {
+        "subtitle": "1. Dasar Pengenaan Pajak",
+        "items": [
+          {
+            "label": "1. Dasar Pengenaan Pajak",
+            "value": "Rp 150.000.000",
+            "subLabel": "Auto-calculated dari Bagian A.1"
+          },
+          {
+            "label": "2. PPN yang wajib (11%)",
+            "value": "Rp 16.500.000",
+            "subLabel": "11% dari DPP Terdapat"
+          },
+          {
+            "label": "3. PPN Masukan yang dapat dikreditkan",
+            "value": "10000000"
+          },
+          {
+            "label": "4. PPN Impor yang dapat dikreditkan",
+            "value": "2250000"
+          }
+        ]
+      },
+      {
+        "subtitle": "Hasil Penghitungan PPN Kurang/Lebih Bayar",
+        "items": [
+          {
+            "label": "5. Dasar Pengenaan Pajak",
+            "value": "Rp 150.000.000",
+            "color": "purple"
+          },
+          {
+            "label": "6. Jumlah PPN Masukan",
+            "value": "Rp 20.750.000",
+            "color": "pink"
+          },
+          {
+            "label": "7. PPN Lebih Bayar",
+            "value": "Rp 4.250.000",
+            "color": "yellow"
+          }
+        ]
+      }
+    ]
+  },
+  "lampiran": {
+    "title": "Lampiran B1 - Daftar Faktur Pajak Masukan",
+    "description": "Data transaksi pembelian dengan PPN",
+    "data": [
+      {
+        "no": "1",
+        "namaPerpajakan": "PT SUPPLIER UTAMA",
+        "npwp": "11.222.333.4-555.8",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "18000000",
+        "ppn": "1980000",
+        "ppnBM": "0",
+        "aksi": "delete"
+      },
+      {
+        "no": "2",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "0",
+        "aksi": "delete"
+      },
+      {
+        "no": "3",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "0",
+        "aksi": "delete"
+      },
+      {
+        "no": "4",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "0",
+        "aksi": "delete"
+      },
+      {
+        "no": "5",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "0",
+        "aksi": "delete"
+      }
+    ],
+    "total": {
+      "dpp": "Rp 18.000.000",
+      "ppn": "Rp 1.980.000",
+      "ppnBM": "Rp 0"
+    }
+  },
+  "lampiran2": {
+    "title": "Lampiran B1 - Daftar Faktur Pajak Masukan",
+    "description": "Lanjutan data transaksi",
+    "data": [
+      {
+        "no": "1",
+        "namaPerpajakan": "PT SUPPLIER UTAMA",
+        "npwp": "11.222.333.4-555.8",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "18000000",
+        "ppn": "1980000",
+        "ppnBM": "",
+        "aksi": "delete"
+      },
+      {
+        "no": "2",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "",
+        "aksi": "delete"
+      },
+      {
+        "no": "3",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "",
+        "aksi": "delete"
+      },
+      {
+        "no": "4",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "",
+        "aksi": "delete"
+      },
+      {
+        "no": "5",
+        "namaPerpajakan": "Nama perpajakan",
+        "npwp": "XX.XXX.XXX.X.XXX.X",
+        "kodeNo": "810",
+        "seriPp": "9999000001",
+        "tanggal": "",
+        "dpp": "0",
+        "ppn": "0",
+        "ppnBM": "",
+        "aksi": "delete"
+      }
+    ],
+    "total": {
+      "dpp": "Rp 18.000.000",
+      "ppn": "Rp 1.980.000",
+      "ppnBM": "Rp 0"
+    }
+  }
+}

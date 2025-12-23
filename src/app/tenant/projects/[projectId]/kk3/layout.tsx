@@ -46,7 +46,7 @@ export default function KK3Layout({ children }: { children: React.ReactNode }) {
 									href={href}
 									className={cn(
 										"flex flex-1 items-center justify-center gap-2.5 self-stretch rounded-[5px] px-[15px] py-[3px] text-sm font-semibold leading-[22px] transition-colors",
-										isActive ? "bg-muted " : "bg-card  ",
+										isActive ? "bg-muted " : "bg-card text-muted-foreground  ",
 									)}
 								>
 									{tab.label}

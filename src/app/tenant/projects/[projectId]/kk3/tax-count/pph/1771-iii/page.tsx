@@ -1,18 +1,26 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TaxCreditTable } from "./_components/TaxCreditTable";
+import { RecapitulationCard } from "./_components/RecapitulationCard";
+import { DataSourceCard } from "./_components/DataSourceCard";
 
-export default function PPhBadanPage() {
-	return (
-		<div className="flex flex-col gap-[30px]">
-			<Card className="flex items-center justify-center rounded-[20px] bg-card p-[100px]">
-				<div className="text-center">
-					<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
-						PPh Badan 1771
-					</h2>
-					<p className="mt-2  text-sm text-muted-foreground">
-						Halaman ini akan segera tersedia
-					</p>
-				</div>
-			</Card>
-		</div>
-	);
+export default function Form1771IIIPage() {
+  return (
+    <div className="flex flex-col gap-[30px]">
+      <Card className="border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-base font-bold">
+            Form 1771-III - Kredit Pajak Dalam Negeri
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <TaxCreditTable />
+
+          <div className="flex gap-[30px]">
+            <RecapitulationCard />
+            <DataSourceCard />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
