@@ -74,7 +74,7 @@ export const columns: ColumnDef<Project>[] = [
 				: "-";
 			return (
 				<div className="inline-flex items-center justify-center rounded-[6.25px] border border-[#C2C5CC] bg-[#EEEFF1] px-[3px] py-[3px]">
-					<span className="text-nowrap font-inter text-[10.7px] font-normal text-[#7C7D8C]">
+					<span className="text-nowrap font-inter text-[10.7px] text-[#7C7D8C]">
 						{start}
 					</span>
 				</div>
@@ -174,7 +174,7 @@ export const columns: ColumnDef<Project>[] = [
 
 			return (
 				<div className="inline-flex items-center justify-center rounded-[5.75px] border border-[#FEC4BE] bg-[#F9E6E7] px-2 py-1.5">
-					<span className="font-inter text-xs font-normal text-[#E47174]">
+					<span className="font-inter text-xs text-[#E47174]">
 						{diffDays} hari
 					</span>
 				</div>

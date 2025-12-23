@@ -174,7 +174,7 @@ export default function TransactionDetailPage({
 }) {
   return (
     <div className="container mx-auto max-w-6xl space-y-6 p-4 md:p-6">
-      <div className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
+      <div className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-card p-6 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">

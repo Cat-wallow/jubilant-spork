@@ -27,7 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import api from '@/lib/api';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   ChevronLeft,
   ChevronRight,
@@ -74,11 +74,19 @@ const formatNpwp = (value: unknown) => {
   return formatted;
 };
 
+const parseDateString = (value: unknown) => {
+  if (typeof value !== 'string' || !value) return undefined;
+  const parts = value.split('-');
+  if (parts.length !== 3) return undefined;
+  const [y, m, d] = parts.map(Number);
+  return new Date(y, m - 1, d);
+};
+
 // Complete form validation schema for all sections
 const clientFormSchema = z.object({
   // Basic Information
   basicInfo: z.object({
-    code: z.string().min(1, 'Kode client wajib diisi'),
+    code: z.string().optional(),
     name: z.string().min(1, 'Nama client wajib diisi'),
     legal_name: z.string().min(1, 'Nama legal wajib diisi'),
     brand_name: z.string().optional(),
@@ -279,7 +287,6 @@ export function CreateClientModalUpdated({
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [coaTemplateOptions, setCoaTemplateOptions] = useState<Array<{ key: string; label: string }>>([]);
   const [missingDocs, setMissingDocs] = useState<string[]>([]);
-  const { toast } = useToast();
   const submitIntentRef = useRef(false);
 
   const {
@@ -624,10 +631,8 @@ export function CreateClientModalUpdated({
         });
 
         if (missing.length > 0) {
-          toast({
-            title: 'Dokumen legal belum lengkap',
+          toast.error('Dokumen legal belum lengkap', {
             description: 'Setiap dokumen wajib diupload atau pilih "Tidak tersedia".',
-            variant: 'destructive',
           });
           setIsSubmitting(false);
           return;
@@ -679,18 +684,15 @@ export function CreateClientModalUpdated({
       };
 
       await onSubmit(transformedData);
-      toast({
-        title: 'Sukses',
+      toast.success('Sukses', {
         description: 'Client berhasil dibuat',
       });
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error creating client:', error);
       const errorMessage = error?.response?.data?.message || error?.message || 'Terjadi kesalahan saat membuat klien';
-      toast({
-        title: 'Gagal membuat klien',
+      toast.error('Gagal membuat klien', {
         description: errorMessage,
-        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -711,10 +713,8 @@ export function CreateClientModalUpdated({
     const step = getFirstInvalidStep(errs);
     setCurrentStep(step);
     const first = getFirstError(errs);
-    toast({
-      title: 'Form belum lengkap',
+    toast.error('Form belum lengkap', {
       description: first?.message || 'Masih ada field yang wajib diisi. Cek input yang berwarna merah.',
-      variant: 'destructive',
     });
 
     if (first?.path) {
@@ -764,10 +764,8 @@ export function CreateClientModalUpdated({
 
       if (missing.length > 0) {
         setMissingDocs(missing);
-        toast({
-          title: 'Dokumen legal belum lengkap',
+        toast.error('Dokumen legal belum lengkap', {
           description: 'Mohon lengkapi status dokumen yang ditandai merah (Upload atau pilih "Tidak tersedia").',
-          variant: 'destructive',
         });
         return;
       }
@@ -796,15 +794,14 @@ export function CreateClientModalUpdated({
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="basicInfo.code">Kode Client *</Label>
+                <Label htmlFor="basicInfo.code">Kode Client</Label>
                 <Input
                   id="basicInfo.code"
+                  disabled
                   {...register('basicInfo.code')}
-                  placeholder="C001"
+                  placeholder="Auto-generated"
+                  className="bg-muted text-muted-foreground"
                 />
-                {errors.basicInfo?.code && (
-                  <p className="text-red-500 text-sm">{errors.basicInfo.code.message}</p>
-                )}
               </div>
               <div>
                 <Label htmlFor="basicInfo.name">Nama Client *</Label>
@@ -1342,10 +1339,16 @@ export function CreateClientModalUpdated({
                   </div>
                   <div>
                     <Label htmlFor="taxInfo.registered_letter_date">Tanggal Surat</Label>
-                    <Input
-                      id="taxInfo.registered_letter_date"
-                      type="date"
-                      {...register('taxInfo.registered_letter_date')}
+                    <Controller
+                      control={control}
+                      name="taxInfo.registered_letter_date"
+                      render={({ field }) => (
+                        <DatePicker
+                          value={parseDateString(field.value)}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          placeholder="Pilih tanggal"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1383,10 +1386,16 @@ export function CreateClientModalUpdated({
                   </div>
                   <div>
                     <Label htmlFor="taxInfo.pkp_confirmation_date">Tanggal Surat</Label>
-                    <Input
-                      id="taxInfo.pkp_confirmation_date"
-                      type="date"
-                      {...register('taxInfo.pkp_confirmation_date')}
+                    <Controller
+                      control={control}
+                      name="taxInfo.pkp_confirmation_date"
+                      render={({ field }) => (
+                        <DatePicker
+                          value={parseDateString(field.value)}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          placeholder="Pilih tanggal"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1446,9 +1455,16 @@ export function CreateClientModalUpdated({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Tanggal Surat</Label>
-                      <Input
-                        type="date"
-                        {...register(`taxInfo.otherTaxDocuments.${index}.document_date`)}
+                      <Controller
+                        control={control}
+                        name={`taxInfo.otherTaxDocuments.${index}.document_date`}
+                        render={({ field }) => (
+                          <DatePicker
+                             value={parseDateString(field.value)}
+                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                             placeholder="Pilih tanggal"
+                           />
+                        )}
                       />
                     </div>
                     <div>
@@ -1992,10 +2008,8 @@ export function CreateClientModalUpdated({
           } catch (e: any) {
             console.error(e);
             const msg = e?.response?.data?.message || e?.message || 'Upload dokumen gagal';
-            toast({
-              title: 'Upload gagal',
+            toast.error('Upload gagal', {
               description: msg,
-              variant: 'destructive',
             });
           }
         };
@@ -2003,7 +2017,7 @@ export function CreateClientModalUpdated({
         // Helper to mark document as not available
         const markAsNotAvailable = (docType: string) => {
           const existingIndex = currentDocs.findIndex(d => d.document_type === docType);
-          
+
           const newDoc = {
             document_type: docType,
             document_number: '',
@@ -2043,7 +2057,7 @@ export function CreateClientModalUpdated({
                 return (
                   <div key={docType.id} className={`border rounded-lg overflow-hidden ${isMissing ? 'border-red-500' : ''}`}>
                     {/* Document Header */}
-                    <div className={`flex items-center justify-between p-4 ${isMissing ? 'bg-red-50 dark:bg-red-900/20' : 'bg-white dark:bg-slate-900'}`}>
+                    <div className={`flex items-center justify-between p-4 ${isMissing ? 'bg-red-50 dark:bg-red-900/20' : 'bg-card dark:bg-slate-900'}`}>
                       <div>
                         <p className="font-medium text-blue-900 dark:text-blue-100">{docType.label}</p>
                         <p className="text-xs text-muted-foreground">Format: {docType.format}</p>
@@ -2078,10 +2092,10 @@ export function CreateClientModalUpdated({
                           </Button>
                         )}
                         {isUploaded && (
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
                             className="text-red-500 hover:text-red-700"
                             onClick={() => {
                               setValue('legalDocuments', currentDocs.filter(d => d.document_type !== docType.id));
@@ -2107,9 +2121,9 @@ export function CreateClientModalUpdated({
                                 Upload
                               </span>
                             </label>
-                            <Button 
-                              type="button" 
-                              variant="secondary" 
+                            <Button
+                              type="button"
+                              variant="secondary"
                               size="sm"
                               className="bg-slate-700 text-white hover:bg-slate-800"
                               onClick={() => markAsNotAvailable(docType.id)}
@@ -2135,9 +2149,9 @@ export function CreateClientModalUpdated({
                                 Upload
                               </span>
                             </label>
-                            <Button 
-                              type="button" 
-                              variant="secondary" 
+                            <Button
+                              type="button"
+                              variant="secondary"
                               size="sm"
                               className="bg-slate-700 text-white hover:bg-slate-800"
                               disabled
@@ -2181,7 +2195,7 @@ export function CreateClientModalUpdated({
             <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg text-sm text-blue-700 dark:text-blue-300">
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <p>
-                Dokumen yang diupload akan disimpan dengan enkripsi dan hanya dapat diakses oleh tim yang berwenang. 
+                Dokumen yang diupload akan disimpan dengan enkripsi dan hanya dapat diakses oleh tim yang berwenang.
                 Pastikan dokumen yang diupload sudah benar dan masih berlaku.
               </p>
             </div>
@@ -2195,21 +2209,21 @@ export function CreateClientModalUpdated({
         const legalDocs = watchedValues.legalDocuments || [];
         const preferences = watchedValues.preferences;
         const errorList = flattenErrors(errors);
-        
+
         // Calculate completeness
         const uploadedDocs = legalDocs.filter(d => d.status === 'uploaded' || d.status === 'verified').length;
         const totalDocs = legalDocs.length;
         const completenessPercent = totalDocs > 0 ? Math.round((uploadedDocs / totalDocs) * 100) : 100;
-        
+
         // Get primary contact
         const primaryContact = contacts.find(c => c.is_primary);
         const billingContact = contacts.find(c => c.is_billing_contact);
-        
+
         // Get applicable taxes for display
         const activeTaxes = taxInfo?.applicable_taxes || [];
-        
+
         // Get PKP effective date
-        const pkpDate = taxInfo?.pkp_confirmation_date 
+        const pkpDate = taxInfo?.pkp_confirmation_date
           ? new Date(taxInfo.pkp_confirmation_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })
           : '-';
 
@@ -2431,11 +2445,11 @@ export function CreateClientModalUpdated({
                     ktp_direktur: 'KTP Direktur',
                   };
                   const isUploaded = doc.status === 'uploaded' || doc.status === 'verified';
-                  
+
                   return (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg"
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-card dark:bg-slate-900 rounded-lg"
                     >
                       <div>
                         <p className="font-medium text-blue-900 dark:text-blue-100">
@@ -2446,7 +2460,7 @@ export function CreateClientModalUpdated({
                           {doc.upload_date && ` • Diupload ${new Date(doc.upload_date).toLocaleDateString('id-ID')}`}
                         </p>
                       </div>
-                      <Badge 
+                      <Badge
                         variant={isUploaded ? 'default' : 'secondary'}
                         className={isUploaded ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : ''}
                       >
@@ -2545,8 +2559,8 @@ export function CreateClientModalUpdated({
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={() => {

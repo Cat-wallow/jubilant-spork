@@ -39,12 +39,9 @@ export function TimelineFilters({
 			<div className="flex items-center gap-5">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button
-							variant="outline"
-							className="h-[42px] rounded-[10px] border-[#D9D9D9]"
-						>
-							<span className="text-[#49454F]">{selectedModule}</span>
-							<ChevronDown className="ml-1 h-3 w-3 text-[#332687]" />
+						<Button variant="outline" className="h-[42px] rounded-[10px] ">
+							<span className="text-muted-foreground">{selectedModule}</span>
+							<ChevronDown className="ml-1 h-3 w-3 text-primary" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
@@ -61,12 +58,9 @@ export function TimelineFilters({
 
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button
-							variant="outline"
-							className="h-[42px] rounded-[10px] border-[#D9D9D9]"
-						>
-							<span className="text-[#49454F]">{selectedMilestone}</span>
-							<ChevronDown className="ml-1 h-3 w-3 text-[#332687]" />
+						<Button variant="outline" className="h-[42px] rounded-[10px] ">
+							<span className="text-muted-foreground">{selectedMilestone}</span>
+							<ChevronDown className="ml-1 h-3 w-3 text-primary" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
@@ -83,12 +77,9 @@ export function TimelineFilters({
 
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button
-							variant="outline"
-							className="h-[42px] rounded-[10px] border-[#D9D9D9]"
-						>
-							<span className="text-[#49454F]">{selectedZoom}</span>
-							<ChevronDown className="ml-1 h-3 w-3 text-[#332687]" />
+						<Button variant="outline" className="h-[42px] rounded-[10px] ">
+							<span className="text-muted-foreground">{selectedZoom}</span>
+							<ChevronDown className="ml-1 h-3 w-3 text-primary" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
@@ -104,32 +95,29 @@ export function TimelineFilters({
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				<Button
-					variant="outline"
-					className="h-[42px] rounded-[10px] border-[#D9D9D9]"
-				>
-					<Filter className="h-[18px] w-[18px] text-[#332687]" />
-					<span className="text-[#49454F]">Filter</span>
+				<Button variant="outline" className="h-[42px] rounded-[10px] ">
+					<Filter className="h-[18px] w-[18px] text-primary" />
+					<span className="text-muted-foreground">Filter</span>
 				</Button>
 			</div>
 
 			<div className="flex items-center gap-5">
 				<Button
 					variant="outline"
-					className="h-[42px] rounded-[5px] border-[rgba(145,158,171,0.20)]"
+					className="h-[42px] rounded-[5px] "
 					onClick={onExportPNG}
 				>
-					<Download className="h-[30px] w-[30px] text-[#404040]" />
-					<span className="text-[#404040] text-base font-medium">PNG</span>
+					<Download className="h-[30px] w-[30px] " />
+					<span className=" text-base font-medium">PNG</span>
 				</Button>
 
 				<Button
 					variant="outline"
-					className="h-[42px] rounded-[5px] border-[rgba(145,158,171,0.20)]"
+					className="h-[42px] rounded-[5px] "
 					onClick={onExportPDF}
 				>
-					<Download className="h-[30px] w-[30px] text-[#404040]" />
-					<span className="text-[#404040] text-base font-medium">PDF</span>
+					<Download className="h-[30px] w-[30px] " />
+					<span className=" text-base font-medium">PDF</span>
 				</Button>
 			</div>
 

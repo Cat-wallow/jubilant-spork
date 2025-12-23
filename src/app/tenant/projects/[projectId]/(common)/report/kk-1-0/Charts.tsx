@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import BarChart from "@/components/charts/BarChart";
 import LineChart from "@/components/charts/LineChart";
 
@@ -119,32 +125,38 @@ export function Charts({ volumeChart, anomalyTrendChart }: ChartsProps) {
 	return (
 		<div className="grid grid-cols-1 gap-[30px] lg:grid-cols-2">
 			{/* Volume Chart */}
-			<Card className="border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="border  p-[30px]">
 				<CardHeader className="p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						Volume Berdasarkan Jenis Transaksi
 					</CardTitle>
 				</CardHeader>
 				<CardContent className="p-0">
 					<div className="h-[350px]">
-						<BarChart chartData={volumeChart.series} chartOptions={barChartOptions} />
+						<BarChart
+							chartData={volumeChart.series}
+							chartOptions={barChartOptions}
+						/>
 					</div>
 				</CardContent>
 			</Card>
 
 			{/* Anomaly Trend Chart */}
-			<Card className="border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="border  p-[30px]">
 				<CardHeader className="p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						Tren Anomali
 					</CardTitle>
-					<CardDescription className="font-roboto text-xs text-[#8C8C8C]">
+					<CardDescription className=" text-xs text-[#8C8C8C]">
 						Tren transaksi yang bersifat anomali
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="p-0">
 					<div className="h-[350px]">
-						<LineChart chartData={anomalyTrendChart.series} chartOptions={lineChartOptions} />
+						<LineChart
+							chartData={anomalyTrendChart.series}
+							chartOptions={lineChartOptions}
+						/>
 					</div>
 				</CardContent>
 			</Card>

@@ -40,7 +40,7 @@ export function BoardChart({ cards }: BoardChartProps) {
 
 	return (
 		<div id="board-chart-export" className="space-y-4">
-			<Card className="overflow-hidden border-2 border-[#D9D9D9] rounded-[30px]">
+			<Card className="overflow-hidden border-2  rounded-[30px]">
 				<div className="p-6">
 					<div className="grid grid-cols-3 gap-6">
 						{columns.map((status) => (
@@ -77,10 +77,7 @@ export function BoardChart({ cards }: BoardChartProps) {
 												</div>
 
 												<div className="flex items-center gap-2">
-													<Badge
-														variant="secondary"
-														className="text-xs font-normal"
-													>
+													<Badge variant="secondary" className="text-xs">
 														{card.module}
 													</Badge>
 												</div>

@@ -82,7 +82,7 @@ export function GanttChart({ tasks }: GanttChartProps) {
 				</Button>
 			</div>
 
-			<Card className="overflow-hidden border-2 border-[#D9D9D9] rounded-[30px]">
+			<Card className="overflow-hidden border-2  rounded-[30px]">
 				<div className="p-6">
 					<div className="flex">
 						<div className="w-48 flex-shrink-0">

@@ -43,7 +43,7 @@ export function IssueCard({ issue }: IssueCardProps) {
 			case "DONE":
 				return "bg-[#01B574]";
 			default:
-				return "bg-[#332687]";
+				return "bg-primary";
 		}
 	};
 
@@ -52,18 +52,18 @@ export function IssueCard({ issue }: IssueCardProps) {
 			<div className="flex flex-col items-start gap-2.5 self-stretch rounded-[10px]">
 				<div className="flex items-center justify-between self-stretch">
 					<div className="flex items-center gap-2.5">
-						<span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#2B3674]">
+						<span className=" text-xs leading-4 tracking-[0.4px] text-primary">
 							{issue.taskId}
 						</span>
 						{issue.module && (
-							<div className="flex items-center justify-center gap-2.5 rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2.5 py-1.5">
-								<span className="font-inter text-xs font-normal text-[#8C8C8C]">
+							<div className="flex items-center justify-center gap-2.5 rounded-[5px] border  px-2.5 py-1.5">
+								<span className="font-inter text-xs text-[#8C8C8C]">
 									{issue.module}
 								</span>
 							</div>
 						)}
 						<span
-							className={`font-inter text-[10px] font-normal ${getPriorityColor(issue.priority)}`}
+							className={`font-inter text-[10px] ${getPriorityColor(issue.priority)}`}
 						>
 							{issue.priority}
 						</span>
@@ -87,10 +87,10 @@ export function IssueCard({ issue }: IssueCardProps) {
 				</div>
 
 				<div className="flex flex-col gap-1.5">
-					<h3 className="font-roboto text-base font-medium leading-6 tracking-[0.15px] text-[#404040]">
+					<h3 className=" text-base font-medium leading-6 tracking-[0.15px] ">
 						{issue.title}
 					</h3>
-					<p className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
+					<p className=" text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
 						{issue.description}
 					</p>
 					<div className="flex items-center gap-1.5">
@@ -99,7 +99,7 @@ export function IssueCard({ issue }: IssueCardProps) {
 							strokeWidth={2.5}
 						/>
 						<span
-							className={`font-roboto text-xs font-normal leading-4 tracking-[0.4px] ${
+							className={` text-xs leading-4 tracking-[0.4px] ${
 								issue.isOverdue ? "text-[#BF6A02]" : "text-[#8C8C8C]"
 							}`}
 						>
@@ -131,19 +131,19 @@ export function IssueCard({ issue }: IssueCardProps) {
 						<div className="flex items-center gap-1.5">
 							<div className="flex items-center gap-1.5">
 								<CheckSquare className="h-5 w-5 text-[#8C8C8C]" />
-								<span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
+								<span className=" text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
 									{issue.checkboxes}/{issue.checkboxTotal}
 								</span>
 							</div>
 							<div className="flex items-center gap-1.5">
 								<MessageSquare className="h-[18px] w-[18px] text-[#8C8C8C]" />
-								<span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
+								<span className=" text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
 									{issue.comments}/{issue.commentTotal}
 								</span>
 							</div>
 							<div className="flex items-center gap-1.5">
 								<Paperclip className="h-[18px] w-[18px] text-[#8C8C8C]" />
-								<span className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-[#8C8C8C]">
+								<span className=" text-xs leading-4 tracking-[0.4px] text-[#8C8C8C]">
 									{issue.attachments}/{issue.attachmentTotal}
 								</span>
 							</div>
@@ -155,7 +155,7 @@ export function IssueCard({ issue }: IssueCardProps) {
 								issue.actionButton,
 							)}`}
 						>
-							<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
+							<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-white">
 								{issue.actionButton}
 							</span>
 						</Button>

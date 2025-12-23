@@ -58,10 +58,10 @@ export default function VerifyEmailPage() {
 
         {/* Header */}
         <div className="space-y-2 text-center">
-          <h1 className="text-xl font-normal leading-[56px] tracking-[-0.48px] text-navy-700 dark:text-white">
+          <h1 className="text-xl leading-[56px] tracking-[-0.48px] text-navy-700 dark:text-white">
             Periksa email masuk!
           </h1>
-          <p className="text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
+          <p className="text-sm leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
             Tautan verifikasi telah dikirim ke{' '}
             <span className="font-medium text-navy-700 dark:text-white">
               {email || 'email Anda'}
@@ -71,7 +71,7 @@ export default function VerifyEmailPage() {
 
         {/* Instructions Box */}
         <div className="w-full rounded-[15px] border border-gray-300 p-[15px] dark:border-white/30">
-          <p className="text-sm font-normal leading-[150%] text-gray-600 dark:text-gray-400">
+          <p className="text-sm leading-[150%] text-gray-600 dark:text-gray-400">
             Periksa kotak masuk Anda dan klik tautan untuk mengatur ulang kata sandi. Jika tidak
             menerima email dalam 60 detik, kirim ulang email verifikasi.
           </p>

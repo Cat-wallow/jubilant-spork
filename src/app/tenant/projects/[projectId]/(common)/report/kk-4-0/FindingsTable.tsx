@@ -71,9 +71,9 @@ export function FindingsTable({ data }: FindingsTableProps) {
 			case "Medium":
 				return "text-[rgba(191,106,2,1)]";
 			case "Low":
-				return "text-[#404040]";
+				return "";
 			default:
-				return "text-[#404040]";
+				return "";
 		}
 	};
 
@@ -95,35 +95,35 @@ export function FindingsTable({ data }: FindingsTableProps) {
 			<CardHeader className="space-y-4 p-6">
 				<div className="flex items-start justify-between">
 					<div>
-						<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+						<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 							Detail Temuan/QC
 						</CardTitle>
-						<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+						<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 							Kelola Invoice di dalam Project
 						</p>
 					</div>
 					<div className="flex items-center justify-end gap-[10px]">
 						<Button
 							variant="outline"
-							className="h-[48px] gap-1 rounded-[10px] border-[#D9D9D9]"
+							className="h-[48px] gap-1 rounded-[10px] "
 						>
-							<Download className="h-[30px] w-[30px] text-[#404040]" />
-							<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+							<Download className="h-[30px] w-[30px] " />
+							<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 								Export XLSX
 							</span>
 						</Button>
 						<Button
 							variant="outline"
-							className="h-[48px] gap-1 rounded-[10px] border-[#D9D9D9]"
+							className="h-[48px] gap-1 rounded-[10px] "
 						>
-							<Download className="h-[30px] w-[30px] text-[#404040]" />
-							<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+							<Download className="h-[30px] w-[30px] " />
+							<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 								Export PDF
 							</span>
 						</Button>
 						<Button className="h-[48px] gap-1 rounded-[10px] bg-[#4318FF] hover:bg-[#4318FF]/90">
 							<Plus className="h-6 w-6 text-white" />
-							<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
+							<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-white">
 								Tambahkan Issue
 							</span>
 						</Button>
@@ -133,9 +133,9 @@ export function FindingsTable({ data }: FindingsTableProps) {
 				{/* Filters */}
 				<div className="flex items-center gap-5">
 					<Select defaultValue="20">
-						<SelectTrigger className="h-[54px] w-auto rounded-[10px] border-[#D9D9D9]">
+						<SelectTrigger className="h-[54px] w-auto rounded-[10px] ">
 							<SelectValue />
-							<ChevronDown className="h-3 w-6 text-[#332687]" />
+							<ChevronDown className="h-3 w-6 text-primary" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="20">20</SelectItem>
@@ -145,20 +145,20 @@ export function FindingsTable({ data }: FindingsTableProps) {
 					</Select>
 
 					<div className="relative flex-1">
-						<Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#332687]" />
+						<Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-primary" />
 						<Input
 							placeholder="Nama tugas"
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="h-[54px] rounded-[10px] border-[#D9D9D9] pl-12 font-dm text-base text-[#8F9BBA]"
+							className="h-[54px] rounded-[10px]  pl-12 font-dm text-base text-muted-foreground"
 						/>
 					</div>
 
 					<div className="flex items-center gap-[10px]">
 						<Select defaultValue="all-status">
-							<SelectTrigger className="h-[54px] w-auto rounded-[10px] border-[#D9D9D9]">
+							<SelectTrigger className="h-[54px] w-auto rounded-[10px] ">
 								<SelectValue placeholder="All Status" />
-								<ChevronDown className="h-3 w-6 text-[#332687]" />
+								<ChevronDown className="h-3 w-6 text-primary" />
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="all-status">All Status</SelectItem>
@@ -169,9 +169,9 @@ export function FindingsTable({ data }: FindingsTableProps) {
 						</Select>
 
 						<Select defaultValue="all-type">
-							<SelectTrigger className="h-[54px] w-auto rounded-[10px] border-[#D9D9D9]">
+							<SelectTrigger className="h-[54px] w-auto rounded-[10px] ">
 								<SelectValue placeholder="All Type" />
-								<ChevronDown className="h-3 w-6 text-[#332687]" />
+								<ChevronDown className="h-3 w-6 text-primary" />
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="all-type">All Type</SelectItem>
@@ -182,10 +182,10 @@ export function FindingsTable({ data }: FindingsTableProps) {
 
 						<Button
 							variant="outline"
-							className="h-[54px] gap-1 rounded-[10px] border-[#D9D9D9]"
+							className="h-[54px] gap-1 rounded-[10px] "
 						>
-							<Filter className="h-[18px] w-[18px] text-[#332687]" />
-							<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+							<Filter className="h-[18px] w-[18px] text-primary" />
+							<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 								Filter
 							</span>
 						</Button>
@@ -210,21 +210,28 @@ export function FindingsTable({ data }: FindingsTableProps) {
 							onCheckedChange={toggleSelectAll}
 							className="h-6 w-6"
 						/>
-						<div className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<div className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
 							Task
 						</div>
-						<ChevronDown className="h-6 w-6 flex-shrink-0 text-[#A3AED0]" />
+						<ChevronDown className="h-6 w-6 flex-shrink-0 text-muted-foreground" />
 					</div>
-					{["Modul", "Assignee", "Priority", "Status", "Progress", "Due", "Update", "Action"].map(
-						(header) => (
-							<div key={header} className="flex w-[120px] items-center gap-[7px]">
-								<div className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-[#A3AED0]">
-									{header}
-								</div>
-								<ChevronDown className="h-6 w-6 flex-shrink-0 text-[#A3AED0]" />
+					{[
+						"Modul",
+						"Assignee",
+						"Priority",
+						"Status",
+						"Progress",
+						"Due",
+						"Update",
+						"Action",
+					].map((header) => (
+						<div key={header} className="flex w-[120px] items-center gap-[7px]">
+							<div className="font-dm text-sm font-medium leading-6 tracking-[-0.28px] text-muted-foreground">
+								{header}
 							</div>
-						),
-					)}
+							<ChevronDown className="h-6 w-6 flex-shrink-0 text-muted-foreground" />
+						</div>
+					))}
 				</div>
 
 				<div className="h-px w-[1450px] bg-border" />
@@ -238,13 +245,15 @@ export function FindingsTable({ data }: FindingsTableProps) {
 								onCheckedChange={() => toggleSelectItem(row.id)}
 								className="h-6 w-6"
 							/>
-							<div className="w-[120px] flex-shrink-0 font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+							<div className="w-[120px] flex-shrink-0  text-xs leading-4 tracking-[0.4px] text-primary">
 								{row.task}
 							</div>
 						</div>
 						<div className="w-[120px]">
-							<div className="flex items-center justify-center gap-[10px] rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2 py-1">
-								<div className="font-inter text-xs text-[#332687]">{row.module}</div>
+							<div className="flex items-center justify-center gap-[10px] rounded-[5px] border  px-2 py-1">
+								<div className="font-inter text-xs text-primary">
+									{row.module}
+								</div>
 							</div>
 						</div>
 						<div className="flex w-[120px] items-center gap-[10px]">
@@ -253,13 +262,13 @@ export function FindingsTable({ data }: FindingsTableProps) {
 									{row.assignee.initials}
 								</div>
 							</div>
-							<div className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#404040]">
+							<div className=" text-xs leading-4 tracking-[0.4px] ">
 								{row.assignee.name}
 							</div>
 						</div>
 						<div className="w-[120px]">
 							<div
-								className={`flex items-center justify-center gap-[10px] rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2 py-1 ${getPriorityColor(row.priority)}`}
+								className={`flex items-center justify-center gap-[10px] rounded-[5px] border  px-2 py-1 ${getPriorityColor(row.priority)}`}
 							>
 								<div className="font-inter text-xs">{row.priority}</div>
 							</div>
@@ -269,14 +278,14 @@ export function FindingsTable({ data }: FindingsTableProps) {
 								variant="secondary"
 								className={`min-w-[48px] rounded-[50px] ${getStatusColor(row.status)}`}
 							>
-								<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#4A4459]">
+								<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-[#4A4459]">
 									{row.status}
 								</span>
 							</Badge>
 						</div>
 						<div className="w-[120px]">
 							<div className="flex w-[120px] items-center gap-[6px]">
-								<div className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+								<div className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 									{row.progress}%
 								</div>
 								<div className="relative h-2 w-[63px] flex-shrink-0">
@@ -285,7 +294,7 @@ export function FindingsTable({ data }: FindingsTableProps) {
 							</div>
 						</div>
 						<div className="flex w-[120px] items-center gap-[5px]">
-							<div className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+							<div className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 								{row.due}
 							</div>
 							{row.daysOverdue && (
@@ -293,13 +302,13 @@ export function FindingsTable({ data }: FindingsTableProps) {
 									variant="secondary"
 									className="min-w-[48px] rounded-[50px] bg-[rgba(236,34,31,1)]"
 								>
-									<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
+									<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-white">
 										{row.daysOverdue}d
 									</span>
 								</Badge>
 							)}
 						</div>
-						<div className="w-[120px] font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#2B3674]">
+						<div className="w-[120px] font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-primary">
 							{row.updated}
 						</div>
 						<div className="w-[120px]">
@@ -307,7 +316,9 @@ export function FindingsTable({ data }: FindingsTableProps) {
 								variant="outline"
 								className="h-[38px] w-[65px] rounded-[5.75px] border-[#C5C4C5]"
 							>
-								<span className="font-inter text-[13.2px] font-bold text-[#676A79]">View</span>
+								<span className="font-inter text-[13.2px] font-bold text-[#676A79]">
+									View
+								</span>
 							</Button>
 						</div>
 					</div>

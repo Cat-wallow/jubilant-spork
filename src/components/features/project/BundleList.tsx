@@ -300,7 +300,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
                       id="date"
                       variant={"outline"}
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left",
                         !date && "text-muted-foreground"
                       )}
                     >
@@ -368,7 +368,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="border-none bg-blue-50/70 dark:bg-blue-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <CheckCircle2 className="h-5 w-5 text-blue-600" />
             </div>
             <div>
@@ -383,7 +383,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
 
         <Card className="border-none bg-red-50/70 dark:bg-red-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <div>
@@ -396,7 +396,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
 
         <Card className="border-none bg-violet-50/70 dark:bg-violet-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <FileText className="h-5 w-5 text-violet-600" />
             </div>
             <div>
@@ -409,7 +409,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
 
         <Card className="border-none bg-emerald-50/70 dark:bg-emerald-950/30">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="rounded-full bg-white/80 p-3 shadow-sm">
+            <div className="rounded-full bg-card/80 p-3 shadow-sm">
               <Clock className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
@@ -522,9 +522,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[200px]">Nama Bundle</TableHead>
-                  <TableHead>Tipe</TableHead>
                   <TableHead>Periode</TableHead>
-                  <TableHead>Assignee</TableHead>
                   <TableHead>Gaps</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Updated</TableHead>
@@ -536,8 +534,6 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-10" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-20" /></TableCell>
@@ -547,7 +543,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
                   ))
                 ) : pageItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       Tidak ada bundle ditemukan.
                     </TableCell>
                   </TableRow>
@@ -561,16 +557,7 @@ export function BundleList({ projectId, tenantId, userId, userName }: BundleList
                       <TableCell className="font-medium">
                         {bundle.name}
                       </TableCell>
-                      <TableCell>{bundle.bundleType}</TableCell>
                       <TableCell>{bundle.period}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-[10px] font-medium text-blue-700">
-                            {bundle.assignee?.charAt(0) || '?'}
-                          </div>
-                          <span className="text-sm">{bundle.assignee}</span>
-                        </div>
-                      </TableCell>
                       <TableCell>
                         {bundle.gaps > 0 ? (
                           <span className="flex items-center text-red-600 text-sm font-medium">

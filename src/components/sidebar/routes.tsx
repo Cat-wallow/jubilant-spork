@@ -104,7 +104,7 @@ const routes = [
 		permission: ["client:read", "client:manage"],
 	},
 	{
-		name: "Perusahaan",
+		name: "Tenants",
 		layout: "/tenant",
 		path: "tenants",
 		icon: (
@@ -120,12 +120,12 @@ const routes = [
 				/>
 			</svg>
 		),
-		permission: ["tenant:tenant_manage", "tenant:tenant_read"],
+		permission: ["tenant:manage", "tenant:read"],
 	},
 	{
 		name: "Tenants",
 		layout: "/platform",
-		path: "tenants",
+		path: "tenantss",
 		icon: (
 			<svg
 				className="h-6 w-6"
@@ -139,7 +139,7 @@ const routes = [
 				/>
 			</svg>
 		),
-		permission: ["platform:tenant_manage", "platform:tenant_read"],
+		permission: ["tenant:manage", "tenant:read"],
 	},
 	{
 		name: "Manajemen Pengguna",

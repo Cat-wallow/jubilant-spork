@@ -3,7 +3,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import { useDebounce } from "use-debounce";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,11 +27,22 @@ import {
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import RBAC from "@/components/rbac/RBAC";
 import { cn } from "@/lib/utils";
 import {
@@ -154,7 +170,9 @@ function TasksPageContent() {
 	const [assigneeSearch, setAssigneeSearch] = useState("");
 	const [debouncedAssigneeSearch] = useDebounce(assigneeSearch, 350);
 	const [isAssigneePopoverOpen, setIsAssigneePopoverOpen] = useState(false);
-	const [manualAssignee, setManualAssignee] = useState<ProjectMember | null>(null);
+	const [manualAssignee, setManualAssignee] = useState<ProjectMember | null>(
+		null,
+	);
 
 	const { data: tasksData, isLoading: isTasksLoading } = useQuery({
 		queryKey: ["projectTasks", projectId],
@@ -226,7 +244,9 @@ function TasksPageContent() {
 		},
 	});
 
-	const { data: membersData, isLoading: isMembersLoading } = useQuery<Awaited<ReturnType<typeof getProjectMembers>>>({
+	const { data: membersData, isLoading: isMembersLoading } = useQuery<
+		Awaited<ReturnType<typeof getProjectMembers>>
+	>({
 		queryKey: ["projectMembers", projectId, debouncedAssigneeSearch],
 		queryFn: () =>
 			getProjectMembers({
@@ -277,7 +297,10 @@ function TasksPageContent() {
 		},
 		onError: (error) => {
 			console.error("Create task failed:", error);
-			const message = (error as any)?.response?.data?.message || (error as Error).message || "Terjadi kesalahan";
+			const message =
+				(error as any)?.response?.data?.message ||
+				(error as Error).message ||
+				"Terjadi kesalahan";
 			toast.error("Gagal", { description: `Task gagal dibuat: ${message}` });
 		},
 	});
@@ -379,74 +402,72 @@ function TasksPageContent() {
 	};
 
 	const uniqueModules = Array.from(new Set(tasks.map((t) => t.module)));
-	const uniqueAssignees = Array.from(
-		new Set(tasks.map((t) => t.assigneeName)),
-	);
+	const uniqueAssignees = Array.from(new Set(tasks.map((t) => t.assigneeName)));
 
 	return (
 		<div className="flex w-full flex-col gap-[30px] ">
 			{/* Status summary cards */}
 			<div className="grid grid-cols-4 gap-[30px]">
 				<Card className="flex h-[97px] items-center gap-[18px] rounded-[20px] px-5 py-[6px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<ClipboardList className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<ClipboardList className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Not Started
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["TODO"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-muted-foreground">
 							12 My task
 						</span>
 					</div>
 				</Card>
 				<Card className="flex h-[97px] items-center gap-[18px] rounded-[20px] px-5 py-[6px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<PlayCircle className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<PlayCircle className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							In Progress
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["IN_PROGRESS"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-muted-foreground">
 							2 My task
 						</span>
 					</div>
 				</Card>
 				<Card className="flex h-[97px] items-center gap-[18px] rounded-[20px] px-5 py-[6px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<Eye className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<Eye className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Awaiting Review and Approval
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["IN_REVIEW"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-muted-foreground">
 							2 My task
 						</span>
 					</div>
 				</Card>
 				<Card className="flex h-[97px] items-center gap-[18px] rounded-[20px] px-5 py-[6px]">
-					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-[#F4F7FE]">
-						<CheckCircle2 className="h-[30px] w-[30px] text-[#332687]" />
+					<div className="flex h-14 w-14 items-center justify-center rounded-[28px] bg-background">
+						<CheckCircle2 className="h-[30px] w-[30px] text-primary" />
 					</div>
 					<div className="flex flex-col">
-						<span className="font-dm text-sm font-bold leading-6  text-[#A3AED0]">
+						<span className="font-dm text-sm font-bold leading-6  text-muted-foreground">
 							Complete
 						</span>
 						<span className="font-dm text-2xl font-bold leading-8  text-muted-foreground">
 							{statusCounts["DONE"]} Task
 						</span>
-						<span className="font-dm text-xs leading-5  text-[#A3AED0]">
+						<span className="font-dm text-xs leading-5  text-muted-foreground">
 							2 My task
 						</span>
 					</div>
@@ -499,7 +520,11 @@ function TasksPageContent() {
 										createTaskMutation.mutate(values),
 									)}
 								>
-									<input type="hidden" value={projectId} {...form.register("projectId")} />
+									<input
+										type="hidden"
+										value={projectId}
+										{...form.register("projectId")}
+									/>
 
 									<div className="grid gap-2">
 										<Label htmlFor="title">Title</Label>
@@ -522,7 +547,10 @@ function TasksPageContent() {
 
 									<div className="grid gap-2">
 										<Label>Assignee</Label>
-										<Popover open={isAssigneePopoverOpen} onOpenChange={setIsAssigneePopoverOpen}>
+										<Popover
+											open={isAssigneePopoverOpen}
+											onOpenChange={setIsAssigneePopoverOpen}
+										>
 											<PopoverTrigger asChild>
 												<Button
 													type="button"
@@ -665,15 +693,15 @@ function TasksPageContent() {
 								</form>
 							</DialogContent>
 						</Dialog>
-						<div className="inline-flex rounded-[10px] bg-[#F4F7FE] p-1">
+						<div className="inline-flex rounded-[10px] bg-background p-1">
 							<Button
 								variant={viewMode === "list" ? "default" : "ghost"}
 								size="icon"
 								className={cn(
 									"h-9 w-9 rounded-[8px]",
 									viewMode === "list"
-										? "bg-white text-[#332687]"
-										: "text-[#757575]",
+										? "bg-card text-primary"
+										: "text-muted-foreground",
 								)}
 								onClick={() => setViewMode("list")}
 							>
@@ -685,8 +713,8 @@ function TasksPageContent() {
 								className={cn(
 									"h-9 w-9 rounded-[8px]",
 									viewMode === "kanban"
-										? "bg-white text-[#332687]"
-										: "text-[#757575]",
+										? "bg-card text-primary"
+										: "text-muted-foreground",
 								)}
 								onClick={() => setViewMode("kanban")}
 							>
@@ -711,7 +739,7 @@ function TasksPageContent() {
 						</Select>
 					</div>
 					<div className="flex flex-1 min-w-[220px] items-center gap-2 rounded-[10px] border border-border bg-background px-3">
-						<FilterIcon className="h-4 w-4 text-[#332687]" />
+						<FilterIcon className="h-4 w-4 text-primary" />
 						<Input
 							placeholder="Cari nama tugas"
 							value={searchQuery}
@@ -819,7 +847,10 @@ function TasksPageContent() {
 						onTaskClick={(task) => setSelectedTask(task)}
 					/>
 				) : (
-					<KanbanView tasks={filteredTasks} onTaskClick={(task) => setSelectedTask(task)} />
+					<KanbanView
+						tasks={filteredTasks}
+						onTaskClick={(task) => setSelectedTask(task)}
+					/>
 				)}
 			</Card>
 
@@ -919,8 +950,8 @@ function TaskTableView({
 							</div>
 						</div>
 						<div className="flex flex-col items-end gap-1">
-							<div className="flex items-center gap-1 rounded-[6px] border border-[#D9D9D9] bg-[#F9FAFB] px-2 py-[3px] text-xs">
-								<CalendarDays className="h-3 w-3 text-[#332687]" />
+							<div className="flex items-center gap-1 rounded-[6px] border  bg-muted px-2 py-[3px] text-xs">
+								<CalendarDays className="h-3 w-3 text-primary" />
 								<span className="text-muted-foreground">{task.dueDate}</span>
 							</div>
 							{task.badge && (
@@ -943,7 +974,13 @@ function TaskTableView({
 	);
 }
 
-function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: Task) => void }) {
+function KanbanView({
+	tasks,
+	onTaskClick,
+}: {
+	tasks: Task[];
+	onTaskClick: (task: Task) => void;
+}) {
 	const columns: { key: TaskStatus; title: string }[] = [
 		{ key: "TODO", title: "To-Do" },
 		{ key: "IN_PROGRESS", title: "In-Progress" },
@@ -956,7 +993,7 @@ function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task:
 			{columns.map((col) => (
 				<div
 					key={col.key}
-					className="flex flex-col gap-3 rounded-[16px] bg-[#F4F7FE] p-3"
+					className="flex flex-col gap-3 rounded-[16px] bg-background p-3"
 				>
 					<div className="flex items-center justify-between">
 						<span className="text-sm font-semibold text-muted-foreground">
@@ -972,7 +1009,7 @@ function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task:
 							.map((task) => (
 								<div
 									key={task.id}
-									className="flex flex-col gap-2 rounded-[14px] border border-[#E2E8F0] bg-white p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+									className="flex flex-col gap-2 rounded-[14px] border border-[#E2E8F0] bg-card p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
 									onClick={() => onTaskClick(task)}
 								>
 									<div className="flex items-start justify-between gap-2">
@@ -1005,8 +1042,8 @@ function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task:
 													/>
 												</div>
 											</div>
-											<div className="flex items-center gap-1 rounded-[6px] border border-[#D9D9D9] bg-[#F9FAFB] px-2 py-[2px] text-[10px]">
-												<CalendarDays className="h-3 w-3 text-[#332687]" />
+											<div className="flex items-center gap-1 rounded-[6px] border  bg-muted px-2 py-[2px] text-[10px]">
+												<CalendarDays className="h-3 w-3 text-primary" />
 												<span className="text-primary">{task.dueDate}</span>
 											</div>
 										</div>
@@ -1061,7 +1098,7 @@ function StatusBadge({ status }: { status: TaskStatus }) {
 	const map: Record<TaskStatus, { label: string; className: string }> = {
 		TODO: {
 			label: "To-Do",
-			className: "bg-[#F4F7FE] text-muted-foreground",
+			className: "bg-background text-muted-foreground",
 		},
 		IN_PROGRESS: {
 			label: "In Progress",
@@ -1110,7 +1147,9 @@ function TaskDetailDialog({
 	const [isAssigneeOpen, setIsAssigneeOpen] = useState(false);
 	const [assigneeSearch, setAssigneeSearch] = useState("");
 	const [debouncedAssigneeSearch] = useDebounce(assigneeSearch, 350);
-	const [manualAssignee, setManualAssignee] = useState<ProjectMember | null>(null);
+	const [manualAssignee, setManualAssignee] = useState<ProjectMember | null>(
+		null,
+	);
 
 	const form = useForm<CreateTaskFormValues>({
 		resolver: zodResolver(createTaskFormSchema),
@@ -1153,7 +1192,9 @@ function TaskDetailDialog({
 		}
 	}, [task, form, projectId]);
 
-	const { data: membersData, isLoading: isMembersLoading } = useQuery<Awaited<ReturnType<typeof getProjectMembers>>>({
+	const { data: membersData, isLoading: isMembersLoading } = useQuery<
+		Awaited<ReturnType<typeof getProjectMembers>>
+	>({
 		queryKey: ["projectMembers", projectId, debouncedAssigneeSearch],
 		queryFn: () =>
 			getProjectMembers({
@@ -1170,7 +1211,9 @@ function TaskDetailDialog({
 	const selectedAssigneeId = form.watch("assignedUserId");
 	const selectedAssignee =
 		members.find((m) => m.userId === selectedAssigneeId) ||
-		(manualAssignee?.userId === selectedAssigneeId ? manualAssignee : undefined);
+		(manualAssignee?.userId === selectedAssigneeId
+			? manualAssignee
+			: undefined);
 
 	const updateMutation = useMutation({
 		mutationFn: async (values: CreateTaskFormValues) => {
@@ -1242,7 +1285,10 @@ function TaskDetailDialog({
 						<p>Apakah anda yakin ingin menghapus task ini?</p>
 					</div>
 					<DialogFooter>
-						<Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+						<Button
+							variant="outline"
+							onClick={() => setIsDeleteConfirmOpen(false)}
+						>
 							Batal
 						</Button>
 						<Button
@@ -1267,7 +1313,9 @@ function TaskDetailDialog({
 
 				<form
 					className="grid gap-6"
-					onSubmit={form.handleSubmit((values) => updateMutation.mutate(values))}
+					onSubmit={form.handleSubmit((values) =>
+						updateMutation.mutate(values),
+					)}
 				>
 					<div className="grid gap-4 border-b pb-4">
 						<h3 className="font-semibold">Informasi Utama</h3>
@@ -1464,7 +1512,9 @@ function TaskDetailDialog({
 								disabled={updateProgressMutation.isPending}
 								className="w-full"
 							>
-								{updateProgressMutation.isPending ? "Updating..." : "Update Progress"}
+								{updateProgressMutation.isPending
+									? "Updating..."
+									: "Update Progress"}
 							</Button>
 						</div>
 					</div>

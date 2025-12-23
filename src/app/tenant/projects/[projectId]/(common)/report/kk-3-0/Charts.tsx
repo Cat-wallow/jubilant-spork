@@ -41,9 +41,9 @@ export function Charts({ ppnNetChart, ppnDistributionChart }: ChartsProps) {
 	return (
 		<div className="grid grid-cols-1 gap-[30px] lg:grid-cols-2">
 			{/* Vertical Bar Chart - PPN Net per-Periode */}
-			<Card className="flex flex-col items-center rounded-[20px] border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="flex flex-col items-center rounded-[20px] border  p-[30px]">
 				<CardHeader className="h-[32px] w-full p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						{ppnNetChart.title}
 					</CardTitle>
 				</CardHeader>
@@ -67,8 +67,15 @@ export function Charts({ ppnNetChart, ppnDistributionChart }: ChartsProps) {
 					</div>
 					<div className="h-[358px] flex-1">
 						<ResponsiveContainer width="100%" height="100%">
-							<BarChart data={ppnNetChart.data} margin={{ top: 20, right: 0, left: 0, bottom: 20 }}>
-								<CartesianGrid strokeDasharray="0" stroke="#f1f1f1" vertical={false} />
+							<BarChart
+								data={ppnNetChart.data}
+								margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
+							>
+								<CartesianGrid
+									strokeDasharray="0"
+									stroke="#f1f1f1"
+									vertical={false}
+								/>
 								<XAxis
 									dataKey="month"
 									axisLine={false}
@@ -76,9 +83,24 @@ export function Charts({ ppnNetChart, ppnDistributionChart }: ChartsProps) {
 									tick={{ fill: "#737373", fontSize: 12, fontFamily: "Geist" }}
 								/>
 								<YAxis hide />
-								<Bar dataKey="keluaran" fill={COLORS[0]} radius={[4, 4, 0, 0]} barSize={32} />
-								<Bar dataKey="masukan" fill={COLORS[1]} radius={[4, 4, 0, 0]} barSize={32} />
-								<Bar dataKey="neto" fill={COLORS[2]} radius={[4, 4, 0, 0]} barSize={32} />
+								<Bar
+									dataKey="keluaran"
+									fill={COLORS[0]}
+									radius={[4, 4, 0, 0]}
+									barSize={32}
+								/>
+								<Bar
+									dataKey="masukan"
+									fill={COLORS[1]}
+									radius={[4, 4, 0, 0]}
+									barSize={32}
+								/>
+								<Bar
+									dataKey="neto"
+									fill={COLORS[2]}
+									radius={[4, 4, 0, 0]}
+									barSize={32}
+								/>
 							</BarChart>
 						</ResponsiveContainer>
 					</div>
@@ -86,9 +108,9 @@ export function Charts({ ppnNetChart, ppnDistributionChart }: ChartsProps) {
 			</Card>
 
 			{/* Horizontal Bar Chart - Distribusi PPh */}
-			<Card className="flex h-[456px] flex-col justify-between rounded-[20px] border border-[rgba(145,158,171,0.20)] p-[30px]">
+			<Card className="flex h-[456px] flex-col justify-between rounded-[20px] border  p-[30px]">
 				<CardHeader className="h-[32px] w-full flex-shrink-0 p-0 pb-6">
-					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+					<CardTitle className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 						{ppnDistributionChart.title}
 					</CardTitle>
 				</CardHeader>
@@ -100,7 +122,11 @@ export function Charts({ ppnNetChart, ppnDistributionChart }: ChartsProps) {
 								layout="vertical"
 								margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
 							>
-								<CartesianGrid strokeDasharray="0" stroke="#f1f1f1" horizontal={false} />
+								<CartesianGrid
+									strokeDasharray="0"
+									stroke="#f1f1f1"
+									horizontal={false}
+								/>
 								<XAxis type="number" hide />
 								<YAxis
 									type="category"

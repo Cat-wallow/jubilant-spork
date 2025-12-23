@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -143,72 +149,96 @@ export function TransactionList({ transactions }: TransactionListProps) {
 				{/* Table Header */}
 				<div className="flex items-center justify-between border-b pb-2.5">
 					<div className="flex w-[150px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Nomor Transaksi</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Nomor Transaksi
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[150px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Tanggal</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Tanggal
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Jenis</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Jenis
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Nilai</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Nilai
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Status</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Status
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Modul Asal</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Modul Asal
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Action</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Action
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 				</div>
 
 				{/* Table Body */}
 				<div className="space-y-2.5">
 					{transactions.map((transaction) => (
-						<div key={transaction.id} className="flex items-center justify-between py-2.5">
+						<div
+							key={transaction.id}
+							className="flex items-center justify-between py-2.5"
+						>
 							<div className="w-[150px]">
-								<span className="font-inter text-sm font-medium text-[#404040]">
+								<span className="font-inter text-sm font-medium ">
 									{transaction.id}
 								</span>
 							</div>
 							<div className="w-[150px]">
-								<span className="font-inter text-sm font-medium text-[#404040]">
+								<span className="font-inter text-sm font-medium ">
 									{transaction.date}
 								</span>
 							</div>
 							<div className="w-[120px]">
-								<span className="font-inter text-sm font-medium text-[#404040]">
+								<span className="font-inter text-sm font-medium ">
 									{transaction.type}
 								</span>
 							</div>
 							<div className="w-[120px]">
-								<span className="font-inter text-sm font-medium text-[#404040]">
+								<span className="font-inter text-sm font-medium ">
 									{transaction.value}
 								</span>
 							</div>
 							<div className="w-[120px]">
-								<Badge className={cn("rounded-full px-3 py-1", getStatusColor(transaction.status))}>
+								<Badge
+									className={cn(
+										"rounded-full px-3 py-1",
+										getStatusColor(transaction.status),
+									)}
+								>
 									{transaction.status}
 								</Badge>
 							</div>
 							<div className="w-[120px]">
-								<div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] border border-[rgba(145,158,171,0.20)] px-3 py-1">
-									<span className="font-inter text-xs text-[#332687]">{transaction.module}</span>
+								<div className="inline-flex items-center justify-center gap-2.5 rounded-[5px] border  px-3 py-1">
+									<span className="font-inter text-xs text-primary">
+										{transaction.module}
+									</span>
 								</div>
 							</div>
 							<div className="flex w-[120px] items-center gap-5">
 								<Button variant="ghost" size="icon" className="h-8 w-8">
-									<ExternalLink className="h-5 w-5 text-[#332687]" />
+									<ExternalLink className="h-5 w-5 text-primary" />
 								</Button>
 							</div>
 						</div>
@@ -217,13 +247,15 @@ export function TransactionList({ transactions }: TransactionListProps) {
 
 				{/* Pagination */}
 				<div className="flex items-center justify-between pt-2.5">
-					<p className="font-geist text-sm text-[#737373]">Showing 1-10 of 100 products</p>
+					<p className="font-geist text-sm text-[#737373]">
+						Showing 1-10 of 100 products
+					</p>
 					<div className="flex items-center gap-2">
 						<Button variant="ghost" size="sm" className="gap-1">
 							<ChevronLeft className="h-4 w-4" />
 							Previous
 						</Button>
-						<Button variant="outline" size="sm" className="bg-white shadow-sm">
+						<Button variant="outline" size="sm" className="bg-card shadow-sm">
 							1
 						</Button>
 						<Button variant="ghost" size="sm">

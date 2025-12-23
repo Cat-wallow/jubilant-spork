@@ -18,13 +18,11 @@ export function AgingAnalysis({ data }: AgingAnalysisProps) {
 	};
 
 	return (
-		// <div className="flex w-full flex-col gap-[30px] rounded-[15px] border border-[#D9D9D9] p-6 shadow-md xl:w-[450px]">
+		// <div className="flex w-full flex-col gap-[30px] rounded-[15px] border  p-6 shadow-md xl:w-[450px]">
 		<Card className="flex  w-full p-6 flex-col gap-[30px]">
 			<div className="flex flex-col">
-				<h3 className="font-roboto text-base font-medium leading-6 text-[#404040]">
-					Aging Analysis
-				</h3>
-				<p className="font-roboto text-xs font-normal leading-4 text-[#8C8C8C]">
+				<h3 className=" text-base font-medium leading-6 ">Aging Analysis</h3>
+				<p className=" text-xs leading-4 text-[#8C8C8C]">
 					Invoice aging by payment status
 				</p>
 			</div>
@@ -39,14 +37,14 @@ export function AgingAnalysis({ data }: AgingAnalysisProps) {
 						<div key={idx} className="flex flex-col gap-5">
 							<Badge
 								variant="outline"
-								className="w-fit rounded-[5px] border border-[rgba(145,158,171,0.20)] font-inter text-xs font-normal text-[#404040]"
+								className="w-fit rounded-[5px] border  font-inter text-xs "
 							>
 								{item.count} Invoice
 							</Badge>
 
 							<div className="flex flex-col gap-[5px]">
 								{/* Progress bars */}
-								<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-[#F4F7FE]">
+								<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-background">
 									<div
 										className="h-full rounded-full transition-all"
 										style={{
@@ -57,10 +55,10 @@ export function AgingAnalysis({ data }: AgingAnalysisProps) {
 								</div>
 
 								<div className="flex items-center justify-between">
-									<span className="font-inter text-xs font-normal text-[#6E7184]">
+									<span className="font-inter text-xs text-[#6E7184]">
 										{item.label}
 									</span>
-									<span className="font-inter text-xs font-normal text-[#6E7184]">
+									<span className="font-inter text-xs text-[#6E7184]">
 										{formatCurrency(item.amount)}
 									</span>
 								</div>

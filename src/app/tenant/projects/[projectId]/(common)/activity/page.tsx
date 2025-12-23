@@ -10,10 +10,10 @@ export default function ActivityPage() {
 		<Card className="flex flex-col gap-5 p-4">
 			{/* Page Header */}
 			<div className="flex flex-col items-start">
-				<h1 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+				<h1 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 					Activity Feed
 				</h1>
-				<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+				<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 					Tinjau riwayat aktivitas dan diskusi di dalam project
 				</p>
 			</div>

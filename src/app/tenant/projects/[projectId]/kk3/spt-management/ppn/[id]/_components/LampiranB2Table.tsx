@@ -1,0 +1,184 @@
+import { Card } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+interface PembelianItem {
+  no: number;
+  namaPenjual: string;
+  npwp: string;
+  nomorFaktur: string;
+  tanggalFaktur: string;
+  dpp: number;
+  ppn: number;
+  ppnbm: number;
+  fakturDiganti: string;
+}
+
+interface LampiranB2Data {
+  pembelianList: PembelianItem[];
+  totalPembelian: { dpp: number; ppn: number; ppnbm: number };
+}
+
+export function LampiranB2Table({ data }: { data: LampiranB2Data }) {
+  return (
+    <Card className="border-[0.8px] border-[rgba(0,0,0,0.10)] bg-white rounded-[20px] shadow-sm p-6">
+      <div className="flex flex-col gap-6">
+        <div className="flex justify-between items-start">
+          <h3 className="text-lg font-normal text-[#0A0A0A] max-w-[960px]">
+            LAMPIRAN B2 - DAFTAR PAJAK MASUKAN YANG DAPAT DIKREDITKAN ATAS PEROLEHAN BKP/JKP DALAM NEGERI
+          </h3>
+          <div className="flex flex-col items-end">
+            <p className="text-xs font-bold text-[#717182]">FORMULIR 1111 B2</p>
+            <p className="text-xs font-normal text-[#717182]">
+              (Bila tidak ada transaksi tidak perlu dilampirkan)
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex gap-2">
+              <span className="font-bold text-[#717182]">NAMA PKP:</span>
+              <span className="font-normal text-[#717182]">PT CONTOH PERUSAHAAN</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold text-[#717182]">MASA:</span>
+              <span className="font-normal text-[#717182]">03</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold text-[#717182]">TH:</span>
+              <span className="font-normal text-[#717182]">2024</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold text-[#717182]">Pembetulan Ke:</span>
+              <span className="font-normal text-[#717182]">( 0 )</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex justify-between items-end">
+          <span className="text-xs font-bold text-[#717182]">NPWP:</span>
+          <span className="text-xs font-normal text-[#717182] font-[Consolas]">12.345.678.9-012.345</span>
+        </div>
+      </div>
+      
+      <div className="overflow-x-auto mt-6">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[40px]">
+                No
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[150px]">
+                <div className="flex flex-col items-center py-2">
+                  <span>Nama Penjual BKP/</span>
+                  <span>JKP Tidak Berwujud/</span>
+                  <span>Pemberi JKP</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[140px]">
+                NPWP
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A]">
+                <div className="flex flex-col items-center py-2">
+                  <span>Faktur Pajak/Dokumen Tertentu</span>
+                  <span>Lain yang Dipersamakan dengan Faktur Pajak</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[130px]">
+                <div className="flex flex-col items-center">
+                  <span>Kode dan Nomor Seri</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[100px]">
+                <div className="flex flex-col items-center">
+                  <span>Tanggal</span>
+                  <span>(dd/mm/yyyy)</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[130px]">
+                <div className="flex flex-col items-center">
+                  <span>DPP</span>
+                  <span>(Rupiah)</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[120px]">
+                <div className="flex flex-col items-center">
+                  <span>PPN</span>
+                  <span>(Rupiah)</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[80px]">
+                <div className="flex flex-col items-center">
+                  <span>PPnBM</span>
+                  <span>(Rupiah)</span>
+                </div>
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-[#0A0A0A] min-w-[180px]">
+                <div className="flex flex-col items-center">
+                  <span>Kode dan No. Seri Faktur Pajak</span>
+                  <span>Yang Diganti/Diretur</span>
+                </div>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.pembelianList.map((item) => (
+              <TableRow key={item.no} className="border-b border-[rgba(0,0,0,0.10)]">
+                <TableCell className="text-center text-xs font-bold text-[#0A0A0A] font-[Consolas]">
+                  {item.no}
+                </TableCell>
+                <TableCell className="text-xs font-normal text-[#0A0A0A] pl-2">
+                  {item.namaPenjual}
+                </TableCell>
+                <TableCell className="text-center text-xs font-normal text-[#0A0A0A] font-[Consolas]">
+                  {item.npwp}
+                </TableCell>
+                <TableCell colSpan={1}></TableCell>
+                <TableCell className="text-center text-xs font-normal text-[#0A0A0A] font-[Consolas]">
+                  {item.nomorFaktur}
+                </TableCell>
+                <TableCell className="text-center text-xs font-normal text-[#0A0A0A] font-[Consolas]">
+                  {item.tanggalFaktur}
+                </TableCell>
+                <TableCell className="text-right text-xs font-bold text-[#0A0A0A] font-[Consolas]">
+                  Rp {item.dpp.toLocaleString("id-ID")}
+                </TableCell>
+                <TableCell className="text-right text-xs font-bold text-[#0A0A0A] font-[Consolas]">
+                  Rp {item.ppn.toLocaleString("id-ID")}
+                </TableCell>
+                <TableCell className="text-right text-xs font-bold text-[#0A0A0A] font-[Consolas]">
+                  Rp {item.ppnbm.toLocaleString("id-ID")}
+                </TableCell>
+                <TableCell className="text-center text-xs font-normal text-[#0A0A0A] font-[Consolas]">
+                  {item.fakturDiganti}
+                </TableCell>
+              </TableRow>
+            ))}
+            <TableRow className="bg-[#EFF6FF]">
+              <TableCell colSpan={6} className="text-center text-xs font-bold text-[#0A0A0A] py-3">
+                JUMLAH
+              </TableCell>
+              <TableCell className="text-right text-base font-bold text-[#0A0A0A] font-[Consolas] py-3">
+                B.2 Rp {data.totalPembelian.dpp.toLocaleString("id-ID")}
+              </TableCell>
+              <TableCell className="text-right text-base font-bold text-[#0A0A0A] font-[Consolas] py-3">
+                Rp {data.totalPembelian.ppn.toLocaleString("id-ID")}
+              </TableCell>
+              <TableCell className="text-right text-base font-bold text-[#0A0A0A] font-[Consolas] py-3">
+                Rp {data.totalPembelian.ppnbm.toLocaleString("id-ID")}
+              </TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  );
+}

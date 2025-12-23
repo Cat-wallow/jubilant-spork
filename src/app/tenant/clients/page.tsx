@@ -6,7 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useClients, useCreateClient, useDeleteClient, useTenantComplianceSummary, useTerminateClient, useActivateClient } from '@/hooks/useClients';
+import { useClients, useCreateClient,
+  useDeleteClient,
+  useTenantComplianceSummary,
+  useTerminateClient,
+  useActivateClient,
+  useRestoreClient,
+} from '@/hooks/useClients';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import { SummaryCards } from './components/SummaryCards';
@@ -21,6 +27,7 @@ import {
   ColumnDef,
 } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -52,6 +59,7 @@ import {
   Building2,
   Ban,
   CheckCircle,
+  RotateCcw,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -61,7 +69,253 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Client } from '@/hooks/useClients';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+
+interface ClientRestoreDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  tenantId: string;
+}
+
+function ClientRestoreDialog({
+  open,
+  onOpenChange,
+  tenantId,
+}: ClientRestoreDialogProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [rowSelection, setRowSelection] = useState({});
+  const restoreClientMutation = useRestoreClient();
+
+  // Debounce search query
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+
+  const { data, isLoading, refetch } = useClients({
+    tenantId,
+    status: 'archived',
+    search: debouncedSearchQuery,
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+  });
+
+  const [confirmation, setConfirmation] = useState<{
+    isOpen: boolean;
+    type: 'single' | 'bulk';
+    client?: Client;
+    count?: number;
+    ids?: string[];
+  }>({ isOpen: false, type: 'single' });
+
+  const handleRestore = (client: Client) => {
+    setConfirmation({
+      isOpen: true,
+      type: 'single',
+      client
+    });
+  };
+
+  const proceedRestore = () => {
+    if (confirmation.type === 'single' && confirmation.client) {
+      restoreClientMutation.mutate(
+        { tenantId, id: confirmation.client.id },
+        {
+          onSuccess: () => {
+            toast.success('Berhasil', { description: 'Klien berhasil dipulihkan' });
+            refetch();
+            setConfirmation(prev => ({ ...prev, isOpen: false }));
+          },
+          onError: () => {
+            toast.error('Gagal', { description: 'Gagal memulihkan klien' });
+          }
+        }
+      );
+    } else if (confirmation.type === 'bulk' && confirmation.ids) {
+      Promise.all(confirmation.ids.map(id => 
+          restoreClientMutation.mutateAsync({ tenantId, id })
+      )).then(() => {
+           toast.success('Berhasil', { description: `${confirmation.ids?.length} klien berhasil dipulihkan` });
+           setRowSelection({});
+           refetch();
+           setConfirmation(prev => ({ ...prev, isOpen: false }));
+      }).catch(() => {
+           toast.error('Gagal', { description: 'Gagal memulihkan beberapa klien' });
+           refetch();
+      });
+    }
+  };
+
+  const columns: ColumnDef<Client>[] = useMemo(
+    () => [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected()
+                ? true
+                : table.getIsSomePageRowsSelected()
+                ? 'indeterminate'
+                : false
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: 'name',
+        header: 'Nama Klien',
+        cell: ({ row }) => (
+          <div className="flex flex-col">
+            <span className="font-medium">{row.getValue('name')}</span>
+            <span className="text-xs text-muted-foreground">{row.original.email || '-'}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'type',
+        header: 'Tipe',
+        cell: ({ row }) => <Badge variant="outline">{row.getValue('type')}</Badge>,
+      },
+      {
+        id: 'updated_at',
+        header: 'Terakhir Diupdate',
+        cell: ({ row }) => {
+             const date = new Date(row.original.updated_at || new Date());
+             return <span className="text-sm text-muted-foreground">{date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        }
+      },
+      {
+        id: 'actions',
+        header: 'Aksi',
+        cell: ({ row }) => (
+           <Button 
+             size="sm" 
+             variant="outline" 
+             className="h-8 gap-2"
+             onClick={() => handleRestore(row.original)}
+             disabled={restoreClientMutation.isPending}
+           >
+             <RotateCcw className="h-3.5 w-3.5" />
+             Pulihkan
+           </Button>
+        ),
+      },
+    ],
+    [restoreClientMutation.isPending]
+  );
+
+  const clients = data?.items || [];
+  const pageCount = data?.pagination?.totalPages || 0;
+
+  const table = useReactTable({
+    data: clients,
+    columns,
+    pageCount,
+    state: {
+      pagination,
+      rowSelection,
+    },
+    onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+  });
+
+  const handleBulkRestore = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const selectedIds = selectedRows.map(row => row.original.id);
+    
+    if (selectedIds.length === 0) return;
+
+    setConfirmation({
+      isOpen: true,
+      type: 'bulk',
+      count: selectedIds.length,
+      ids: selectedIds
+    });
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl h-[80vh] flex flex-col gap-4">
+          <DialogHeader>
+            <DialogTitle>Pemulihan Klien</DialogTitle>
+            <DialogDescription>
+              Daftar klien yang telah dihapus (soft delete). Anda dapat memulihkan mereka beserta proyeknya.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex items-center justify-between gap-4 py-4">
+              <Input 
+                  placeholder="Cari nama klien, email..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="max-w-sm"
+              />
+              {Object.keys(rowSelection).length > 0 && (
+                  <Button onClick={handleBulkRestore} disabled={restoreClientMutation.isPending}>
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      Pulihkan ({Object.keys(rowSelection).length})
+                  </Button>
+              )}
+          </div>
+
+          <div className="flex-1 overflow-auto border rounded-md">
+              <DataTable 
+                  table={table} 
+                  columns={columns} 
+                  isLoading={isLoading} 
+                  isError={false}
+              />
+          </div>
+
+          <DialogFooter className="flex items-center justify-between w-full">
+              <div className="text-sm text-muted-foreground">
+                  {Object.keys(rowSelection).length} dipilih
+              </div>
+              <Button variant="outline" onClick={() => onOpenChange(false)}>Tutup</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirmation.isOpen} onOpenChange={(open) => !open && setConfirmation(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Pemulihan</DialogTitle>
+            <DialogDescription>
+              {confirmation.type === 'single' 
+                ? `Apakah Anda yakin ingin memulihkan klien "${confirmation.client?.name}"?`
+                : `Apakah Anda yakin ingin memulihkan ${confirmation.count} klien terpilih?`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 text-sm text-muted-foreground">
+            Klien yang dipulihkan akan kembali aktif beserta semua proyek yang terkait.
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmation(prev => ({ ...prev, isOpen: false }))}>
+              Batal
+            </Button>
+            <Button onClick={proceedRestore} disabled={restoreClientMutation.isPending}>
+              {restoreClientMutation.isPending ? 'Memulihkan...' : 'Ya, Pulihkan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 
 interface ClientDeleteDialogProps {
   open: boolean;
@@ -252,7 +506,6 @@ function ClientActivateDialog({
 export default function ClientsPage() {
   const { tenant } = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
   const createClientMutation = useCreateClient();
   const deleteClientMutation = useDeleteClient();
   const terminateClientMutation = useTerminateClient();
@@ -264,6 +517,7 @@ export default function ClientsPage() {
   const [pkpFilter, setPkpFilter] = useState<string>('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [businessTypeOptions, setBusinessTypeOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -601,6 +855,12 @@ export default function ClientsPage() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Restore Client Button */}
+            <Button variant="outline" onClick={() => setShowRestoreDialog(true)} className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Pemulihan Klien
+            </Button>
+
             {/* Add Client Button */}
             <Button onClick={() => setShowCreateModal(true)} className="gap-2">
               <Building2 className="h-4 w-4" />
@@ -660,6 +920,12 @@ export default function ClientsPage() {
         </div>
       </div>
 
+      <ClientRestoreDialog
+        open={showRestoreDialog}
+        onOpenChange={setShowRestoreDialog}
+        tenantId={tenant.id}
+      />
+
       {/* Create Client Modal */}
       <CreateClientModalUpdated
         open={showCreateModal}
@@ -686,8 +952,7 @@ export default function ClientsPage() {
               },
               {
                 onSuccess: () => {
-                  toast({
-                    title: 'Berhasil',
+                  toast.success('Berhasil', {
                     description: 'Klien berhasil dihapus',
                   });
                   setShowDeleteDialog(false);
@@ -698,10 +963,8 @@ export default function ClientsPage() {
                     error?.response?.data?.message ||
                     error?.message ||
                     'Terjadi kesalahan saat menghapus klien';
-                  toast({
-                    title: 'Gagal menghapus klien',
+                  toast.error('Gagal menghapus klien', {
                     description: errorMessage,
-                    variant: 'destructive',
                   });
                 },
               }
@@ -724,8 +987,7 @@ export default function ClientsPage() {
               },
               {
                 onSuccess: () => {
-                  toast({
-                    title: 'Berhasil',
+                  toast.success('Berhasil', {
                     description: 'Kerja sama berhasil diputus',
                   });
                   setShowTerminateDialog(false);
@@ -736,10 +998,8 @@ export default function ClientsPage() {
                     error?.response?.data?.message ||
                     error?.message ||
                     'Terjadi kesalahan saat memutus kerja sama';
-                  toast({
-                    title: 'Gagal memutus kerja sama',
+                  toast.error('Gagal memutus kerja sama', {
                     description: errorMessage,
-                    variant: 'destructive',
                   });
                 },
               }
@@ -762,8 +1022,7 @@ export default function ClientsPage() {
               },
               {
                 onSuccess: () => {
-                  toast({
-                    title: 'Berhasil',
+                  toast.success('Berhasil', {
                     description: 'Klien berhasil diaktifkan kembali',
                   });
                   setShowActivateDialog(false);
@@ -774,10 +1033,8 @@ export default function ClientsPage() {
                     error?.response?.data?.message ||
                     error?.message ||
                     'Terjadi kesalahan saat mengaktifkan klien';
-                  toast({
-                    title: 'Gagal mengaktifkan klien',
+                  toast.error('Gagal mengaktifkan klien', {
                     description: errorMessage,
-                    variant: 'destructive',
                   });
                 },
               }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -37,14 +43,18 @@ interface DocumentListProps {
 	documents: Document[];
 }
 
-export function DocumentList({ documents: initialDocuments }: DocumentListProps) {
+export function DocumentList({
+	documents: initialDocuments,
+}: DocumentListProps) {
 	const [documents, setDocuments] = useState(initialDocuments);
 
 	const toggleVisibility = (id: string) => {
 		setDocuments((docs) =>
 			docs.map((doc) =>
-				doc.id === id ? { ...doc, visibleToCustomer: !doc.visibleToCustomer } : doc
-			)
+				doc.id === id
+					? { ...doc, visibleToCustomer: !doc.visibleToCustomer }
+					: doc,
+			),
 		);
 	};
 
@@ -65,7 +75,7 @@ export function DocumentList({ documents: initialDocuments }: DocumentListProps)
 							<Download className="h-4 w-4" />
 							Export PDF
 						</Button>
-						<Button size="sm" className="gap-1 bg-[#332687] hover:bg-[#241963]">
+						<Button size="sm" className="gap-1 bg-primary hover:bg-[#241963]">
 							<Plus className="h-4 w-4" />
 							Buat Invoice
 						</Button>
@@ -145,40 +155,59 @@ export function DocumentList({ documents: initialDocuments }: DocumentListProps)
 				<div className="flex items-center justify-between border-b pb-2.5">
 					<div className="flex w-[150px] items-center gap-2.5">
 						<Checkbox />
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">File Name</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							File Name
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">File Type</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							File Type
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Lampiran</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Lampiran
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[120px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Visible to Customer</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Visible to Customer
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 					<div className="flex w-[210px] items-center gap-1.5">
-						<span className="font-dm text-sm font-medium text-[#A3AED0]">Action</span>
-						<ChevronDown className="h-4 w-4 text-[#A3AED0]" />
+						<span className="font-dm text-sm font-medium text-muted-foreground">
+							Action
+						</span>
+						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</div>
 				</div>
 
 				{/* Table Body */}
 				<div className="space-y-2.5">
 					{documents.map((doc) => (
-						<div key={doc.id} className="flex items-center justify-between py-2.5">
+						<div
+							key={doc.id}
+							className="flex items-center justify-between py-2.5"
+						>
 							<div className="flex w-[150px] items-center gap-2.5">
 								<Checkbox defaultChecked />
-								<span className="font-inter text-sm font-medium text-[#404040]">{doc.name}</span>
+								<span className="font-inter text-sm font-medium ">
+									{doc.name}
+								</span>
 							</div>
 							<div className="w-[120px]">
-								<span className="font-inter text-sm font-medium text-[#404040]">{doc.type}</span>
+								<span className="font-inter text-sm font-medium ">
+									{doc.type}
+								</span>
 							</div>
 							<div className="w-[120px]">
-								<span className="font-inter text-sm font-medium text-[#404040]">{doc.attachments}</span>
+								<span className="font-inter text-sm font-medium ">
+									{doc.attachments}
+								</span>
 							</div>
 							<div className="w-[120px]">
 								<Switch
@@ -188,7 +217,7 @@ export function DocumentList({ documents: initialDocuments }: DocumentListProps)
 							</div>
 							<div className="flex w-[210px] items-center gap-5">
 								<Button variant="ghost" size="icon" className="h-8 w-8">
-									<Send className="h-5 w-5 text-[#332687]" />
+									<Send className="h-5 w-5 text-primary" />
 								</Button>
 								<Button variant="ghost" size="icon" className="h-8 w-8">
 									<Trash2 className="h-5 w-5 text-[#BF6A02]" />
@@ -200,13 +229,15 @@ export function DocumentList({ documents: initialDocuments }: DocumentListProps)
 
 				{/* Pagination */}
 				<div className="flex items-center justify-between pt-2.5">
-					<p className="font-geist text-sm text-[#737373]">Showing 1-10 of 100 products</p>
+					<p className="font-geist text-sm text-[#737373]">
+						Showing 1-10 of 100 products
+					</p>
 					<div className="flex items-center gap-2">
 						<Button variant="ghost" size="sm" className="gap-1">
 							<ChevronLeft className="h-4 w-4" />
 							Previous
 						</Button>
-						<Button variant="outline" size="sm" className="bg-white shadow-sm">
+						<Button variant="outline" size="sm" className="bg-card shadow-sm">
 							1
 						</Button>
 						<Button variant="ghost" size="sm">

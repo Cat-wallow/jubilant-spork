@@ -22,15 +22,15 @@ export function DocumentFilters({
 	return (
 		<div className="flex flex-col items-center gap-5 lg:flex-row">
 			{/* Entries Dropdown */}
-			<div className="flex h-[54px] w-full items-center justify-center gap-1 rounded-[10px] border border-[#D9D9D9] px-4 sm:w-auto">
-				<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+			<div className="flex h-[54px] w-full items-center justify-center gap-1 rounded-[10px] border  px-4 sm:w-auto">
+				<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 					20
 				</span>
-				<ChevronDown className="h-6 w-6 text-[#332687]" />
+				<ChevronDown className="h-6 w-6 text-primary" />
 			</div>
 
 			{/* Search Input */}
-			<div className="flex h-[54px] flex-1 items-center gap-[15px] rounded-[10px] border border-[#D9D9D9] px-4">
+			<div className="flex h-[54px] flex-1 items-center gap-[15px] rounded-[10px] border  px-4">
 				<div className="relative h-5 w-5">
 					<div className="absolute left-0 top-0 h-[18px] w-[18px] rounded-full border-[3px] border-[#332687]" />
 					<div className="absolute left-[15px] top-[15px] h-0 w-2" />
@@ -39,7 +39,7 @@ export function DocumentFilters({
 					placeholder="Cari nama user"
 					value={searchQuery}
 					onChange={(e) => onSearchChange(e.target.value)}
-					className="h-5 border-0 p-0 font-dm text-base font-normal leading-5 tracking-[-0.32px] text-[#8F9BBA] placeholder:text-[#8F9BBA] focus-visible:ring-0 focus-visible:ring-offset-0"
+					className="h-5 border-0 p-0 font-dm text-base leading-5 tracking-[-0.32px] text-muted-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
 				/>
 			</div>
 
@@ -47,47 +47,47 @@ export function DocumentFilters({
 			<div className="flex w-full flex-wrap items-center gap-2.5 lg:w-auto">
 				<Button
 					variant="outline"
-					className="h-[54px] rounded-[10px] border-[#D9D9D9] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]"
+					className="h-[54px] rounded-[10px]  px-4  text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground"
 				>
 					All Modul
-					<ChevronDown className="ml-1 h-6 w-6 text-[#332687]" />
+					<ChevronDown className="ml-1 h-6 w-6 text-primary" />
 				</Button>
 
 				<Button
 					variant="outline"
-					className="h-[54px] rounded-[10px] border-[#D9D9D9] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]"
+					className="h-[54px] rounded-[10px]  px-4  text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground"
 				>
 					Assignee
-					<ChevronDown className="ml-1 h-6 w-6 text-[#332687]" />
+					<ChevronDown className="ml-1 h-6 w-6 text-primary" />
 				</Button>
 
 				<Button
 					variant="outline"
-					className="h-[54px] rounded-[10px] border-[#D9D9D9] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]"
+					className="h-[54px] rounded-[10px]  px-4  text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground"
 				>
 					All Status
-					<ChevronDown className="ml-1 h-6 w-6 text-[#332687]" />
+					<ChevronDown className="ml-1 h-6 w-6 text-primary" />
 				</Button>
 
 				<Button
 					variant="outline"
-					className="h-[54px] rounded-[10px] border-[#D9D9D9] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]"
+					className="h-[54px] rounded-[10px]  px-4  text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground"
 				>
 					Due
-					<ChevronDown className="ml-1 h-6 w-6 text-[#332687]" />
+					<ChevronDown className="ml-1 h-6 w-6 text-primary" />
 				</Button>
 
 				<Button
 					variant="outline"
-					className="h-[54px] rounded-[10px] border-[#D9D9D9] px-4 font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]"
+					className="h-[54px] rounded-[10px]  px-4  text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground"
 				>
-					<Filter className="mr-2 h-[18px] w-[18px] text-[#332687]" />
+					<Filter className="mr-2 h-[18px] w-[18px] text-primary" />
 					Filter
 				</Button>
 
 				<Button
 					variant="outline"
-					className="h-[54px] w-[54px] rounded-[10px] border-[#D9D9D9] p-0"
+					className="h-[54px] w-[54px] rounded-[10px]  p-0"
 				>
 					<MoreHorizontal className="h-[35px] w-[35px] text-[#4318FF]" />
 				</Button>

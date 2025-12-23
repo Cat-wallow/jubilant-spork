@@ -43,31 +43,31 @@ export function TeamTable({ members }: TeamTableProps) {
 						checked={selectedMembers.length === members.length}
 						onCheckedChange={toggleAll}
 					/>
-					<span className="font-dm text-sm font-medium leading-6 text-[#A3AED0]">
+					<span className="font-dm text-sm font-medium leading-6 text-muted-foreground">
 						Nama
 					</span>
-					<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+					<ChevronDown className="h-6 w-6 text-muted-foreground" />
 				</div>
 
 				<div className="flex w-[120px] items-center gap-[7px]">
-					<span className="font-dm text-sm font-medium leading-6 text-[#A3AED0]">
+					<span className="font-dm text-sm font-medium leading-6 text-muted-foreground">
 						Role
 					</span>
-					<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+					<ChevronDown className="h-6 w-6 text-muted-foreground" />
 				</div>
 
 				<div className="flex w-[120px] items-center gap-[7px]">
-					<span className="font-dm text-sm font-medium leading-6 text-[#A3AED0]">
+					<span className="font-dm text-sm font-medium leading-6 text-muted-foreground">
 						Modul
 					</span>
-					<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+					<ChevronDown className="h-6 w-6 text-muted-foreground" />
 				</div>
 
 				<div className="flex w-[210px] items-center gap-[7px]">
-					<span className="font-dm text-sm font-medium leading-6 text-[#A3AED0]">
+					<span className="font-dm text-sm font-medium leading-6 text-muted-foreground">
 						Action
 					</span>
-					<ChevronDown className="h-6 w-6 text-[#A3AED0]" />
+					<ChevronDown className="h-6 w-6 text-muted-foreground" />
 				</div>
 			</div>
 
@@ -86,17 +86,17 @@ export function TeamTable({ members }: TeamTableProps) {
 								checked={selectedMembers.includes(member.id)}
 								onCheckedChange={() => toggleMember(member.id)}
 							/>
-							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#4318FF] font-dm text-base font-normal leading-[30px] text-white">
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#4318FF] font-dm text-base leading-[30px] text-white">
 								{member.avatar}
 							</div>
-							<span className="font-inter text-sm font-medium leading-[14px] text-[#404040]">
+							<span className="font-inter text-sm font-medium leading-[14px] ">
 								{member.name}
 							</span>
 						</div>
 
 						<div className="w-[120px]">
 							<div className="flex h-[29px] items-center justify-center rounded-[5px] bg-transparent px-2">
-								<span className="font-dm text-sm font-bold leading-6 text-[#2B3674]">
+								<span className="font-dm text-sm font-bold leading-6 text-primary">
 									{member.role}
 								</span>
 							</div>
@@ -107,7 +107,7 @@ export function TeamTable({ members }: TeamTableProps) {
 								<Badge
 									key={idx}
 									variant="outline"
-									className="justify-center text-nowrap rounded-[5px] border border-[rgba(145,158,171,0.20)] px-2.5 py-1 font-inter text-xs font-normal text-[#332687]"
+									className="justify-center text-nowrap rounded-[5px] border  px-2.5 py-1 font-inter text-xs text-primary"
 								>
 									{module}
 								</Badge>
@@ -129,7 +129,7 @@ export function TeamTable({ members }: TeamTableProps) {
 			{/* Upload Button */}
 			<Button
 				variant="outline"
-				className="mt-10 flex h-[42px] items-center gap-1 self-start rounded-[10px] border border-[#D9D9D9] bg-transparent"
+				className="mt-10 flex h-[42px] items-center gap-1 self-start rounded-[10px] border  bg-transparent"
 			>
 				<svg
 					width="24"
@@ -150,7 +150,7 @@ export function TeamTable({ members }: TeamTableProps) {
 						fill="#332687"
 					/>
 				</svg>
-				<span className="font-roboto text-sm font-medium leading-5 text-[#332687]">
+				<span className=" text-sm font-medium leading-5 text-primary">
 					Upload
 				</span>
 			</Button>

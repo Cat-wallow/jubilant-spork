@@ -27,7 +27,7 @@ const statsData = [
 		label: "Total Invoice",
 		value: "22",
 		subtitle: (
-			<span className="font-dm text-xs font-normal leading-5 tracking-[-0.24px] text-[#A3AED0]">
+			<span className="font-dm text-xs leading-5 tracking-[-0.24px] text-muted-foreground">
 				Semua invoice project
 			</span>
 		),
@@ -61,7 +61,7 @@ export function StatsCards() {
 			{statsData.map((stat, index) => (
 				<Card
 					key={index}
-					className="flex h-[97px] flex-1 items-center overflow-hidden whitespace-nowrap  gap-[18px] rounded-[20px] border border-[rgba(145,158,171,0.20)] px-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.10)]"
+					className="flex h-[97px] flex-1 items-center overflow-hidden whitespace-nowrap  gap-[18px] rounded-[20px] border  px-4 "
 				>
 					<div className="flex h-[56px] w-[56px] items-center justify-center gap-2.5 rounded-[28px]">
 						<stat.icon
@@ -70,10 +70,10 @@ export function StatsCards() {
 						/>
 					</div>
 					<div className="flex flex-col items-start">
-						<div className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-[#A3AED0]">
+						<div className="font-dm text-sm font-bold leading-6 tracking-[-0.28px] text-muted-foreground">
 							{stat.label}
 						</div>
-						<div className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-[#404040]">
+						<div className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] ">
 							{stat.value}
 						</div>
 						{stat.subtitle}

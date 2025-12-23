@@ -9,7 +9,9 @@ interface DocumentUploadAreaProps {
 	onFilesUploaded: (files: File[]) => void;
 }
 
-export function DocumentUploadArea({ onFilesUploaded }: DocumentUploadAreaProps) {
+export function DocumentUploadArea({
+	onFilesUploaded,
+}: DocumentUploadAreaProps) {
 	const [isDragging, setIsDragging] = useState(false);
 
 	const handleDrag = useCallback((e: React.DragEvent) => {
@@ -55,27 +57,27 @@ export function DocumentUploadArea({ onFilesUploaded }: DocumentUploadAreaProps)
 	return (
 		<div
 			className={cn(
-				"flex h-[200px] flex-col items-center justify-center gap-2.5 rounded-[20px] border-2 border-dashed border-[#D9D9D9] transition-all",
-				isDragging && "border-[#332687] bg-[#F4F7FE]",
+				"flex h-[200px] flex-col items-center justify-center gap-2.5 rounded-[20px] border-2 border-dashed  transition-all",
+				isDragging && "border-[#332687] bg-background",
 			)}
 			onDragEnter={handleDragIn}
 			onDragLeave={handleDragOut}
 			onDragOver={handleDrag}
 			onDrop={handleDrop}
 		>
-			<Upload className="h-[50px] w-[50px] text-[#332687]" />
+			<Upload className="h-[50px] w-[50px] text-primary" />
 			<div className="flex flex-col items-center justify-center">
-				<h3 className="font-roboto text-[22px] font-medium leading-7 text-[#2B3674]">
+				<h3 className=" text-[22px] font-medium leading-7 text-primary">
 					Drag and drop files here
 				</h3>
-				<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+				<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 					or click to browse
 				</p>
 			</div>
 			<label htmlFor="document-upload">
 				<Button
 					type="button"
-					className="h-auto rounded-[10px] bg-[#332687] px-4 py-2 font-roboto text-sm font-medium leading-5 tracking-[0.1px] hover:bg-[#241963]"
+					className="h-auto rounded-[10px] bg-primary px-4 py-2  text-sm font-medium leading-5 tracking-[0.1px] hover:bg-[#241963]"
 					onClick={() => document.getElementById("document-upload")?.click()}
 				>
 					Choose File

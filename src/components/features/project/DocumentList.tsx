@@ -42,9 +42,10 @@ interface DocumentListProps {
   projectId: string;
   tenantId: string;
   userId: string;
+  userName?: string;
 }
 
-export function DocumentList({ projectId, tenantId, userId }: DocumentListProps) {
+export function DocumentList({ projectId, tenantId, userId, userName = '' }: DocumentListProps) {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 500);
   const [statusFilter, setStatusFilter] = useState<'all' | 'digital' | 'asli' | 'copy'>('all');
@@ -472,17 +473,22 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                                  onClick={() => handleWorkflowClick(doc, step.key)}
                                >
                                  {isDone ? (
-                                   <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                                 ) : (
-                                   <Circle className="h-5 w-5 text-slate-300" />
-                                 )}
-                                 {isDone && stepData.date && (
-                                   <span className="text-[10px] text-muted-foreground mt-1">
-                                     {format(new Date(stepData.date), 'dd/MM')}
-                                   </span>
-                                 )}
-                               </div>
-                             </TableCell>
+                                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                                ) : (
+                                  <Circle className="h-5 w-5 text-slate-300" />
+                                )}
+                                {isDone && stepData.byName && (
+                                  <span className="text-[10px] text-muted-foreground/1 mt-1 max-w-[70px] truncate" title={stepData.byName}>
+                                    {stepData.byName}
+                                  </span>
+                                )}
+                                {isDone && stepData.date && (
+                                  <span className="text-[9px] text-muted-foreground/100 mt-0.5">
+                                    {format(new Date(stepData.date), 'dd/MM')}
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
                            );
                         })}
                       </TableRow>
@@ -611,7 +617,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal',
+                          'w-full justify-start text-left',
                           !documentDate && 'text-muted-foreground',
                         )}
                       >
@@ -800,7 +806,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                  <div className="space-y-3">
                    <Label className="text-base">Nama</Label>
                    <Input 
-                     value={userId} // TODO: Replace with actual user name
+                     value={userName || userId}
                      readOnly 
                      className="bg-background text-foreground opacity-100 h-11"
                    />
@@ -813,7 +819,7 @@ export function DocumentList({ projectId, tenantId, userId }: DocumentListProps)
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal h-11',
+                          'w-full justify-start text-left h-11',
                           !workflowDate && 'text-muted-foreground',
                         )}
                       >

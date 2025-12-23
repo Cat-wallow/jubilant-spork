@@ -47,7 +47,7 @@ export default function KK3OverviewPage() {
 	};
 
 	return (
-		<div className="flex flex-col gap-[30px] p-[30px]">
+		<div className="flex flex-col gap-[30px] ">
 			{/* Stats Cards */}
 			<StatsCards stats={mockData.stats} />
 

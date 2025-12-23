@@ -78,7 +78,7 @@ export default function Admin({ children }: { children: ReactNode }) {
 		<RBAC redirect>
 			<div className="bg-background-100 dark:bg-background-900 flex h-full w-full">
 				<Sidebar
-  				routes={routes}
+					routes={routes}
 					open={open}
 					setOpen={setOpen}
 					variant="admin"
@@ -89,30 +89,30 @@ export default function Admin({ children }: { children: ReactNode }) {
 					<div className="fixed left-[80px] items-start hidden md:flex top-0 z-40  h-full w-[290px] flex-col gap-[26px]  pb-10 shadow-md transition-all duration-175 bg-card">
 						{/* Project Info */}
 						<div className="flex flex-col justify-start items-start px-5 ">
-						<div className="flex h-24 w-full flex-col justify-center text-left">
-							<h3 className="font-dm text-sm font-bold leading-6  text-primary">
-								{isProjectLoading ? (
-									<Skeleton asChild className="h-4 w-[220px]">
-										<span />
-									</Skeleton>
-								) : (
-									project?.name || `Project ${projectId}`
-								)}
-							</h3>
-							<p className="text-sm font-normal leading-[140%] text-primary">
-								{isProjectLoading ? (
-									<Skeleton asChild className="h-4 w-[120px]">
-										<span />
-									</Skeleton>
-								) : (
-									project?.code || projectId
-								)}
-							</p>
+							<div className="flex h-24 w-full flex-col justify-center text-left">
+								<h3 className="font-dm text-sm font-bold leading-6  text-primary">
+									{isProjectLoading ? (
+										<Skeleton asChild className="h-4 w-[220px]">
+											<span />
+										</Skeleton>
+									) : (
+										project?.name || `Project ${projectId}`
+									)}
+								</h3>
+								<p className="text-sm leading-[140%] text-primary">
+									{isProjectLoading ? (
+										<Skeleton asChild className="h-4 w-[120px]">
+											<span />
+										</Skeleton>
+									) : (
+										project?.code || projectId
+									)}
+								</p>
+							</div>
+							<div
+								className={`h-[2px] bg-gray-300 dark:bg-card/30 w-[250px]`}
+							/>
 						</div>
-						<div
-							className={`h-[2px] bg-gray-300 dark:bg-white/30 w-[250px]`}
-						/>
-					</div>
 
 						<div className="flex flex-col  gap-5 px-5">
 							{projectModules.map((module) => {
@@ -128,7 +128,7 @@ export default function Admin({ children }: { children: ReactNode }) {
 											"flex items-center gap-[15px] transition-colors",
 											isActive
 												? "text-primary font-bold "
-												: "text-[#A3AED0] hover:text-primary dark:text-gray-400 dark:hover:text-white",
+												: "text-muted-foreground hover:text-primary dark:text-gray-400 dark:hover:text-white",
 										)}
 									>
 										<Icon className="h-5 w-5" />

@@ -12,29 +12,29 @@ export function TrialBalanceTab() {
 		<Card className="p-8 flex flex-col gap-5 self-stretch rounded-[20px] shadow-[0_1px_2px_0_rgba(0,0,0,0.3),0_1px_3px_1px_rgba(0,0,0,0.15)]">
 			<div className="flex items-start justify-between self-stretch">
 				<div className="flex flex-col">
-					<h2 className="font-dm-sans text-2xl font-bold leading-8 tracking-[-0.48px] text-[#2B3674]">
+					<h2 className="font-dm-sans text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 						Trial Balance
 					</h2>
-					<p className="font-roboto text-xs leading-4 tracking-[0.4px] text-[#2B3674]">
+					<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 						Kelola Invoice di dalam Project
 					</p>
 				</div>
 				<div className="flex items-center gap-2.5">
 					<Button
 						variant="outline"
-						className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9]"
+						className="flex items-center gap-1 rounded-[10px] border "
 					>
-						<Download className="h-[30px] w-[30px] text-[#404040]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<Download className="h-[30px] w-[30px] " />
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Export XLSX
 						</span>
 					</Button>
 					<Button
 						variant="outline"
-						className="flex items-center gap-1 rounded-[10px] border border-[#D9D9D9]"
+						className="flex items-center gap-1 rounded-[10px] border "
 					>
-						<Download className="h-[30px] w-[30px] text-[#404040]" />
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-[#49454F]">
+						<Download className="h-[30px] w-[30px] " />
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-muted-foreground">
 							Export PDF
 						</span>
 					</Button>
@@ -46,39 +46,25 @@ export function TrialBalanceTab() {
 			<div className="flex flex-col self-stretch">
 				<div className="flex items-start gap-[34px] border-b-[0.8px] border-[rgba(0,0,0,0.1)] py-2">
 					<div className="flex items-center px-2">
-						<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-							Account No
-						</div>
+						<div className=" text-sm leading-5 ">Account No</div>
 					</div>
 					<div className="flex w-[150px] items-center gap-2.5">
-						<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-							Account Name
-						</div>
+						<div className=" text-sm leading-5 ">Account Name</div>
 					</div>
 					<div className="flex w-[150px] items-center gap-2.5">
-						<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-							Begining Balance
-						</div>
+						<div className=" text-sm leading-5 ">Begining Balance</div>
 					</div>
 					<div className="flex w-[236px] items-center justify-end">
-						<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
-							Debit
-						</div>
+						<div className=" text-right text-sm leading-5 ">Debit</div>
 					</div>
 					<div className="flex w-[236px] items-center justify-end">
-						<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
-							Credit
-						</div>
+						<div className=" text-right text-sm leading-5 ">Credit</div>
 					</div>
 					<div className="flex w-[236px] items-center justify-end">
-						<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
-							Balance
-						</div>
+						<div className=" text-right text-sm leading-5 ">Balance</div>
 					</div>
 					<div className="flex items-center">
-						<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-							Normal Side
-						</div>
+						<div className=" text-sm leading-5 ">Normal Side</div>
 					</div>
 				</div>
 
@@ -88,32 +74,24 @@ export function TrialBalanceTab() {
 						className="flex items-start gap-[34px] border-b-[0.8px] border-[rgba(0,0,0,0.1)] py-2"
 					>
 						<div className="flex w-[193px] items-center px-2">
-							<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-								{item.accountNo}
-							</div>
+							<div className=" text-sm leading-5 ">{item.accountNo}</div>
 						</div>
 						<div className="flex w-[150px] items-center gap-2.5">
-							<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-								{item.accountName}
-							</div>
+							<div className=" text-sm leading-5 ">{item.accountName}</div>
 						</div>
 						<div className="flex w-[150px] items-center gap-2.5">
-							<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-								{item.beginningBalance}
-							</div>
+							<div className=" text-sm leading-5 ">{item.beginningBalance}</div>
 						</div>
 						<div className="flex w-[236px] items-center justify-end">
-							<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
-								{item.debit}
-							</div>
+							<div className=" text-right text-sm leading-5 ">{item.debit}</div>
 						</div>
 						<div className="flex w-[236px] items-center justify-end">
-							<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
+							<div className=" text-right text-sm leading-5 ">
 								{item.credit}
 							</div>
 						</div>
 						<div className="flex w-[236px] items-center justify-end">
-							<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
+							<div className=" text-right text-sm leading-5 ">
 								{item.balance}
 							</div>
 						</div>
@@ -122,9 +100,7 @@ export function TrialBalanceTab() {
 								variant="outline"
 								className="h-[22px] rounded-lg border-[0.8px] border-[rgba(0,0,0,0.1)]"
 							>
-								<span className="font-arial text-xs leading-4 text-[#0A0A0A]">
-									{item.normalSide}
-								</span>
+								<span className=" text-xs leading-4 ">{item.normalSide}</span>
 							</Badge>
 						</div>
 					</div>
@@ -132,19 +108,13 @@ export function TrialBalanceTab() {
 
 				<div className="flex items-center self-stretch py-2">
 					<div className="flex w-[986px] items-center px-2">
-						<div className="font-arial text-sm leading-5 text-[#0A0A0A]">
-							TOTAL
-						</div>
+						<div className=" text-sm leading-5 ">TOTAL</div>
 					</div>
 					<div className="flex w-[270px] items-center gap-2.5">
-						<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
-							Rp 165.500.000
-						</div>
+						<div className=" text-right text-sm leading-5 ">Rp 165.500.000</div>
 					</div>
 					<div className="flex items-center justify-center gap-2.5">
-						<div className="font-arial text-right text-sm leading-5 text-[#0A0A0A]">
-							Rp 165.500.000
-						</div>
+						<div className=" text-right text-sm leading-5 ">Rp 165.500.000</div>
 					</div>
 				</div>
 			</div>
@@ -154,49 +124,31 @@ export function TrialBalanceTab() {
 					Showing 1-10 of 100 products
 				</div>
 				<div className="flex items-center gap-2">
-					<Button
-						variant="ghost"
-						className="font-geist text-sm font-medium text-[#404040]"
-					>
+					<Button variant="ghost" className="font-geist text-sm font-medium ">
 						Previous
 					</Button>
 					<Button
 						variant="outline"
 						className="h-9 w-[34px] rounded-lg border border-[#D4D4D4] bg-[rgba(255,255,255,0.1)] shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)]"
 					>
-						<span className="font-geist text-sm font-medium text-[#0A0A0A]">
-							1
-						</span>
+						<span className="font-geist text-sm font-medium ">1</span>
 					</Button>
 					<Button variant="ghost" className="h-9 w-[34px] rounded-lg">
-						<span className="font-geist text-sm font-medium text-[#404040]">
-							2
-						</span>
+						<span className="font-geist text-sm font-medium ">2</span>
 					</Button>
 					<Button variant="ghost" className="h-9 w-[34px] rounded-lg">
-						<span className="font-geist text-sm font-medium text-[#404040]">
-							3
-						</span>
+						<span className="font-geist text-sm font-medium ">3</span>
 					</Button>
 					<Button variant="ghost" className="h-9 w-[34px] rounded-lg">
-						<span className="font-geist text-sm font-medium text-[#404040]">
-							4
-						</span>
+						<span className="font-geist text-sm font-medium ">4</span>
 					</Button>
 					<Button variant="ghost" className="h-9 w-[34px] rounded-lg">
-						<span className="font-geist text-sm font-medium text-[#404040]">
-							...
-						</span>
+						<span className="font-geist text-sm font-medium ">...</span>
 					</Button>
 					<Button variant="ghost" className="h-9 w-[34px] rounded-lg">
-						<span className="font-geist text-sm font-medium text-[#404040]">
-							10
-						</span>
+						<span className="font-geist text-sm font-medium ">10</span>
 					</Button>
-					<Button
-						variant="ghost"
-						className="font-geist text-sm font-medium text-[#404040]"
-					>
+					<Button variant="ghost" className="font-geist text-sm font-medium ">
 						Next
 					</Button>
 				</div>

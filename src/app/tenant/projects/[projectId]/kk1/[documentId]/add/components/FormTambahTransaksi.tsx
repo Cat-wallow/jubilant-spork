@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 export default function FormTambahTransaksi() {
 	return (
-		<Card className="flex flex-col gap-[30px] p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-white shadow-sm">
+		<Card className="flex flex-col gap-[30px] p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-card shadow-sm">
 			<CardTitle className="mb-5 text-[22px] font-medium  text-primary">
 				Deskripsi Dokumen
 			</CardTitle>
@@ -77,13 +77,13 @@ export default function FormTambahTransaksi() {
 			<div className="flex flex-col gap-[30px] w-full">
 				{/* Row 1 */}
 				<div className="flex gap-[30px] w-full">
-					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-white">
+					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-card">
 						<span className="text-[22px] font-medium text-muted-foreground ">
 							Invoice/Tagihan/Nota/Memo
 						</span>
 						<Checkbox className="h-[30px] w-[30px] rounded-[4px] border-[#A3AED0] data-[state=checked]:bg-[#4318FF] data-[state=checked]:border-[#4318FF]" />
 					</div>
-					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-white">
+					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-card">
 						<span className="text-[22px] font-medium text-muted-foreground ">
 							Surat Jalan/DO/Service Report
 						</span>
@@ -93,13 +93,13 @@ export default function FormTambahTransaksi() {
 
 				{/* Row 2 */}
 				<div className="flex gap-[30px] w-full">
-					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-white">
+					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-card">
 						<span className="text-[22px] font-medium text-muted-foreground ">
 							Faktur Pajak
 						</span>
 						<Checkbox className="h-[30px] w-[30px] rounded-[4px] border-[#A3AED0] data-[state=checked]:bg-[#4318FF] data-[state=checked]:border-[#4318FF]" />
 					</div>
-					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-white">
+					<div className="flex flex-1 items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-card">
 						<span className="text-[22px] font-medium text-muted-foreground ">
 							Bukti Potong/Pungut PPh
 						</span>
@@ -109,7 +109,7 @@ export default function FormTambahTransaksi() {
 
 				{/* Row 3 (Half width) */}
 				<div className="flex w-full">
-					<div className="flex w-[calc(50%-15px)] items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-white">
+					<div className="flex w-[calc(50%-15px)] items-center justify-between p-[20px] rounded-[20px] border border-[rgba(145,158,171,0.2)] bg-card">
 						<span className="text-[22px] font-medium text-muted-foreground ">
 							Referensi : Purchase Order/Offering
 						</span>
@@ -136,13 +136,13 @@ export default function FormTambahTransaksi() {
 				<div className="flex h-[70px] w-full items-center justify-between rounded-[10px] border border-[rgba(0,0,0,0.15)] px-[11.3px] py-[0.8px]">
 					<div className="flex items-center gap-[10.5px]">
 						<div className="flex items-center justify-center h-[31px] w-[31px]">
-							<FileText className="h-5 w-5 text-[#A3AED0]" />
+							<FileText className="h-5 w-5 text-muted-foreground" />
 						</div>
 						<div className="flex flex-col">
 							<span className="text-[12.25px] font-medium text-slate-800 font-inter">
 								Sales Orded SO-001
 							</span>
-							<span className="text-[10.5px] font-normal text-slate-500 font-inter">
+							<span className="text-[10.5px] text-slate-500 font-inter">
 								Sales Order • SO-001
 							</span>
 						</div>
@@ -165,7 +165,7 @@ export default function FormTambahTransaksi() {
 				</Label>
 				<Textarea
 					placeholder="Catatan tambahan atau informasi khusus..."
-					className="min-h-[56px] rounded-[10px] border-[0.8px] border-[rgba(0,0,0,0.08)] bg-white px-[10.5px] py-[7px] text-[12.25px] placeholder:text-slate-500 font-inter resize-none focus-visible:ring-1 focus-visible:ring-[#0088ff]"
+					className="min-h-[56px] rounded-[10px] border-[0.8px] border-[rgba(0,0,0,0.08)] bg-card px-[10.5px] py-[7px] text-[12.25px] placeholder:text-slate-500 font-inter resize-none focus-visible:ring-1 focus-visible:ring-[#0088ff]"
 				/>
 			</div>
 		</Card>

@@ -30,7 +30,7 @@ const DUE_POLICY_OPTIONS = [
 // Helper to get color style based on module code (mimicking original)
 const getModuleStyle = (code: string) => {
 	if (["Form 1.0", "KK 2.0", "KK 4.0"].includes(code)) {
-		return { bg: "bg-[#F4F7FE]", textColor: "text-[#332687]" };
+		return { bg: "bg-background", textColor: "text-primary" };
 	}
 	return { bg: "bg-[rgba(255,204,0,0.1)]", textColor: "" };
 };
@@ -87,7 +87,10 @@ export default function ProjectSettingsTab() {
 	});
 
 	const pmoUsers = useMemo(
-		() => (pmoUsersData?.items || []).filter((u: any) => u?.role !== "Admin Tenant"),
+		() =>
+			(pmoUsersData?.items || []).filter(
+				(u: any) => u?.role !== "Admin Tenant",
+			),
 		[pmoUsersData],
 	);
 
@@ -99,7 +102,10 @@ export default function ProjectSettingsTab() {
 	});
 
 	const tenantUsers = useMemo(
-		() => (tenantUsersData?.items || []).filter((u: any) => u?.role !== "Admin Tenant"),
+		() =>
+			(tenantUsersData?.items || []).filter(
+				(u: any) => u?.role !== "Admin Tenant",
+			),
 		[tenantUsersData],
 	);
 
@@ -123,7 +129,8 @@ export default function ProjectSettingsTab() {
 				<div className="mb-5 flex flex-col gap-0 self-stretch">
 					<CardTitle>Team Assignment</CardTitle>
 					<CardDescription className="line-clamp-1 overflow-hidden text-ellipsis text-primary">
-						Pilih modul yang akan dikerjakan dan atur Team Leader / Member untuk setiap modul
+						Pilih modul yang akan dikerjakan dan atur Team Leader / Member untuk
+						setiap modul
 					</CardDescription>
 				</div>
 
@@ -163,7 +170,7 @@ export default function ProjectSettingsTab() {
 									className={`inline-flex items-center justify-center gap-2.5 self-start rounded-[5px] border  px-2.5 py-2.5 ${style.bg}`}
 								>
 									<span
-										className={`font-inter text-xs font-normal leading-normal ${style.textColor}`}
+										className={`font-inter text-xs leading-normal ${style.textColor}`}
 									>
 										{scope}
 									</span>
@@ -278,7 +285,7 @@ export default function ProjectSettingsTab() {
 									value={
 										field.value !== undefined && field.value !== null
 											? String(field.value)
-										: ""
+											: ""
 									}
 								>
 									<SelectTrigger>

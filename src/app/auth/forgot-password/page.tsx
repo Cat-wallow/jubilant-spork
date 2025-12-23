@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
           <h1 className="text-xl font-bold leading-[56px] tracking-[-0.48px] text-navy-700 dark:text-white">
             Lupa kata sandi?
           </h1>
-          <p className="text-sm font-normal leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
+          <p className="text-sm leading-[150%] tracking-[-0.32px] text-gray-700 dark:text-gray-400">
             Masukkan alamat email dan kami akan kirimkan link untuk mereset kata sandi
           </p>
         </div>

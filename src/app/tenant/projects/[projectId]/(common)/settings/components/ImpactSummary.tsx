@@ -9,10 +9,10 @@ export function ImpactSummary() {
 	return (
 		<Card className="h-fit w-full rounded-[20px] ">
 			<CardHeader className="p-[30px]">
-				<CardTitle className="text-2xl font-bold text-[#2B3674]">
+				<CardTitle className="text-2xl font-bold text-primary">
 					Ringkasan Dampak Perubahan
 				</CardTitle>
-				<p className="text-xs leading-4 text-[#2B3674]">
+				<p className="text-xs leading-4 text-primary">
 					Menginformasikan dampak deri setiap konfigurasi yang dilakukan
 				</p>
 			</CardHeader>
@@ -23,9 +23,7 @@ export function ImpactSummary() {
 
 				{/* Modul dan Timeline */}
 				<div className="flex flex-col gap-5">
-					<h3 className="text-base font-semibold text-[#404040]">
-						Modul dan Timeline
-					</h3>
+					<h3 className="text-base font-semibold ">Modul dan Timeline</h3>
 
 					<div className="flex flex-col gap-5">
 						{impactSummary.modules.map((item, index) => (
@@ -34,10 +32,10 @@ export function ImpactSummary() {
 								className="flex items-center justify-between gap-2.5"
 							>
 								<div className="flex flex-1 flex-col gap-[5px]">
-									<span className="text-sm font-medium leading-5 text-[#404040]">
+									<span className="text-sm font-medium leading-5 ">
 										{item.name}
 									</span>
-									<span className="text-xs leading-4 text-[#2B3674]">
+									<span className="text-xs leading-4 text-primary">
 										{item.description}
 									</span>
 								</div>
@@ -50,7 +48,7 @@ export function ImpactSummary() {
 											"rounded-[5px] px-2.5 py-1.5 text-xs font-bold",
 											item.status === "Enabled"
 												? "bg-[#14AE5C] text-white hover:bg-[#14AE5C]/90"
-												: "bg-transparent text-[#404040] hover:bg-transparent",
+												: "bg-transparent  hover:bg-transparent",
 										)}
 									>
 										{item.status}
@@ -66,7 +64,7 @@ export function ImpactSummary() {
 
 				{/* Billing */}
 				<div className="flex flex-col gap-5">
-					<h3 className="text-base font-semibold text-[#404040]">Billing</h3>
+					<h3 className="text-base font-semibold ">Billing</h3>
 
 					<div className="flex flex-col gap-5">
 						{impactSummary.billing.map((item, index) => (
@@ -75,10 +73,10 @@ export function ImpactSummary() {
 								className="flex items-center justify-between gap-2.5"
 							>
 								<div className="flex flex-1 flex-col gap-[5px]">
-									<span className="text-sm font-medium leading-5 text-[#404040]">
+									<span className="text-sm font-medium leading-5 ">
 										{item.name}
 									</span>
-									<span className="text-xs leading-4 text-[#2B3674]">
+									<span className="text-xs leading-4 text-primary">
 										{item.description}
 									</span>
 								</div>
@@ -86,7 +84,7 @@ export function ImpactSummary() {
 									<Badge className="rounded-[5px] bg-[#14AE5C] px-2.5 py-1.5 text-xs font-bold text-white hover:bg-[#14AE5C]/90">
 										{item.days}
 									</Badge>
-									<Badge className="rounded-[5px] bg-transparent px-2.5 py-1.5 text-xs font-bold text-[#404040] hover:bg-transparent">
+									<Badge className="rounded-[5px] bg-transparent px-2.5 py-1.5 text-xs font-bold  hover:bg-transparent">
 										{item.status}
 									</Badge>
 								</div>
@@ -100,7 +98,7 @@ export function ImpactSummary() {
 
 				{/* Reports */}
 				<div className="flex flex-col gap-5">
-					<h3 className="text-base font-semibold text-[#404040]">Reports</h3>
+					<h3 className="text-base font-semibold ">Reports</h3>
 
 					<div className="flex flex-col gap-5">
 						{impactSummary.reports.map((item, index) => (
@@ -109,10 +107,10 @@ export function ImpactSummary() {
 								className="flex items-center justify-between gap-2.5"
 							>
 								<div className="flex flex-1 flex-col gap-[5px]">
-									<span className="text-sm font-medium leading-5 text-[#404040]">
+									<span className="text-sm font-medium leading-5 ">
 										{item.name}
 									</span>
-									<span className="text-xs leading-4 text-[#2B3674]">
+									<span className="text-xs leading-4 text-primary">
 										{item.description}
 									</span>
 								</div>
@@ -120,7 +118,7 @@ export function ImpactSummary() {
 									<Badge className="rounded-[5px] bg-[#14AE5C] px-2.5 py-1.5 text-xs font-bold text-white hover:bg-[#14AE5C]/90">
 										{item.days}
 									</Badge>
-									<Badge className="rounded-[5px] bg-transparent px-2.5 py-1.5 text-xs font-bold text-[#404040] hover:bg-transparent">
+									<Badge className="rounded-[5px] bg-transparent px-2.5 py-1.5 text-xs font-bold  hover:bg-transparent">
 										{item.status}
 									</Badge>
 								</div>

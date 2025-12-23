@@ -42,12 +42,12 @@ export default function TimelinePage() {
 						<h2 className="font-dm text-2xl font-bold leading-8 tracking-[-0.48px] text-primary">
 							Project Timeline
 						</h2>
-						<p className="font-roboto text-xs font-normal leading-4 tracking-[0.4px] text-primary">
+						<p className=" text-xs leading-4 tracking-[0.4px] text-primary">
 							Tinjau dan kelola timeline project
 						</p>
 					</div>
-					<Button className="h-12 rounded-[10px] bg-[#332687] hover:bg-[#241963]">
-						<span className="font-roboto text-sm font-medium leading-5 tracking-[0.1px] text-white">
+					<Button className="h-12 rounded-[10px] bg-primary hover:bg-[#241963]">
+						<span className=" text-sm font-medium leading-5 tracking-[0.1px] text-white">
 							Tambah Tugas
 						</span>
 					</Button>
@@ -66,7 +66,7 @@ export default function TimelinePage() {
 					milestones={milestoneTypes}
 				/>
 
-				<Card className="overflow-hidden border-2 border-[#D9D9D9] rounded-[30px] w-full p-10">
+				<Card className="overflow-hidden border-2  rounded-[30px] w-full p-10">
 					<Tabs
 						value={viewMode}
 						onValueChange={(v) => setViewMode(v as "gantt" | "board")}

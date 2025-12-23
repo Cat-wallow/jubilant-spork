@@ -1099,7 +1099,7 @@ export function CreateClientModal({ open, onClose, onSuccess }: CreateClientModa
                           }}
                           className="rounded border-gray-300"
                         />
-                        <Label htmlFor={`tax-${tax}`} className="text-sm font-normal">
+                        <Label htmlFor={`tax-${tax}`} className="text-sm">
                           {tax}
                         </Label>
                       </div>

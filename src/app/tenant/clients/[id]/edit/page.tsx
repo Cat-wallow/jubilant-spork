@@ -859,7 +859,17 @@ export default function EditClientPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="establishment_date">Tanggal Berdiri</Label>
-                      <Input type="date" id="establishment_date" {...register('establishment_date')} />
+                      <Controller
+                        control={control}
+                        name="establishment_date"
+                        render={({ field }) => (
+                          <DatePicker
+                            value={parseDateString(field.value)}
+                            onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                            placeholder="Pilih tanggal"
+                          />
+                        )}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="employee_count">Jumlah Karyawan</Label>
@@ -1156,7 +1166,11 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Tanggal *</Label>
-                      <Input type="date" />
+                      <DatePicker
+                        value={undefined}
+                        onChange={() => {}}
+                        placeholder="Pilih tanggal"
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -1179,7 +1193,11 @@ export default function EditClientPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Tanggal *</Label>
-                      <Input type="date" />
+                      <DatePicker
+                        value={undefined}
+                        onChange={() => {}}
+                        placeholder="Pilih tanggal"
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -1503,7 +1521,7 @@ export default function EditClientPage() {
                     </p>
                     {watch('use_default_coa') && (
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="px-3 py-1 bg-white dark:bg-slate-800 border rounded-md text-sm">
+                        <span className="px-3 py-1 bg-card dark:bg-slate-800 border rounded-md text-sm">
                           Trading COA Template
                         </span>
                         <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
@@ -1729,7 +1747,7 @@ export default function EditClientPage() {
                       </div>
                       
                       {doc.file_url ? (
-                        <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg border">
+                        <div className="mt-3 p-3 bg-card dark:bg-slate-800 rounded-lg border">
                           <p className="font-medium text-blue-900 dark:text-blue-100">{doc.file_name || 'Dokumen'}</p>
                           <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                             {doc.expiry_date && (
@@ -1804,7 +1822,7 @@ export default function EditClientPage() {
             )}
           </div>
 
-          <div className="w-full h-[70vh] rounded-md border overflow-hidden bg-white">
+          <div className="w-full h-[70vh] rounded-md border overflow-hidden bg-card">
             {previewUrl ? (
               <iframe
                 src={previewUrl}
@@ -1854,11 +1872,10 @@ export default function EditClientPage() {
 
             <div className="space-y-2">
               <Label>Masa Berlaku Hingga (opsional)</Label>
-              <Input 
-                type="date" 
-                value={newDocument.expiry_date}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, expiry_date: e.target.value }))}
-                placeholder="dd/mm/yyyy"
+              <DatePicker
+                value={parseDateString(newDocument.expiry_date)}
+                onChange={(date) => setNewDocument(prev => ({ ...prev, expiry_date: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                placeholder="Pilih tanggal"
               />
             </div>
 
