@@ -1,0 +1,216 @@
+{
+  "stats": [
+    {
+      "id": "total-issues",
+      "icon": "AlertTriangle",
+      "label": "Total Issues",
+      "value": "45",
+      "badge": "3 Critical",
+      "badgeVariant": "critical",
+      "description": "12 warning · 3 critical",
+      "gradient": "from-[#FEF2F2] via-[#FEE2E2] to-[#FECACA]",
+      "iconBg": "rgba(255, 201, 201, 0.40)",
+      "iconColor": "#E7000B",
+      "valueColor": "#82181A",
+      "descColor": "#E7000B"
+    },
+    {
+      "id": "completion-rate",
+      "icon": "CheckCircle2",
+      "label": "Completion Rate",
+      "value": "82%",
+      "badge": "82%",
+      "badgeVariant": "success",
+      "description": "",
+      "gradient": "from-[#ECFDF5] via-[#D1FAE5] to-[#A7F3D0]",
+      "iconBg": "rgba(164, 244, 207, 0.40)",
+      "iconColor": "#009966",
+      "valueColor": "#004F3B",
+      "descColor": "#096",
+      "progress": 82
+    },
+    {
+      "id": "avg-resolution",
+      "icon": "Clock",
+      "label": "Avg Resolution Time",
+      "value": "2.3 days",
+      "badge": "",
+      "badgeVariant": "info",
+      "badgeIcon": "TrendingUp",
+      "description": "15% lebih cepat dari bulan lalu",
+      "gradient": "from-[#EFF6FF] via-[#DBEAFE] to-[#BFDBFE]",
+      "iconBg": "rgba(190, 219, 255, 0.40)",
+      "iconColor": "#155DFC",
+      "valueColor": "#1C398E",
+      "descColor": "#155DFC"
+    },
+    {
+      "id": "under-review",
+      "icon": "AlertCircle",
+      "label": "Sedang Review",
+      "value": "2",
+      "badge": "Review",
+      "badgeVariant": "warning",
+      "description": "Menunggu review tim",
+      "gradient": "from-[#FFF7ED] via-[#FFEDD5] to-[#FED7AA]",
+      "iconBg": "rgba(255, 214, 168, 0.40)",
+      "iconColor": "#F54900",
+      "valueColor": "#7E2A0C",
+      "descColor": "#F54900"
+    }
+  ],
+  "issueTrends": {
+    "title": "Issue Trends",
+    "description": "Monthly analysis performance over time",
+    "data": [
+      {
+        "month": "Jun",
+        "Critical": 13,
+        "Warning": 24,
+        "Resolved": 7
+      },
+      {
+        "month": "Jul",
+        "Critical": 10,
+        "Warning": 21,
+        "Resolved": 15
+      },
+      {
+        "month": "Aug",
+        "Critical": 18,
+        "Warning": 28,
+        "Resolved": 14
+      },
+      {
+        "month": "Sep",
+        "Critical": 7,
+        "Warning": 19,
+        "Resolved": 22
+      },
+      {
+        "month": "Oct",
+        "Critical": 3,
+        "Warning": 14,
+        "Resolved": 27
+      }
+    ],
+    "lines": [
+      {
+        "dataKey": "Critical",
+        "stroke": "#F5222D",
+        "name": "Critical"
+      },
+      {
+        "dataKey": "Warning",
+        "stroke": "#FAAD14",
+        "name": "Warning"
+      },
+      {
+        "dataKey": "Resolved",
+        "stroke": "#52C41A",
+        "name": "Resolved"
+      }
+    ]
+  },
+  "analysisModules": [
+    {
+      "id": "kk-4-1",
+      "badge": "KK 4.1",
+      "title": "Rekonsiliasi Fiskal",
+      "description": "Koreksi fiskal positif/negatif",
+      "status": "OK",
+      "statusVariant": "success",
+      "icon": "FileText",
+      "iconBg": "#F6FFED",
+      "iconColor": "#52C41A",
+      "lastRun": "2025-10-14 09:30",
+      "link": "/tenant/projects/{projectId}/kk4/reconsiliation"
+    },
+    {
+      "id": "kk-4-2",
+      "badge": "KK 4.2",
+      "title": "Equalisasi SPT vs LK",
+      "description": "Perbandingan SPT dengan Laporan Keuangan",
+      "status": "2 issues",
+      "statusVariant": "warning",
+      "icon": "FileSpreadsheet",
+      "iconBg": "#FFFBE6",
+      "iconColor": "#FAAD14",
+      "lastRun": "2025-10-14 10:15"
+    },
+    {
+      "id": "kk-4-3",
+      "badge": "KK 4.3",
+      "title": "Equalisasi antar SPT",
+      "description": "Konsistensi data antar jenis SPT",
+      "status": "1 issue",
+      "statusVariant": "warning",
+      "icon": "Receipt",
+      "iconBg": "#FFFBE6",
+      "iconColor": "#FAAD14",
+      "lastRun": "2025-10-14 10:45"
+    },
+    {
+      "id": "kk-4-4",
+      "badge": "KK 4.4",
+      "title": "Uji Arus Uang",
+      "description": "Validasi penjualan → kas → piutang",
+      "status": "OK",
+      "statusVariant": "success",
+      "icon": "DollarSign",
+      "iconBg": "#F6FFED",
+      "iconColor": "#52C41A",
+      "lastRun": "2025-10-14 11:20"
+    },
+    {
+      "id": "kk-4-5",
+      "badge": "KK 4.5",
+      "title": "Uji Arus Barang",
+      "description": "Validasi pembelian → persediaan → HPP",
+      "status": "OK",
+      "statusVariant": "success",
+      "icon": "Package",
+      "iconBg": "#F6FFED",
+      "iconColor": "#52C41A",
+      "lastRun": "2025-10-14 11:50"
+    }
+  ],
+  "recentIssues": [
+    {
+      "id": "1",
+      "module": "KK 4.2",
+      "status": "IN REVIEW",
+      "statusVariant": "info",
+      "title": "Selisih PPN Masa dengan Penjualan di Laba Rugi",
+      "assignedTo": "Jane Smith",
+      "variance": "Rp 45.000.000",
+      "icon": "AlertCircle",
+      "iconColor": "#FAAD14",
+      "iconBg": "#FFFBE6"
+    },
+    {
+      "id": "2",
+      "module": "KK 4.3",
+      "status": "OPEN",
+      "statusVariant": "neutral",
+      "title": "Inkonsistensi DPP antara SPT PPN dan SPT PPh",
+      "assignedTo": "John Doe",
+      "variance": "Rp 28.000.000",
+      "icon": "AlertCircle",
+      "iconColor": "#FAAD14",
+      "iconBg": "#FFFBE6"
+    },
+    {
+      "id": "3",
+      "module": "KK 4.2",
+      "status": "RESOLVED",
+      "statusVariant": "success",
+      "title": "Selisih kecil pembulatan pajak",
+      "assignedTo": "Mike Johnson",
+      "variance": "Rp 5.000",
+      "icon": "CheckCircle",
+      "iconColor": "#1890FF",
+      "iconBg": "#E6F7FF"
+    }
+  ]
+}
