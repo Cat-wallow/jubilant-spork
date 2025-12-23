@@ -1,0 +1,177 @@
+{
+  "stats": {
+    "qcProgress": {
+      "label": "QC Progress",
+      "percentage": 50,
+      "completed": 2,
+      "total": 4,
+      "icon": "checkCircle",
+      "bgColor": "bg-blue-100",
+      "iconColor": "text-blue-600"
+    },
+    "bastApproved": {
+      "label": "BAST Approved",
+      "count": 1,
+      "sublabel": "Documents",
+      "icon": "checkCircle",
+      "bgColor": "bg-green-100",
+      "iconColor": "text-green-600"
+    },
+    "invoiceApproved": {
+      "label": "Invoice Approved",
+      "count": 0,
+      "sublabel": "Documents",
+      "icon": "checkCircle",
+      "bgColor": "bg-purple-100",
+      "iconColor": "text-purple-600"
+    }
+  },
+  "overview": {
+    "title": "Checklist Validasi QC Dinamis",
+    "description": "Checklist otomatis disesuaikan dengan modul yang aktif dalam project ini",
+    "projectScope": {
+      "title": "Project Scope",
+      "titleColor": "text-blue-700",
+      "bgColor": "bg-blue-50",
+      "items": [
+        "Form 1.0 - Compliance Documentation",
+        "KK 1.0 - Transaction Management",
+        "KK 2.0 - Accounting System",
+        "KK 3.0 - Tax Management"
+      ]
+    },
+    "progressSummary": {
+      "title": "Progress Summary",
+      "titleColor": "text-green-700",
+      "bgColor": "bg-green-50",
+      "percentage": 50,
+      "summary": "2 dari 4 item selesai",
+      "summaryColor": "text-green-600"
+    },
+    "userRole": {
+      "title": "Your Role",
+      "titleColor": "text-orange-700",
+      "bgColor": "bg-orange-50",
+      "role": "PMO",
+      "roleColor": "text-orange-600",
+      "permission": "Can edit QC items",
+      "permissionColor": "text-orange-500"
+    }
+  },
+  "checklistItems": [
+    {
+      "id": "form-1.0",
+      "number": 1,
+      "title": "Form 1.0 - Compliance Documentation",
+      "description": "Verifikasi kelengkapan dokumentasi compliance dan workflow approval",
+      "status": "Complete",
+      "statusColor": "bg-green-100",
+      "statusTextColor": "text-green-700",
+      "icon": "checkCircle",
+      "iconColor": "text-green-600",
+      "completedDate": "2024-01-10",
+      "reviewedBy": "Ketua Tim A",
+      "validationChecklist": [
+        {
+          "id": "check-1",
+          "label": "Semua dokumen wajib telah diserahkan",
+          "checked": true
+        },
+        {
+          "id": "check-2",
+          "label": "Data keuangan telah divalidasi",
+          "checked": true
+        },
+        {
+          "id": "check-3",
+          "label": "Kepatuhan pajak telah diverifikasi",
+          "checked": true
+        },
+        {
+          "id": "check-4",
+          "label": "Persyaratan hukum telah dipenuhi",
+          "checked": false
+        },
+        {
+          "id": "check-5",
+          "label": "Standar kualitas telah dikonfirmasi",
+          "checked": false
+        },
+        {
+          "id": "check-6",
+          "label": "Persetujuan stakeholder telah diperoleh",
+          "checked": false
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "kk-1.0",
+      "number": 2,
+      "title": "KK 1.0 - Transaction Management",
+      "description": "Verifikasi sistem transaksi, voucher, dan audit trail",
+      "status": "Complete",
+      "statusColor": "bg-green-100",
+      "statusTextColor": "text-green-700",
+      "icon": "checkCircle",
+      "iconColor": "text-green-600",
+      "validationChecklist": [
+        {
+          "id": "check-1",
+          "label": "Semua dokumen wajib telah diserahkan",
+          "checked": true
+        },
+        {
+          "id": "check-2",
+          "label": "Data keuangan telah divalidasi",
+          "checked": true
+        },
+        {
+          "id": "check-3",
+          "label": "Kepatuhan pajak telah diverifikasi",
+          "checked": true
+        },
+        {
+          "id": "check-4",
+          "label": "Persyaratan hukum telah dipenuhi",
+          "checked": true
+        },
+        {
+          "id": "check-5",
+          "label": "Standar kualitas telah dikonfirmasi",
+          "checked": true
+        },
+        {
+          "id": "check-6",
+          "label": "Persetujuan stakeholder telah diperoleh",
+          "checked": true
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "kk-2.0",
+      "number": 3,
+      "title": "KK 2.0 - General Ledger & Financial Statements",
+      "description": "Verifikasi COA, jurnal otomatis, dan laporan keuangan",
+      "status": "Pending",
+      "statusColor": "bg-amber-100",
+      "statusTextColor": "text-amber-700",
+      "icon": "clockCircle",
+      "iconColor": "text-amber-600",
+      "notes": ""
+    },
+    {
+      "id": "kk-3.0",
+      "number": 4,
+      "title": "KK 3.0 - Tax Management System",
+      "description": "Verifikasi perhitungan pajak, SPT generation, dan export CoreTax",
+      "status": "Need Correction",
+      "statusColor": "bg-red-100",
+      "statusTextColor": "text-red-700",
+      "icon": "alertCircle",
+      "iconColor": "text-red-600",
+      "notes": "Ditemukan perbedaan kecil pada PPh 23, perlu disesuaikan"
+    }
+  ]
+}
