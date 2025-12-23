@@ -1,0 +1,143 @@
+{
+  "header": {
+    "title": "BAST Management",
+    "description": "Pengelolaan Berita Acara Serah Terima untuk deliverable layanan konsultan pajak"
+  },
+  "stats": {
+    "totalBast": {
+      "label": "Total BAST",
+      "value": 1,
+      "sublabel": "Documents",
+      "bgColor": "bg-blue-50",
+      "labelColor": "text-blue-700",
+      "valueColor": "text-blue-600",
+      "sublabelColor": "text-blue-600"
+    },
+    "approved": {
+      "label": "Approved",
+      "value": 1,
+      "sublabel": "Ready for Invoice",
+      "bgColor": "bg-green-50",
+      "labelColor": "text-green-700",
+      "valueColor": "text-green-600",
+      "sublabelColor": "text-green-600"
+    },
+    "totalValue": {
+      "label": "Total Value",
+      "value": "Rp 75.000.000",
+      "sublabel": "All BAST",
+      "bgColor": "bg-purple-50",
+      "labelColor": "text-purple-700",
+      "valueColor": "text-purple-700",
+      "sublabelColor": "text-purple-600"
+    }
+  },
+  "bastTable": {
+    "title": "Berita Acara Serah Terima (BAST)",
+    "subtitle": "Kelola Invoice di dalam Project",
+    "rows": [
+      {
+        "id": "bast-001",
+        "bastId": "BAST/PRJ-2024-12-1",
+        "date": "2024-10-10",
+        "description": "BAST Laporan Keuangan Q1",
+        "status": "Signed",
+        "statusColor": "bg-green-100",
+        "statusTextColor": "text-green-700",
+        "signedBy": "PIC - 123",
+        "due": "200 days",
+        "dueColor": "bg-amber-100",
+        "dueTextColor": "text-amber-700"
+      },
+      {
+        "id": "bast-002",
+        "bastId": "BAST/PRJ-2024-12-1",
+        "date": "2024-10-10",
+        "description": "BAST Dokumen Pajak",
+        "status": "Pending",
+        "statusColor": "bg-amber-100",
+        "statusTextColor": "text-gray-700",
+        "signedBy": "PIC - 123",
+        "due": "200 days",
+        "dueColor": "bg-amber-100",
+        "dueTextColor": "text-amber-700"
+      },
+      {
+        "id": "bast-003",
+        "bastId": "BAST/PRJ-2024-12-1",
+        "date": "2024-10-10",
+        "description": "BAST Audit Internat",
+        "status": "Pending",
+        "statusColor": "bg-amber-100",
+        "statusTextColor": "text-gray-700",
+        "signedBy": "PIC - 123",
+        "due": "200 days",
+        "dueColor": "bg-amber-100",
+        "dueTextColor": "text-amber-700"
+      },
+      {
+        "id": "bast-004",
+        "bastId": "BAST/PRJ-2024-12-1",
+        "date": "2024-10-10",
+        "description": "BAST Laporan Keuangan Q2",
+        "status": "Signed",
+        "statusColor": "bg-green-100",
+        "statusTextColor": "text-green-700",
+        "signedBy": "PIC - 123",
+        "due": "200 days",
+        "dueColor": "bg-amber-100",
+        "dueTextColor": "text-amber-700"
+      },
+      {
+        "id": "bast-005",
+        "bastId": "BAST/PRJ-2024-12-1",
+        "date": "2024-10-10",
+        "description": "BAST Laporan Keuangan Q3",
+        "status": "Pending",
+        "statusColor": "bg-amber-100",
+        "statusTextColor": "text-gray-700",
+        "signedBy": "PIC - 123",
+        "due": "200 days",
+        "dueColor": "bg-amber-100",
+        "dueTextColor": "text-amber-700"
+      }
+    ]
+  },
+  "template": {
+    "title": "Template & Standar BAST",
+    "components": {
+      "title": "Komponen BAST Standar",
+      "items": [
+        "Header dengan nomor auto-generate",
+        "Identitas klien dan konsultan",
+        "Daftar deliverable per layanan",
+        "Tanda tangan digital/manual"
+      ]
+    },
+    "deliverables": {
+      "title": "Deliverable per Layanan",
+      "items": [
+        {
+          "service": "SIM (Form 1.0 & KK 1.0)",
+          "description": "Dokumentasi compliance & transaction management",
+          "color": "text-blue-600"
+        },
+        {
+          "service": "SIA (KK 2.0)",
+          "description": "General ledger & financial statements",
+          "color": "text-green-600"
+        },
+        {
+          "service": "SIP (KK 3.0)",
+          "description": "Tax management & SPT generation",
+          "color": "text-purple-600"
+        },
+        {
+          "service": "AKPAJ (KK 4.0)",
+          "description": "Audit findings & quality control",
+          "color": "text-orange-600"
+        }
+      ]
+    }
+  }
+}
