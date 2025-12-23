@@ -1,0 +1,101 @@
+{
+  "stats": [
+    {
+      "id": "total-runs",
+      "icon": "FileText",
+      "label": "Total Runs",
+      "value": "3",
+      "badge": "+12.5%",
+      "badgeVariant": "success",
+      "description": "Dari 1771-I",
+      "gradient": "from-[#ECFDF5] via-[#D1FAE5] to-[#A7F3D0]",
+      "iconBg": "rgba(164, 244, 207, 0.40)",
+      "iconColor": "#009966",
+      "valueColor": "#004F3B",
+      "descColor": "#096"
+    },
+    {
+      "id": "under-review",
+      "icon": "Eye",
+      "label": "Sedang Review",
+      "value": "1",
+      "badge": "PKP",
+      "badgeVariant": "info",
+      "description": "Menunggu persetujuan",
+      "gradient": "from-[#EFF6FF] via-[#DBEAFE] to-[#BFDBFE]",
+      "iconBg": "rgba(190, 219, 255, 0.40)",
+      "iconColor": "#155DFC",
+      "valueColor": "#1C398E",
+      "descColor": "#155DFC"
+    },
+    {
+      "id": "locked",
+      "icon": "Lock",
+      "label": "Terkunci",
+      "value": "1",
+      "badge": "22%",
+      "badgeVariant": "purple",
+      "description": "23% × PKP",
+      "gradient": "from-[#FAF5FF] via-[#F3E8FF] to-[#E9D5FF]",
+      "iconBg": "rgba(233, 212, 255, 0.40)",
+      "iconColor": "#9810FA",
+      "valueColor": "#59168B",
+      "descColor": "#9810FA"
+    },
+    {
+      "id": "total-impact",
+      "icon": "AlertTriangle",
+      "label": "Total Dampak",
+      "value": "Rp 534.500.000",
+      "badge": "Due",
+      "badgeVariant": "warning",
+      "description": "Harus dibayar",
+      "gradient": "from-[#FFF7ED] via-[#FFEDD5] to-[#FED7AA]",
+      "iconBg": "rgba(255, 214, 168, 0.40)",
+      "iconColor": "#F54900",
+      "valueColor": "#7E2A0C",
+      "descColor": "#F54900"
+    }
+  ],
+  "reconciliationRuns": [
+    {
+      "id": "FR-2025-001",
+      "version": "v3",
+      "period": "Jan-Sep 2025",
+      "status": "Locked",
+      "statusVariant": "success",
+      "statusIcon": "Lock",
+      "adjustments": 12,
+      "netImpact": "Rp 252.500.000",
+      "createdBy": "John Doe",
+      "createdAt": "2025-10-01 14:30",
+      "locked": true
+    },
+    {
+      "id": "FR-2025-002",
+      "version": "v2",
+      "period": "Q3 2025",
+      "status": "In Review",
+      "statusVariant": "warning",
+      "statusIcon": "Eye",
+      "adjustments": 8,
+      "netImpact": "Rp 187.000.000",
+      "createdBy": "John Doe",
+      "createdAt": "2025-10-10 09:15",
+      "locked": false
+    },
+    {
+      "id": "FR-2025-003",
+      "version": "v1",
+      "period": "Sep 2025",
+      "status": "Draft",
+      "statusVariant": "neutral",
+      "statusIcon": "Clock",
+      "adjustments": 5,
+      "netImpact": "Rp 95.000.000",
+      "createdBy": "Mike Johnson",
+      "createdAt": "2025-10-14 10:20",
+      "locked": false
+    }
+  ]
+}
