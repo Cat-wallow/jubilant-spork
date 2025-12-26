@@ -2,34 +2,45 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calculator, CircleCheck, File, FileText } from "lucide-react";
 import OverviewTab from "./components/OverviewTab";
-import DocumentTab from "./components/DocumentTab";
+import ExpensesTab from "./components/ExpensesTab";
+import WittholdingTaxTab from "./components/WittholdingTaxTab";
 
 export default function Form1771IVPage() {
 	return (
 		<div className="flex flex-col gap-[30px]">
 			<div className="space-y-8 rounded-2xl  p-6">
-				<Tabs defaultValue="overview" className="w-full">
+				<Tabs defaultValue="Overview" className="w-full">
 					<TabsList className="w-full rounded-2xl bg-gray-200">
 						<TabsTrigger
-							value="overview"
+							value="Overview"
 							className="flex-1 gap-2 items-center rounded-2xl"
 						>
-							Overview
+							Overview by pasal
 						</TabsTrigger>
 						<TabsTrigger
-							value="document"
+							value="Expenses"
 							className="flex-1 gap-2 items-center rounded-2xl"
 						>
-							Document
+							Journal Expenses
+						</TabsTrigger>
+						<TabsTrigger
+							value="WittholdingTax"
+							className="flex-1 gap-2 items-center rounded-2xl"
+						>
+							Bukti Potong
 						</TabsTrigger>
 					</TabsList>
 
-					<TabsContent value="overview">
+					<TabsContent value="Overview">
 						<OverviewTab />
 					</TabsContent>
 
-					<TabsContent value="document">
-						<DocumentTab />
+					<TabsContent value="Expenses">
+						<ExpensesTab />
+					</TabsContent>
+
+					<TabsContent value="WittholdingTax">
+						<WittholdingTaxTab />
 					</TabsContent>
 				</Tabs>
 			</div>
