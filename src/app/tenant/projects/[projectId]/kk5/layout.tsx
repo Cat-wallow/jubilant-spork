@@ -17,6 +17,10 @@ export default function KK2Layout({ children }: { children: React.ReactNode }) {
 	const projectId = params.projectId as string;
 
 	return (
+	<>
+	{pathname.includes("kk5/bast/") || pathname.includes("kk5/qr/") || pathname.includes("kk5/invoice/") ? (
+		children
+	) : (
 		<div className="flex flex-col gap-[30px]  px-2 ">
 			<div className="flex flex-col gap-[5px]">
 				<h1 className="text-[34px] font-bold leading-[42px] tracking-[-0.68px] ">
@@ -46,5 +50,7 @@ export default function KK2Layout({ children }: { children: React.ReactNode }) {
 
 			{children}
 		</div>
+	)}
+	</>
 	);
 }
