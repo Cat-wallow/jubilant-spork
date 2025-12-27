@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calculator, CircleCheck, File, FileText } from "lucide-react";
+import SummaryCard from "./components/SummaryCard";
 import OverviewTab from "./components/OverviewTab";
 import ExpensesTab from "./components/ExpensesTab";
 import WittholdingTaxTab from "./components/WittholdingTaxTab";
@@ -8,7 +9,9 @@ import WittholdingTaxTab from "./components/WittholdingTaxTab";
 export default function Form1771IVPage() {
 	return (
 		<div className="flex flex-col gap-[30px]">
-			<div className="space-y-8 rounded-2xl  p-6">
+			<SummaryCard />
+
+			<div className="space-y-8 rounded-2xl p-6">
 				<Tabs defaultValue="Overview" className="w-full">
 					<TabsList className="w-full rounded-2xl bg-gray-200">
 						<TabsTrigger
