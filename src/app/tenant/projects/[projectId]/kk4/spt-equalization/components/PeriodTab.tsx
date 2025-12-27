@@ -12,20 +12,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Eye, Search, Filter } from "lucide-react";
-import { journalExpensesData } from "../data";
+import { periodTabData } from "../data";
 
-export default function ExpensesTab() {
+export default function PeriodTab() {
   return (
-    <div className="mt-6 space-y-4">
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold text-slate-900">
-          4.2.3.2 Journal Expenses Requiring Withholding
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          Transactions that trigger PPh withholding obligations
-        </p>
-      </div>
+    <div className="mt-6 space-y-6">
+      {/* Card Header */}
+      <Card className="border border-slate-200 bg-white">
+        <CardContent className="p-[24px]">
+          <div className="flex flex-col gap-2">
+            <h3 className="text-2xl font-bold text-slate-900">
+              Perbandingan Per Masa Pajak
+            </h3>
+            <p className="text-sm text-slate-500">
+              Detil perbandingan omzet PPh Badan dengan DPP PPN Keluaran per bulan
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Filter Section */}
       <Card className="border border-slate-200">
         <CardContent className="pt-6">
           <div className="mb-6 flex items-center gap-4 rounded-xl bg-slate-100 p-3">
@@ -55,8 +61,8 @@ export default function ExpensesTab() {
               <SelectContent>
                 <SelectItem value="all-status">All Status</SelectItem>
                 <SelectItem value="ok">OK</SelectItem>
-                <SelectItem value="under">Under Withholding</SelectItem>
-                <SelectItem value="missing">Missing Bukpot</SelectItem>
+                <SelectItem value="warning">Warning</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
               </SelectContent>
             </Select>
 
@@ -66,9 +72,8 @@ export default function ExpensesTab() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-type">All Type</SelectItem>
-                <SelectItem value="pph21">PPh 21</SelectItem>
-                <SelectItem value="pph23">PPh 23</SelectItem>
-                <SelectItem value="pph4_2">PPh 4(2)</SelectItem>
+                <SelectItem value="ok">OK</SelectItem>
+                <SelectItem value="warning">Warning</SelectItem>
               </SelectContent>
             </Select>
 
@@ -86,105 +91,98 @@ export default function ExpensesTab() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    Journal Ref
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    Account
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    Description
+                    Masa Pajak
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
-                    Amount
+                    Omzet PPh (SPT 1771)
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
+                    DPP PPN Keluaran (SPT 1111)
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
+                    Selisih
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
-                    Pasal
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
-                    Expected PPh
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
-                    Actual PPh
+                    Rasio
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
                     Status
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
-                    Action
+                    Justifikasi
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
+                    Aksi
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {journalExpensesData.map((item, index) => (
+                {periodTabData.map((item, index) => (
                   <tr
-                    key={item.id}
+                    key={index}
                     className={`border-b border-slate-200 ${
-                      item.status === "Under Withholding"
-                        ? "bg-orange-50/30"
-                        : item.status === "Missing Bukpot"
+                      item.status === "Warning"
+                        ? "bg-amber-50/30"
+                        : item.status === "Critical"
                           ? "bg-red-50/30"
                           : ""
                     }`}
                   >
-                    <td className="px-4 py-3 text-sm font-mono text-slate-900">
-                      {item.journalRef}
-                    </td>
                     <td className="px-4 py-3 text-sm text-slate-900">
-                      {item.date}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-1">
-                        <p className="text-sm font-mono text-slate-900">
-                          {item.account}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {item.accountName}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-900">
-                      {item.description}
+                      {item.masaPajak}
                     </td>
                     <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
-                      {item.amount}
+                      {item.omzetPph}
+                    </td>
+                    <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
+                      {item.dppPpn}
+                    </td>
+                    <td
+                      className="px-4 py-3 text-right text-sm font-mono font-bold"
+                      style={{ color: item.selisih === "Rp 5.000.000" || item.selisih === "Rp 2.000.000" ? "#52C41A" : "#FAAD14" }}
+                    >
+                      {item.selisih}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <Badge className="bg-slate-100 text-slate-900 border border-slate-300">
+                        {item.rasio}
+                      </Badge>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <Badge
                         style={{
-                          backgroundColor: item.pasalColor,
-                          borderColor: item.pasalBorder,
-                          color: item.pasalText,
+                          backgroundColor:
+                            item.status === "OK"
+                              ? "#F6FFED"
+                              : item.status === "Warning"
+                                ? "#FFFBE6"
+                                : "#FFF1F0",
+                          borderColor:
+                            item.status === "OK"
+                              ? "#52C41A"
+                              : item.status === "Warning"
+                                ? "#FAAD14"
+                                : "#F5222D",
+                          color:
+                            item.status === "OK"
+                              ? "#52C41A"
+                              : item.status === "Warning"
+                                ? "#FAAD14"
+                                : "#F5222D",
                           border: "1px solid",
                         }}
                         className="text-xs font-medium"
                         variant="outline"
                       >
-                        {item.pasal}
+                        {item.status}
                       </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
-                      {item.expectedPph}
-                    </td>
-                    <td
-                      className="px-4 py-3 text-right text-sm font-mono font-bold"
-                      style={{ color: item.actualPphColor }}
-                    >
-                      {item.actualPph}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <Badge
-                        style={{
-                          backgroundColor: item.statusColor,
-                          borderColor: item.statusBorder,
-                          border: "1px solid",
-                        }}
-                        className="text-xs font-medium text-slate-700"
+                        className="bg-slate-100 text-slate-700 border border-slate-300"
                         variant="outline"
                       >
-                        {item.statusIcon} {item.status}
+                        {item.justifikasi}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-center">

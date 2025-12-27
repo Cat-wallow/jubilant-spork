@@ -11,21 +11,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Search, Filter } from "lucide-react";
-import { buktiPotongData } from "../data";
+import { Eye, Search, Filter, AlertCircle } from "lucide-react";
+import { pphTabData, inconsistenciesData } from "../data";
 
-export default function WittholdingTaxTab() {
+export default function PphTab() {
   return (
-    <div className="mt-6 space-y-4">
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold text-slate-900">
-          4.2.3.3 Bukti Potong Records
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          All withholding tax certificates issued
-        </p>
-      </div>
+    <div className="mt-6 space-y-6">
+      {/* Card Header */}
+      <Card className="border border-slate-200 bg-white">
+        <CardContent className="p-[24px]">
+          <div className="flex flex-col gap-2">
+            <h3 className="text-2xl font-bold text-slate-900">
+              Perbandingan Per Jenis PPh
+            </h3>
+            <p className="text-sm text-slate-500">
+              Detil perbandingan biaya dengan bukti potong per jenis PPh
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Filter Section */}
       <Card className="border border-slate-200">
         <CardContent className="pt-6">
           <div className="mb-6 flex items-center gap-4 rounded-xl bg-slate-100 p-3">
@@ -54,9 +60,9 @@ export default function WittholdingTaxTab() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-status">All Status</SelectItem>
-                <SelectItem value="ok">OK</SelectItem>
-                <SelectItem value="under">Under Withholding</SelectItem>
-                <SelectItem value="over">Over Withholding</SelectItem>
+                <SelectItem value="matched">Matched</SelectItem>
+                <SelectItem value="mismatch">Mismatch</SelectItem>
+                <SelectItem value="missing">Missing Bukti</SelectItem>
               </SelectContent>
             </Select>
 
@@ -68,6 +74,7 @@ export default function WittholdingTaxTab() {
                 <SelectItem value="all-type">All Type</SelectItem>
                 <SelectItem value="pph21">PPh 21</SelectItem>
                 <SelectItem value="pph23">PPh 23</SelectItem>
+                <SelectItem value="pph26">PPh 26</SelectItem>
                 <SelectItem value="pph4_2">PPh 4(2)</SelectItem>
               </SelectContent>
             </Select>
@@ -86,100 +93,77 @@ export default function WittholdingTaxTab() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    No. Bukti Potong
+                    Jenis PPh
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    Tanggal
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
+                    Nilai Biaya (PPh Badan)
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
+                    Nilai Bukti Potong (P2PPh)
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
+                    Selisih
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
-                    Pasal
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    NPWP
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                    Wajib Pajak
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
-                    DPP
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
-                    Tarif
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">
-                    PPh
+                    Jumlah Item
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
                     Status
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">
-                    Action
+                    Aksi
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {buktiPotongData.map((item) => (
+                {pphTabData.map((item, index) => (
                   <tr
-                    key={item.id}
+                    key={index}
                     className={`border-b border-slate-200 ${
-                      item.status === "Under Withholding"
-                        ? "bg-orange-50/30"
-                        : ""
+                      item.status === "Mismatch"
+                        ? "bg-red-50/30"
+                        : item.status === "Missing Bukti"
+                          ? "bg-amber-50/30"
+                          : ""
                     }`}
                   >
-                    <td className="px-4 py-3 text-sm font-mono text-slate-900">
-                      {item.buktiPotongNo}
+                    <td className="px-4 py-3 text-sm font-medium text-slate-900">
+                      {item.jenisPph}
                     </td>
-                    <td className="px-4 py-3 text-sm text-slate-900">
-                      {item.tanggal}
+                    <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
+                      {item.nilaiRp}
+                    </td>
+                    <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
+                      {item.nilaiRpPotong}
+                    </td>
+                    <td
+                      className="px-4 py-3 text-right text-sm font-mono font-bold"
+                      style={{ color: item.selisihColor }}
+                    >
+                      {item.selisih}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex gap-2 justify-center">
+                        <Badge className="bg-slate-100 text-slate-900 border border-slate-300 text-xs">
+                          {item.jumlahItem.split(",")[0]}
+                        </Badge>
+                        <Badge className="bg-slate-100 text-slate-900 border border-slate-300 text-xs">
+                          {item.jumlahItem.split(",")[1]}
+                        </Badge>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <Badge
                         style={{
-                          backgroundColor: item.pasalColor,
-                          borderColor: item.pasalBorder,
-                          color: item.pasalText,
+                          backgroundColor: item.statusBg,
+                          borderColor: item.statusColor,
+                          color: item.statusColor,
                           border: "1px solid",
                         }}
                         className="text-xs font-medium"
                         variant="outline"
                       >
-                        {item.pasal}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-mono text-slate-900">
-                      {item.npwp}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-1">
-                        <p className="text-sm text-slate-900">
-                          {item.wajibPajak}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          Journal: {item.journal}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
-                      {item.dpp}
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm text-slate-900">
-                      {item.tarif}
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm font-mono text-slate-900">
-                      {item.pph}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Badge
-                        style={{
-                          backgroundColor: item.statusColor,
-                          borderColor: item.statusBorder,
-                          border: "1px solid",
-                        }}
-                        className="text-xs font-medium text-slate-700"
-                        variant="outline"
-                      >
-                        {item.statusIcon} {item.status}
+                        {item.status === "Matched" ? "✓" : item.status === "Mismatch" ? "✗" : "⚠"} {item.status}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -195,6 +179,60 @@ export default function WittholdingTaxTab() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Mismatch Detection Card */}
+      <Card className="border-2 border-red-300 bg-white">
+        <CardContent className="p-[24px]">
+          <div className="flex items-start gap-3 mb-6">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-base font-semibold text-slate-900">
+                Mismatch Terdeteksi
+              </h4>
+              <p className="text-sm text-slate-600">
+                Item yang memerlukan perhatian dan tindakan segera
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {inconsistenciesData.items.map((issue) => (
+              <div key={issue.id} className="flex items-start justify-between gap-4 p-3 border border-slate-200 rounded-lg">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge
+                      style={{
+                        backgroundColor: issue.badge.includes("Perbedaan") ? "#FFF1F0" : "#FFFBE6",
+                        borderColor: issue.badge.includes("Perbedaan") ? "#F5222D" : "#FAAD14",
+                        color: issue.badge.includes("Perbedaan") ? "#F5222D" : "#FAAD14",
+                        border: "1px solid",
+                      }}
+                      className="text-xs font-medium"
+                      variant="outline"
+                    >
+                      {issue.badge}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-slate-900 font-medium">
+                    {issue.title}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {issue.id}
+                  </p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm font-bold text-red-600">
+                    {issue.impact}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    dampak
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
